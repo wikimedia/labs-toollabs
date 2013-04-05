@@ -1,0 +1,11 @@
+Package: Jobutils
+Version: 1.0.0
+Section: universe/utils
+Priority: optional
+Architecture: all
+Essential: no
+Depends: perl, gridengine-common
+Installed-Size: 9
+Maintainer: Marc-André Pelletier <marc@wikimedia.org>, Petr Bena <benapetr@gmail.com>
+Description: Set of utilities to use on wikimedia bots and tools cluster
+ This package will install jstart (jsub) and jstop, which can be used with GE

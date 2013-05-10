@@ -1,5 +1,7 @@
 #! /usr/bin/perl
 
+use String::ShellQuote;
+
 my %qsubargs = (
        '-a' => 1, '-b' => 1, '-cwd' => 0, '-e' => 1, '-hard' => 0, '-i' => 1, '-j' => 1,
        '-l' => 1, '-now' => 1, '-N' => 1, '-o' => 1, '-p' => 1, '-q' => 1, '-soft' => 0,
@@ -111,9 +113,9 @@ push @args, '-N', $jobname, '-hard', '-l', "h_vmem=$memory";
 
 if($continuous) {
   push @args, '-q', 'continuous';
-  open QSUB, "|/usr/bin/qsub '".join("' '", @args)."'" or die "\[$now\] unable to start qsub: $!\n";
-  print QSUB "#! /bin/bash\n";
-  print QSUB "while ! '$prog' '".join("' '", @ARGV)."' ; do\n";
+  open QSUB, '|-', '/usr/bin/qsub', @args or die "\[$now\] unable to start qsub: $!\n";
+  print QSUB "#!/bin/bash\n";
+  print QSUB "while ! " . shell_quote($prog, @ARGV) . "; do\n";
   print QSUB "  sleep 5\n";
   print QSUB "done\n";
   close QSUB;

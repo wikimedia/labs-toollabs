@@ -6,6 +6,20 @@ use warnings;
 use IPC::Run qw(harness run);
 use String::ShellQuote;
 
+sub memparse_kb {
+  # parses an XXK, XXm, XXg to the # of kilobytes
+  $arg = $_[0];
+  if ($arg =~ m/^([1-9][0-9]*)([mgk])$/i) {
+    $amount = $1;
+    $unit = $2;
+    if($unit =~ m/[mg]/i) {$amount *= 1024};
+    if($unit =~ m/[g]/i) {$amount *= 1024};
+  } else {
+    die "$script: memory value must be an integer followed by 'k', 'm' or 'g': $_[0]\n";
+  }
+  return $amount;
+}
+
 my %qsubargs = (
        '-a' => 1, '-b' => 1, '-cwd' => 0, '-e' => 1, '-hard' => 0, '-i' => 1, '-j' => 1,
        '-l' => 1, '-now' => 1, '-N' => 1, '-o' => 1, '-p' => 1, '-q' => 1, '-soft' => 0,
@@ -14,7 +28,7 @@ my %qsubargs = (
 );
 my %qsargs;
 my @args;
-my $memory = '256m';
+my $memory = memparse_kb('256M');
 my $once = 0;
 my $stderr = 0;
 my $continuous = 0;
@@ -24,6 +38,7 @@ my $queue = 'task';
 $script = $1 if $script =~ m{/([^/]+)$};
 
 $continuous = $once = 1 if ($script eq 'jstart');
+$once = 1 if $script eq 'qcronsub';
 
 my @options;
 while($#ARGV > 0) {
@@ -50,7 +65,7 @@ Options include many (but not all) qsub options, along with:
                    (number prefixed by 'k', 'm' or 'g')
  -once             Only start one job with that name, fail if
                    another is already started or queued (default
-                   if invoked as 'jstart').
+                   if invoked as 'jstart' or 'qcronsub').
  -continuous       Start a self-restarting job on the continuous
                    queue (default if invoked as 'jstart')
  -quiet            If successful, don't output anything
@@ -106,8 +121,7 @@ close EXE;
 foreach my $option (@options) {
   my($opt, $optval) = @$option;
   if($opt eq '-mem') {
-    $memory = $optval;
-    die "$script: memory value must be an integer followed by 'k', 'm' or 'g'\n" unless $memory =~ m/^([1-9][0-9]*[mMgGkK])$/;
+    $memory = memparse_kb($optval);
   } elsif($opt eq '-once') {
     $once = 1;
   } elsif($opt eq '-stderr') {
@@ -119,7 +133,15 @@ foreach my $option (@options) {
     $quiet = 1;
   } else {
     if($opt eq '-l') {
-      $memory = $1  if $optval =~ s/h_vmem=([0-9]+[mMgGkK]),?//;
+      $memory = memparse_kb($1) if $optval =~ s/h_vmem=([0-9]+[mMgGkK]),?//;
+      if ($optval =~ s/virtual_free=([0-9]+[mMgGkK]),?//) {
+        $vfmem = memparse_kb($1);
+        if ($vfmem > $memory) {
+            $new_mem = $vfmem * 1.1;
+            print "WARNING: virtual_free=${vfmem}k is larger than h_vmem=${memory}k. Setting h_vmem=${new_mem}k\n";
+            $memory = $new_mem;
+        }
+      }
       next if $optval =~ m/^,?$/;
     }
     $qsargs{$opt} = $optval;
@@ -155,7 +177,7 @@ if($once) {
 
 push @args, '-e', $err unless defined $qsargs{'-e'};
 push @args, '-o', $out unless defined $qsargs{'-o'};
-push @args, '-N', $jobname, '-hard', '-l', "h_vmem=$memory";
+push @args, '-N', $jobname, '-hard', '-l', "h_vmem=${memory}k";
 
 my ($qsubinput, $qsuboutput, $qsuberror);
 

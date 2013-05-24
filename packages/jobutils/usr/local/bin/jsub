@@ -84,7 +84,6 @@ while(-l $prog) {
   $prog .= "/$symlink";
 }
 
-print "prog?: $prog\n";
 unless($prog =~ m{^/}) {
   my $cwd = `pwd`;
   chomp $cwd;

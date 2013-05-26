@@ -183,7 +183,7 @@ my ($qsubinput, $qsuboutput, $qsuberror);
 
 if($continuous) {
   push @args, '-q', 'continuous';
-  push @args, '-b', $sqargs{'-b'} if defined $qsargs{'-b'};
+  push @args, '-b', $qsargs{'-b'} if defined $qsargs{'-b'};
   $qsubinput = "#!/bin/bash\n"                                   .
                "while ! " . shell_quote($prog, @ARGV) . "; do\n" .
                "  sleep 5\n"                                     .

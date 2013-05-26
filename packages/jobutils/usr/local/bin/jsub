@@ -1,12 +1,13 @@
 #! /usr/bin/perl
 
+use IPC::Run qw(harness run);
 use String::ShellQuote;
 
 my %qsubargs = (
        '-a' => 1, '-b' => 1, '-cwd' => 0, '-e' => 1, '-hard' => 0, '-i' => 1, '-j' => 1,
        '-l' => 1, '-now' => 1, '-N' => 1, '-o' => 1, '-p' => 1, '-q' => 1, '-soft' => 0,
        '-sync' => 1, '-v' => 1, '-wd' => 1,
-       '-mem' => 1, '-once' => 0, '-stderr' => 0, '-continuous' => 0,
+       '-mem' => 1, '-once' => 0, '-stderr' => 0, '-continuous' => 0, '-quiet' => 0,
 );
 my %qsargs;
 my @args;
@@ -14,6 +15,7 @@ my $memory = '256m';
 my $once = 0;
 my $stderr = 0;
 my $continuous = 0;
+my $quiet = 0;
 my $script = $0;
 my $queue = 'task';
 $script = $1 if $script =~ m{/([^/]+)$};
@@ -47,6 +49,7 @@ Options include many (but not all) qsub options, along with:
                    another is already started or queued.
  -continuous       Start a self-restarting job on the continuous
                    queue (default if invoked as 'jstart')
+ -quiet            If successful, don't output anything
 
 Unlike qsub, if you do not specify output and error files, output is appended
 by default to files named <job>.err and <job>.out in your home directory
@@ -109,6 +112,8 @@ foreach my $option (@options) {
   } elsif($opt eq '-continuous') {
     $continuous = 1;
     $once = 1;
+  } elsif($opt eq '-quiet') {
+    $quiet = 1;
   } else {
     if($opt eq '-l') {
       $memory = $1  if $optval =~ s/h_vmem=([0-9]+[mMgGkK]),?//;
@@ -149,19 +154,30 @@ push @args, '-e', $err unless defined $qsargs{'-e'};
 push @args, '-o', $out unless defined $qsargs{'-o'};
 push @args, '-N', $jobname, '-hard', '-l', "h_vmem=$memory";
 
+my ($qsubinput, $qsuboutput, $qsuberror);
+
 if($continuous) {
   push @args, '-q', 'continuous';
-  push @args, '-b', $sqargs{'-b'}  if defined $qsargs{'-b'};
-  open QSUB, '|-', '/usr/bin/qsub', @args or die "\[$now\] unable to start qsub: $!\n";
-  print QSUB "#!/bin/bash\n";
-  print QSUB "while ! " . shell_quote($prog, @ARGV) . "; do\n";
-  print QSUB "  sleep 5\n";
-  print QSUB "done\n";
-  close QSUB;
+  push @args, '-b', $sqargs{'-b'} if defined $qsargs{'-b'};
+  $qsubinput = "#!/bin/bash\n"                                   .
+               "while ! " . shell_quote($prog, @ARGV) . "; do\n" .
+               "  sleep 5\n"                                     .
+               "done\n";
 } else {
+  $qsubinput = '';
   $queue = $qsargs{'-q'} if defined $qsargs{'-q'};
   push @args, '-q', $queue, '-b', 'y', $prog, @ARGV;
-  exec '/usr/bin/qsub', @args;
-  die "\[$now\] qsub failed: $!\n";
 }
 
+my $h = harness(['/usr/bin/qsub', @args], \$qsubinput, \$qsuboutput, \$qsuberror);
+if (!run ($h)) {
+    print STDOUT $qsuboutput;
+    print STDERR $qsuberror;
+    exit ($h->result ());
+}
+
+# Suppress output if the user requested so.
+if (!$quiet) {
+    print STDOUT $qsuboutput;
+    print STDERR $qsuberror;
+}

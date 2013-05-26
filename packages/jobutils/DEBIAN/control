@@ -4,7 +4,7 @@ Section: universe/utils
 Priority: optional
 Architecture: all
 Essential: no
-Depends: perl, gridengine-common
+Depends: perl, gridengine-common, libipc-run-perl
 Installed-Size: 9
 Maintainer: Marc-André Pelletier <marc@wikimedia.org>, Petr Bena <benapetr@gmail.com>
 Description: Set of utilities to use on wikimedia bots and tools cluster

@@ -12,7 +12,8 @@ Options include many (but not all) qsub options, along with:
  \-mem <value>      Request <value> amount of memory for the job.
                    (number prefixed by 'k', 'm' or 'g')
  \-once             Only start one job with that name, fail if
-                   another is already started or queued.
+                   another is already started or queued (default if
+                   invoked as 'jstart').
  \-continuous       Start a self-restarting job on the continuous
                    queue (default if invoked as 'jstart')
  \-quiet            Suppress output if job could be submitted.

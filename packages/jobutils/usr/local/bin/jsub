@@ -23,7 +23,7 @@ my $script = $0;
 my $queue = 'task';
 $script = $1 if $script =~ m{/([^/]+)$};
 
-$continuous = 1 if $script eq 'jstart';
+$continuous = $once = 1 if ($script eq 'jstart');
 
 my @options;
 while($#ARGV > 0) {
@@ -49,7 +49,8 @@ Options include many (but not all) qsub options, along with:
  -mem <value>      Request <value> amount of memory for the job.
                    (number prefixed by 'k', 'm' or 'g')
  -once             Only start one job with that name, fail if
-                   another is already started or queued.
+                   another is already started or queued (default
+                   if invoked as 'jstart').
  -continuous       Start a self-restarting job on the continuous
                    queue (default if invoked as 'jstart')
  -quiet            If successful, don't output anything

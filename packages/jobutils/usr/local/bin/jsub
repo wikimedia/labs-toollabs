@@ -125,8 +125,8 @@ my $jobname = 'unknown';
 $jobname = $1 if $prog =~ m{([^/.]+)(\.[^/]*)?$};
 $jobname = $qsargs{'-N'} if defined $qsargs{'-N'};
 
-my $err = "$ENV{'HOME'}/$jobname.err";
-my $out = "$ENV{'HOME'}/$jobname.out";
+my $err = (getpwuid ($<)) [7] . '/' . $jobname . '.err';
+my $out = (getpwuid ($<)) [7] . '/' . $jobname . '.out';
 
 $err = $qsargs{'-e'} if defined $qsargs{'-e'};
 $out = $qsargs{'-o'} if defined $qsargs{'-o'};

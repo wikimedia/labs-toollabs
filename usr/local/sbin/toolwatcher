@@ -20,7 +20,8 @@ while true;do
       password="$(sed -n -e "/password='\(.*\)'/{;s//\1/;p;}" $tool/replica.my.cnf)"
       /usr/bin/mysql -h tools-db -u root <<-END
         grant usage on *.* to '$user'@'%' identified by '$password';
-        grant all privileges on \`${user}__%\`.* to '$user'@'%';
+        grant all privileges on \`${user}__%\`.* to '$user'@'%' with grant option;
+        grant select on \`%_p\`.* to '$user'@'%';
 END
       touch /data/project/.system/cache/localdb-$tool
     fi

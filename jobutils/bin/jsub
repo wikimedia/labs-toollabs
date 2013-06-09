@@ -6,20 +6,6 @@ use warnings;
 use IPC::Run qw(harness run);
 use String::ShellQuote;
 
-sub memparse_kb {
-  # parses an XXK, XXm, XXg to the # of kilobytes
-  $arg = $_[0];
-  if ($arg =~ m/^([1-9][0-9]*)([mgk])$/i) {
-    $amount = $1;
-    $unit = $2;
-    if($unit =~ m/[mg]/i) {$amount *= 1024};
-    if($unit =~ m/[g]/i) {$amount *= 1024};
-  } else {
-    die "$script: memory value must be an integer followed by 'k', 'm' or 'g': $_[0]\n";
-  }
-  return $amount;
-}
-
 my %qsubargs = (
        '-a' => 1, '-b' => 1, '-cwd' => 0, '-e' => 1, '-hard' => 0, '-i' => 1, '-j' => 1,
        '-l' => 1, '-now' => 1, '-N' => 1, '-o' => 1, '-p' => 1, '-q' => 1, '-soft' => 0,
@@ -36,6 +22,21 @@ my $quiet = 0;
 my $script = $0;
 my $queue = 'task';
 $script = $1 if $script =~ m{/([^/]+)$};
+
+sub memparse_kb {
+  # parses an XXK, XXm, XXg to the # of kilobytes
+  my $arg = $_[0];
+  if ($arg !~ m/^([1-9][0-9]*)([mgk])$/i) {
+    die "$script: memory value must be an integer followed by 'k', 'm' or 'g': $_[0]\n";
+  }
+
+  my $amount = $1;
+  my $unit = $2;
+  if($unit =~ m/[mg]/i) {$amount *= 1024};
+  if($unit =~ m/[g]/i) {$amount *= 1024};
+
+  return $amount;
+}
 
 $continuous = $once = 1 if ($script eq 'jstart');
 $once = 1 if $script eq 'qcronsub';
@@ -135,9 +136,9 @@ foreach my $option (@options) {
     if($opt eq '-l') {
       $memory = memparse_kb($1) if $optval =~ s/h_vmem=([0-9]+[mMgGkK]),?//;
       if ($optval =~ s/virtual_free=([0-9]+[mMgGkK]),?//) {
-        $vfmem = memparse_kb($1);
+        my $vfmem = memparse_kb($1);
         if ($vfmem > $memory) {
-            $new_mem = $vfmem * 1.1;
+            my $new_mem = $vfmem * 1.1;
             print "WARNING: virtual_free=${vfmem}k is larger than h_vmem=${memory}k. Setting h_vmem=${new_mem}k\n";
             $memory = $new_mem;
         }

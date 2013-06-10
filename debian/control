@@ -1,23 +1,25 @@
 Source: toollabs
 Section: utils
 Priority: extra
-Maintainer: Petr Bena <benapetr@gmail.com>
-Uploaders: Marc-André Pelletier <marc@wikimedia.org>,
- Carl Fürstenberg <azatoth@gmail.com>
+Maintainer: Marc-André Pelletier <mpelletier@wikimedia.org>,
+Uploaders: Marc-André Pelletier <mpelletier@wikimedia.org>,
+ Carl Fürstenberg <azatoth@gmail.com>,
+ Petr Bena <benapetr@gmail.com>
 Build-Depends: debhelper (>= 8.0.0)
 Standards-Version: 3.9.3
-#Vcs-Git: git://git.debian.org/collab-maint/toollabs.git
-#Vcs-Browser: http://git.debian.org/?p=collab-maint/toollabs.git;a=summary
+Vcs-Git: https://gerrit.wikimedia.org/r/labs/toollabs
+Vcs-Browser: https://git.wikimedia.org/summary/labs%2Ftoollabs
 
-Package: tools
+Package: misctools
 Architecture: all
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: Various tools
- Tools used on toollabs
+Description: Miscelaneous Labs-specific tools
+ Miscelaneous Labs-specific Tools used on Tool Labs
 
 Package: jobutils
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, gridengine-client, libstring-shellquote-perl
 Description: Set of utilities to use on wikimedia bots and tools cluster
- This package will install jstart (jsub) and jstop, which can be used with GE
+ This package will install jstart (jsub) and jstop, the Tool Labs (more)
+ user-friendly wrappers to submit jobs to the gridengine
 

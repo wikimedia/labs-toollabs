@@ -1,3 +1,11 @@
+toollabs (1.0.1) unstable; urgency=low
+
+  * Added copyright information
+  * Minor tweaks to control files
+  * Added missing job(1) command
+
+ -- Marc-André Pelletier <mpelletier@wikimedia.org>  Mon, 10 Jun 2013 17:12:45 -0400
+
 toollabs (1.0) unstable; urgency=low
 
   * Initial Release.

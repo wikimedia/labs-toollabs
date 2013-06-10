@@ -11,6 +11,7 @@ my %qsubargs = (
        '-l' => 1, '-now' => 1, '-N' => 1, '-o' => 1, '-p' => 1, '-q' => 1, '-soft' => 0,
        '-sync' => 1, '-v' => 1, '-wd' => 1,
        '-mem' => 1, '-once' => 0, '-stderr' => 0, '-continuous' => 0, '-quiet' => 0,
+       '-umask' => 1,
 );
 my %qsargs;
 my @args;
@@ -37,6 +38,10 @@ sub memparse_kb {
 
   return $amount;
 }
+
+# Set default umask for output files depending on whether we're called
+# by a user or a tool.
+my $umask = $> >= 50000 ? oct ('007') : oct ('077');
 
 $continuous = $once = 1 if ($script eq 'jstart');
 $once = 1 if $script eq 'qcronsub';
@@ -69,6 +74,7 @@ Options include many (but not all) qsub options, along with:
                    if invoked as 'jstart' or 'qcronsub').
  -continuous       Start a self-restarting job on the continuous
                    queue (default if invoked as 'jstart')
+ -umask <value>    Set umask for output files if they don't exist
  -quiet            If successful, don't output anything
 
 Unlike qsub, if you do not specify output and error files, output is appended
@@ -130,6 +136,10 @@ foreach my $option (@options) {
   } elsif($opt eq '-continuous') {
     $continuous = 1;
     $once = 1;
+  } elsif($opt eq '-umask') {
+    die ("$script: umask must be an octal value: $optval\n")
+      unless ($optval =~ /^[0-7]+$/);
+    $umask = oct ($optval);
   } elsif($opt eq '-quiet') {
     $quiet = 1;
   } else {
@@ -163,7 +173,28 @@ $err = $qsargs{'-e'} if defined $qsargs{'-e'};
 $out = $qsargs{'-o'} if defined $qsargs{'-o'};
 $err = $out if defined $qsargs{'-j'} and $qsargs{'-j'} =~ m/^[yY]/;
 
-open STDERR, ">>$err" unless $stderr;
+# For STDOUT and STDERR we do the same dance:
+# - If the output file exists, we do nothing (the output file being a
+#   directory is a subset of this).
+# - Otherwise, we touch the output file once with the set umask.
+# - If -stderr is not given and the error output file is not a
+#   directory, we redirect STDERR to it.
+my $oldumask = umask ($umask);
+if (!-e $out) {
+  open (my $tempfh, '>>', $out) or
+    die ("Couldn't touch '$out': $!");
+  close ($tempfh);
+}
+if (!-e $err) {
+  open (my $tempfh, '>>', $err) or
+    die ("Couldn't touch '$err': $!");
+  close ($tempfh);
+}
+if (!$stderr && !-d $err) {
+  open (STDERR, '>>', $err) or
+    die ("Couldn't redirect STDERR to '$err': $!");
+}
+umask ($oldumask);
 
 my $now = localtime;
 

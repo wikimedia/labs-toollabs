@@ -1,0 +1,23 @@
+Source: toollabs
+Section: utils
+Priority: extra
+Maintainer: Petr Bena <benapetr@gmail.com>
+Uploaders: Marc-André Pelletier <marc@wikimedia.org>,
+ Carl Fürstenberg <azatoth@gmail.com>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.3
+#Vcs-Git: git://git.debian.org/collab-maint/toollabs.git
+#Vcs-Browser: http://git.debian.org/?p=collab-maint/toollabs.git;a=summary
+
+Package: tools
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Various tools
+ Tools used on toollabs
+
+Package: jobutils
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Set of utilities to use on wikimedia bots and tools cluster
+ This package will install jstart (jsub) and jstop, which can be used with GE
+

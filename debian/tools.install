@@ -1,0 +1,2 @@
+tools/become /usr/bin
+tools/toolwatcher /usr/sbin

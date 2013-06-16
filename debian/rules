@@ -19,3 +19,8 @@ export DH_OPTIONS
 
 %:
 	dh $@ 
+
+# Test that Perl scripts not have compilation errors.
+override_dh_auto_test:
+	perl -cw jobutils/bin/job
+	perl -cw jobutils/bin/jsub

@@ -1,2 +1,3 @@
 tools/become /usr/bin
 tools/toolwatcher /usr/sbin
+tools/rmtool /usr/sbin

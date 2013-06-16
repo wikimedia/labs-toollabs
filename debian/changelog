@@ -1,3 +1,11 @@
+toollabs (1.0.3) unstable; urgency=low
+
+  * Tim Landscheidt: Add umask defaults for output files
+  * Tim Landscheidt: other minor tweaks and fixes
+  * Marc-André Pelletier: add rmtool
+
+ -- Marc-André Pelletier <mpelletier@wikimedia.org>  Mon, 16 Jun 2013 16:42:00 -0400
+
 toollabs (1.0.2) unstable; urgency=low
 
   * Tim Landscheidt: Add umask defaults for output files

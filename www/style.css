@@ -1,0 +1,125 @@
+
+BODY {
+  font-family: sans-serif;
+  font-size: 12pt;
+}
+
+TD {
+  border-collapse: collapse;
+}
+
+TR.tool {
+  margin-top: 1ex;
+  width: 100%;
+  vertical-align: top;
+  padding-bottom: .5ex;
+}
+
+TD.tool-name {
+  border-top: solid 2px black;
+  padding: .5ex;
+  background: #8DF;
+  font-weight: bolder;
+  font-size: 120%;
+  width: 10em;
+}
+
+TD.tool-maintainers {
+  padding: .5ex;
+  width: 10em;
+}
+
+TD.tool-maintainers A {
+  display: block;
+}
+
+TD.tool-desc {
+  padding: 0.5ex;
+  padding-left: 1em;
+}
+
+DIV.sidebar A {
+  display: block;
+  margin-left: .5em;
+  margin-bottom: .5ex;
+}
+
+TD.content {
+  vertical-align: top;
+}
+
+DIV.hostline {
+  display: block;
+  padding: 0.5ex;
+  margin-top: 1ex;
+  width: 95%;
+  background: #8DF;
+  border-bottom: solid 2px black;
+}
+
+DIV.hostline SPAN {
+  display: inline-block;
+}
+
+DIV.hostline SPAN.hostname {
+  font-weight: bolder;
+  font-size: 120%;
+  margin-right: 2em;
+}
+
+TABLE.hostjobs {
+  width: 95%;
+}
+
+TABLE.hostjobs TD {
+  border-bottom: solid 1px black;
+}
+
+TABLE.hostjobs TD {
+  vertical-align: top;
+  padding: 0.3ex;
+  padding-left: 1ex;
+}
+
+TABLE.hostjobs TD SPAN {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+TABLE.hostjobs TD A {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+TABLE.hostjobs TD.jobno {
+  font-weight: bolder;
+  text-align: right;
+  width: 3em;
+}
+
+TABLE.tool-info {
+  margin-top: 2ex;
+  vertical-align: top;
+}
+
+TABLE.tool-info TH {
+  text-align: right;
+  vertical-align: top;
+}
+
+TABLE.tool-info TH.tool-name {
+  font-weight: bolder;
+  font-size: 200%;
+}
+
+TABLE.tool-info TD {
+  padding-left: 1em;
+  vertical-align: top;
+}
+
+.mw-editsection {
+	font-size: small;
+	font-weight: normal;
+	line-height: 1em;
+}
+

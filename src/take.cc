@@ -12,15 +12,16 @@
 // ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 // OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
+#include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <dirent.h>
-#include <sys/types.h>
+#include <getopt.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 bool refuse(const char* file, const char* why)
 {
@@ -163,14 +164,60 @@ bool takeover(const char* path, bool trustpath)
     return true;
 }
 
+void usage(void) {
+    puts("usage: take [-h] [--version] FILE [FILE ...]\n"       \
+         "\n"                                                   \
+         "Assume ownership of files and directories\n"          \
+         "\n"                                                   \
+         "positional arguments:\n"                              \
+         "  FILE        file or directory to take over\n"       \
+         "\n"                                                   \
+         "optional arguments:\n"                                \
+         "  -h, --help  show this help message and exit\n"      \
+         "  --version   show program's version number and exit");
+}
 
 int main(int argc, char** argv)
 {
+    int opt;
+    struct option options[] = {
+        { "help",    no_argument, NULL, 'h' },
+        { "version", no_argument, NULL, 'V' },
+        { NULL,      0,           NULL, 0 },
+    };
+
+    while ((opt = getopt_long(argc, argv, "h", options, NULL)) != -1) {
+        switch (opt) {
+            case 'h':
+                usage();
+                return 0;
+
+            case 'V':
+                puts("take (Wikimedia Labs Tools misctools) " PACKAGE_VERSION "\n"                         \
+                     "Copyright (C) 2013 Marc-André Pelletier\n"                                           \
+                     "License ISC: <https://www.isc.org/downloads/software-support-policy/isc-license/>\n" \
+                     "This is free software: you are free to change and redistribute it.\n"                \
+                     "There is NO WARRANTY, to the extent permitted by law.");
+                return 0;
+
+            default:
+                // An error message has already been printed by
+                // getopt_long().
+                fputs("Run take --help for usage.\n", stderr);
+                return 1;
+        }
+    }
+
+    if (optind >= argc) {
+        fprintf(stderr, "No files to take were provided.\nRun take --help for usage.\n");
+        return 1;
+    }
+
     ngroups = getgroups(sizeof(groups)/sizeof(groups[0]), groups);
 
     int cwd = open(".", O_RDONLY);
     bool ok = true;
-    for(int arg=1; arg<argc; arg++) {
+    for(int arg=optind; arg<argc; arg++) {
         if (cwdchanged)
             fchdir(cwd);
         ok &= takeover(argv[arg], false);

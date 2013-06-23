@@ -1,5 +1,6 @@
 toollabs (1.9~dev) unstable; urgency=medium
 
+  * Add options --help and --version to take. [Platonides]
   * list-user-databases: List all databases a user has access to. [Tim
     Landscheidt]
   * Add bash-completion config for `become`. [Bryan Davis]

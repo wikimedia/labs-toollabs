@@ -76,7 +76,7 @@ bool takeover(const char* path, bool trustpath)
 		else
 			strcpy(dirname, ".");
 
-		FD dir  = open(dirname, O_RDONLY|O_NOFOLLOW);
+		int dir  = open(dirname, O_RDONLY|O_NOFOLLOW);
 
 		if(dir < 0) {
 			if(errno == ELOOP)
@@ -85,17 +85,26 @@ bool takeover(const char* path, bool trustpath)
 		}
 
 		struct stat	sdir;
-		if(fstat(dir, &sdir))
+		if(fstat(dir, &sdir)) {
+			close(dir);
 			return error(dirname);
+		}
 
-		if(!S_ISDIR(sdir.st_mode))
+		if(!S_ISDIR(sdir.st_mode)) {
+			close(dir);
 			return refuse(dirname, "containing directory doesn't appear to be... a directory?");
-		if(sdir.st_uid != getuid())
+		}
+
+		if(sdir.st_uid != getuid()) {
+			close(dir);
 			return refuse(path, "you must own the containing directory");
+		}
 
 		// Here, we are being extremely paranoid, and check that the file is actually in the directory.
-		if(sdir.st_dev != sfile.st_dev)
+		if(sdir.st_dev != sfile.st_dev) {
+			close(dir);
 			return refuse(path, "the file must be on the same filesystem as its directory");
+		}
 
 		bool found = false;
 		if(DIR* df = fdopendir(dir)) {

@@ -44,6 +44,7 @@ struct FD {
 
 gid_t	groups[256];
 int	ngroups;
+bool cwdchanged = false;
 
 bool takeover(const char* path, bool trustpath)
 {
@@ -142,6 +143,7 @@ bool takeover(const char* path, bool trustpath)
 						continue;
 				}
 				fchdir(file);
+				cwdchanged = true;
 				ok &= takeover(d->d_name, true);
 			}
 			closedir(df);
@@ -157,9 +159,14 @@ int main(int argc, char** argv)
 {
 	ngroups = getgroups(sizeof(groups)/sizeof(groups[0]), groups);
 
+	int cwd = open(".", O_RDONLY);
 	bool ok = true;
-	for(int arg=1; arg<argc; arg++)
+	for(int arg=1; arg<argc; arg++) {
+		if (cwdchanged)
+			fchdir(cwd);
 		ok &= takeover(argv[arg], false);
+    }
+	close(cwd);
 	return ok? 0: 1;
 }
 

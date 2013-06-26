@@ -13,8 +13,8 @@ Vcs-Browser: https://git.wikimedia.org/summary/labs%2Ftoollabs
 Package: misctools
 Architecture: all
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: Miscelaneous Labs-specific tools
- Miscelaneous Labs-specific Tools used on Tool Labs
+Description: Miscellaneous Labs-specific tools
+ Miscellaneous Labs-specific Tools used on Tool Labs
 
 Package: jobutils
 Architecture: all

@@ -1,0 +1,3 @@
+misctools/become /usr/bin
+misctools/toolwatcher /usr/sbin
+misctools/rmtool /usr/sbin

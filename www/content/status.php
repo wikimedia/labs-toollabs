@@ -50,6 +50,15 @@
 
   $rawjobs = toarray(simplexml_load_string(`PATH=/bin:/usr/bin /usr/bin/qstat -u '*' -r -xml`));
   $rawhosts = toarray(simplexml_load_string(`PATH=/bin:/usr/bin /usr/bin/qhost -F h_vmem -xml`));
+  $vmem = toarray(simplexml_load_string(`PATH=/bin:/usr/bin /usr/bin/qstat -F h_vmem -xml`));
+  foreach ($vmem['queue_info']['Queue-List'] as $vm) {
+	  $server = $vm['name'];
+	  $server = substr($server, strpos($server, "@") + 1);
+	  $server = substr($server, 0, strpos($server, "."));
+	  if ( $server !== false ) {
+	      $h_vmem[$server] = $vm['resource'];
+	  }
+  }
 ?>
 <H1>Wikimedia Tool Labs</H1>
 This is the web server for the Tool Labs project, the home of community-maintained external tools supporting Wikimedia projects and their users.
@@ -117,6 +126,7 @@ This is the web server for the Tool Labs project, the home of community-maintain
 	  <SPAN CLASS="hostname"><?= $host ?></SPAN>
           <SPAN><B>Load:</B> <?= (int)($h['use']*1000)/10 ?>%</SPAN>
           <SPAN><B>Memory:</B> <?= (int)($h['mem']*1000)/10 ?>%</SPAN>
+          <SPAN><B>Free vmem:</B> <? echo $h_vmem[$host]; ?></SPAN>
         </DIV>
       <TABLE CLASS="hostjobs"><?
       foreach($jobs as $jobid => $j):

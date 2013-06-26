@@ -5,7 +5,7 @@ Maintainer: Marc-André Pelletier <mpelletier@wikimedia.org>
 Uploaders: Marc-André Pelletier <mpelletier@wikimedia.org>,
  Carl Fürstenberg <azatoth@gmail.com>,
  Petr Bena <benapetr@gmail.com>
-Build-Depends: debhelper (>= 8.0.0)
+Build-Depends: debhelper (>= 8.0.0), dh-autoreconf
 Standards-Version: 3.9.3
 Vcs-Git: https://gerrit.wikimedia.org/r/labs/toollabs
 Vcs-Browser: https://git.wikimedia.org/summary/labs%2Ftoollabs

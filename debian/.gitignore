@@ -1,3 +1,5 @@
+/autoreconf.after
+/autoreconf.before
 /files
 /jobutils
 /jobutils.debhelper.log
@@ -5,3 +7,4 @@
 /misctools
 /misctools.debhelper.log
 /misctools.substvars
+/tmp

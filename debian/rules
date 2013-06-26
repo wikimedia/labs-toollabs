@@ -18,7 +18,7 @@ export DH_OPTIONS
 
 
 %:
-	dh $@ 
+	dh $@ --with autoreconf
 
 # Test that Perl scripts not have compilation errors.
 override_dh_auto_test:

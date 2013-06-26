@@ -134,7 +134,7 @@ This is the web server for the Tool Labs project, the home of community-maintain
         continue;
           ?><TR CLASS="jobline-<?= $j['state'] ?>">
           <TD CLASS="jobno"><?= $jobid ?></TD>
-          <TD CLASS="jobname"><SPAN><?= $j['name'] ?></SPAN></TD>
+          <TD CLASS="jobname"><SPAN><?= htmlspecialchars($j['name']) ?></SPAN></TD>
           <TD CLASS="jobtool"><A HREF="/?list#<?= $j['tool'] ?>"><?= $j['tool'] ?></A></TD>
           <TD CLASS="jobstate"><SPAN><?= ucfirst($j['queue']) ?> / <?= ucfirst($j['state']) ?></SPAN></TD>
           <TD CLASS="jobtime"><SPAN><?= strftime("%F %T", $j['sub']) ?></SPAN></TD>

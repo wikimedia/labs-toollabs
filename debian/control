@@ -12,13 +12,13 @@ Vcs-Browser: https://git.wikimedia.org/summary/labs%2Ftoollabs
 
 Package: misctools
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${misc:Depends}
 Description: Miscellaneous Labs-specific tools
  Miscellaneous Labs-specific Tools used on Tool Labs
 
 Package: jobutils
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}, gridengine-client, libstring-shellquote-perl
+Depends: ${misc:Depends}, ${perl:Depends}, gridengine-client, libstring-shellquote-perl
 Description: Set of utilities to use on wikimedia bots and tools cluster
  This package will install jstart (jsub) and jstop, the Tool Labs (more)
  user-friendly wrappers to submit jobs to the gridengine

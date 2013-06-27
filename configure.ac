@@ -4,11 +4,13 @@ AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([foreign no-dist silent-rules -Wall -Werror])
 AC_PROG_INSTALL
 AC_PROG_LN_S
+AC_PROG_CXX
 
 AC_CONFIG_FILES([Makefile
                  jobutils/Makefile
                  jobutils/bin/Makefile
                  jobutils/man/Makefile
-                 misctools/Makefile])
+                 misctools/Makefile
+                 src/Makefile])
 
 AC_OUTPUT

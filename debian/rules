@@ -20,6 +20,11 @@ export DH_OPTIONS
 %:
 	dh $@ --with autoreconf
 
+# Make take setuid.
+override_dh_fixperms:
+	dh_fixperms
+	chmod u+s debian/misctools/usr/bin/take
+
 # Test that Perl scripts not have compilation errors.
 override_dh_auto_test:
 	perl -cw jobutils/bin/job

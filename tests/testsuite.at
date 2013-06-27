@@ -1,0 +1,20 @@
+# Test suite for toollabs.
+
+# Initialize autotest.
+AT_INIT()
+AT_COLOR_TESTS()
+
+# AT_TOOLLABS_PERL_COMPILE(FILE)
+# ------------------------------
+# Test if FILE is compilable with "perl -cw".  FILE is relative to the
+# top source directory.
+m4_define([AT_TOOLLABS_PERL_COMPILE],
+[AT_SETUP([Checking $1 for compilation errors])
+AT_CHECK_UNQUOTED([perl -cw $top_srcdir/$1], [0], [], [$top_srcdir/$1 syntax OK
+])
+AT_CLEANUP()
+])
+
+# Test that Perl scripts do not have compilation errors.
+AT_TOOLLABS_PERL_COMPILE([jobutils/bin/job])
+AT_TOOLLABS_PERL_COMPILE([jobutils/bin/jsub])

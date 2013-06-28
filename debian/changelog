@@ -1,7 +1,7 @@
 toollabs (1.0.4) unstable; urgency=low
 
-  * Marc-André Pelletier: make jsub accept -M for qsub, and
-    provide a sane default for it
+  * Marc-André Pelletier: make jsub accept -M and -m for
+    qsub, and provide a sane default for it
 
  -- Marc-André Pelletier <mpelletier@wikimedia.org>  Mon, 16 Jun 2013 16:42:00 -0400
 

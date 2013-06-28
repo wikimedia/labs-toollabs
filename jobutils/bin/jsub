@@ -24,7 +24,7 @@ use String::ShellQuote;
 my %qsubargs = (
        '-a' => 1, '-b' => 1, '-cwd' => 0, '-e' => 1, '-hard' => 0, '-i' => 1, '-j' => 1,
        '-l' => 1, '-now' => 1, '-N' => 1, '-o' => 1, '-p' => 1, '-q' => 1, '-soft' => 0,
-       '-sync' => 1, '-v' => 1, '-wd' => 1, '-M' => 1,
+       '-sync' => 1, '-v' => 1, '-wd' => 1, '-M' => 1, '-m' => 1,
        '-mem' => 1, '-once' => 0, '-stderr' => 0, '-continuous' => 0, '-quiet' => 0,
        '-umask' => 1,
 );

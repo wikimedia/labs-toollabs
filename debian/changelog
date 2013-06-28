@@ -1,3 +1,10 @@
+toollabs (1.0.4) unstable; urgency=low
+
+  * Marc-André Pelletier: make jsub accept -M for qsub, and
+    provide a sane default for it
+
+ -- Marc-André Pelletier <mpelletier@wikimedia.org>  Mon, 16 Jun 2013 16:42:00 -0400
+
 toollabs (1.0.3) unstable; urgency=low
 
   * Tim Landscheidt: Add umask defaults for output files

@@ -24,7 +24,7 @@ use String::ShellQuote;
 my %qsubargs = (
        '-a' => 1, '-b' => 1, '-cwd' => 0, '-e' => 1, '-hard' => 0, '-i' => 1, '-j' => 1,
        '-l' => 1, '-now' => 1, '-N' => 1, '-o' => 1, '-p' => 1, '-q' => 1, '-soft' => 0,
-       '-sync' => 1, '-v' => 1, '-wd' => 1,
+       '-sync' => 1, '-v' => 1, '-wd' => 1, '-M' => 1,
        '-mem' => 1, '-once' => 0, '-stderr' => 0, '-continuous' => 0, '-quiet' => 0,
        '-umask' => 1,
 );
@@ -37,6 +37,9 @@ my $continuous = 0;
 my $quiet = 0;
 my $script = $0;
 my $queue = 'task';
+my $username = $ENV{LOGNAME} || $ENV{USER} || getpwuid($<);
+my $mailto = "$username\@tools.wmflabs.org";
+
 $script = $1 if $script =~ m{/([^/]+)$};
 
 sub memparse_kb {
@@ -222,8 +225,10 @@ if($once) {
   die "\[$now\] there is a job named '$jobname' already active\n" unless $running==0;
 }
 
+$mailto = $qsargs{'-M'} if defined $qsargs{'-M'};
 push @args, '-e', $err unless defined $qsargs{'-e'};
 push @args, '-o', $out unless defined $qsargs{'-o'};
+push @args, '-M', $mailto;
 push @args, '-N', $jobname, '-hard', '-l', "h_vmem=${memory}k";
 
 my ($qsubinput, $qsuboutput, $qsuberror);

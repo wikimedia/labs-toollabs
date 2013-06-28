@@ -15,6 +15,112 @@ AT_CHECK_UNQUOTED([perl -cw $top_srcdir/$1], [0], [], [$top_srcdir/$1 syntax OK
 AT_CLEANUP()
 ])
 
+# _AT_TOOLLABS_JSUB(ARGS,
+#                   OUTPUT,
+#                   ERROR,
+#                   STATUS,
+#                   EXPARGS,
+#                   EXPINPUT,
+#                   EXPOUTPUT,
+#                   EXPERROR,
+#                   EXPSTATUS)
+# ----------------------------------
+# Check if jsub called with ARGS calls a qsub mock-up with EXPARGS and
+# EXPINPUT and upon receiving OUTPUT, ERROR and STATUS from the latter
+# produces EXPOUTPUT, EXPERROR and EXPSTATUS respectively.
+m4_define([_AT_TOOLLABS_JSUB],
+[AT_DATA([dummy.out], [$2])
+AT_DATA([dummy.err], [$3])
+AT_DATA([dummy.exitcode], [$4
+])
+AT_CHECK([JOBUTILS_QSUB=dummy.sh jsub $1], [$9], [$7], [$8])
+AT_CHECK_UNQUOTED([cat dummy.args], [0], [$5], [])
+AT_CHECK([cat dummy.in], [0], [$6], [])
+])
+
+# AT_TOOLLABS_JSUB(TEST-GROUP-NAME,
+#                  ARGS,
+#                  OUTPUT,
+#                  ERROR,
+#                  STATUS,
+#                  EXPARGS,
+#                  EXPINPUT,
+#                  EXPOUTPUT,
+#                  EXPERROR,
+#                  EXPSTATUS)
+# ---------------------------------
+# Test if jsub called with ARGS calls a qsub mock-up with EXPARGS and
+# EXPINPUT and upon receiving OUTPUT, ERROR and STATUS from the latter
+# produces EXPOUTPUT, EXPERROR and EXPSTATUS respectively.  Use
+# TEST-GROUP-NAME for identification.
+m4_define([AT_TOOLLABS_JSUB],
+[AT_SETUP([$1])
+_AT_TOOLLABS_JSUB([$2], [$3], [$4], [$5], [$6], [$7], [$8], [$9], [$10])
+AT_CLEANUP()
+])
+
 # Test that Perl scripts do not have compilation errors.
 AT_TOOLLABS_PERL_COMPILE([jobutils/bin/job])
 AT_TOOLLABS_PERL_COMPILE([jobutils/bin/jsub])
+
+# Test jsub.
+
+# We use mainly true for tests, as jsub determines the path to the
+# script internally and we can predict with a great certainty that
+# true will be in /bin/true.
+
+# These tests will create two files (true.err and true.out) in the
+# home directory of the calling user.
+AT_TOOLLABS_JSUB([Normal call], [true], [Your job 501377 ("true") has been submitted
+], [], [0], [-e $HOME/true.err -o $HOME/true.out -M $USER@tools.wmflabs.org -N true -hard -l h_vmem=262144k -q task -b y /bin/true
+], [], [Your job 501377 ("true") has been submitted
+], [], [0])
+AT_TOOLLABS_JSUB([Quiet call], [-quiet true], [Your job 501377 ("true") has been submitted
+], [], [0], [-e $HOME/true.err -o $HOME/true.out -M $USER@tools.wmflabs.org -N true -hard -l h_vmem=262144k -q task -b y /bin/true
+], [], [], [], [0])
+
+# Test that umasks are handled properly.
+AT_SETUP([-o points to a non-existing file])
+_AT_TOOLLABS_JSUB([-o does-not-exist.log -quiet true], [Your job 501377 ("true") has been submitted
+], [], [0], [-o does-not-exist.log -e $HOME/true.err -M $USER@tools.wmflabs.org -N true -hard -l h_vmem=262144k -q task -b y /bin/true
+], [], [], [], [0])
+AT_CHECK([stat -c %a does-not-exist.log], [0], [600
+], [])
+AT_CLEANUP()
+
+AT_SETUP([-o points to a existing file])
+AT_CHECK([touch does-exist.log], [0], [], [])
+AT_CHECK([chmod 664 does-exist.log], [0], [], [])
+_AT_TOOLLABS_JSUB([-o does-exist.log -quiet true], [Your job 501377 ("true") has been submitted
+], [], [0], [-o does-exist.log -e $HOME/true.err -M $USER@tools.wmflabs.org -N true -hard -l h_vmem=262144k -q task -b y /bin/true
+], [], [], [], [0])
+AT_CHECK([stat -c %a does-exist.log], [0], [664
+], [])
+AT_CLEANUP()
+
+AT_SETUP([-o points to a non-existing file and -umask is used])
+_AT_TOOLLABS_JSUB([-o does-not-exist.log -quiet -umask 000 true], [Your job 501377 ("true") has been submitted
+], [], [0], [-o does-not-exist.log -e $HOME/true.err -M $USER@tools.wmflabs.org -N true -hard -l h_vmem=262144k -q task -b y /bin/true
+], [], [], [], [0])
+AT_CHECK([stat -c %a does-not-exist.log], [0], [666
+], [])
+AT_CLEANUP()
+
+AT_SETUP([-o points to a existing file and -umask is used])
+AT_CHECK([touch does-exist.log], [0], [], [])
+AT_CHECK([chmod 664 does-exist.log], [0], [], [])
+_AT_TOOLLABS_JSUB([-o does-exist.log -quiet -umask 000 true], [Your job 501377 ("true") has been submitted
+], [], [0], [-o does-exist.log -e $HOME/true.err -M $USER@tools.wmflabs.org -N true -hard -l h_vmem=262144k -q task -b y /bin/true
+], [], [], [], [0])
+AT_CHECK([stat -c %a does-exist.log], [0], [664
+], [])
+AT_CLEANUP()
+
+AT_SETUP([-o points to a existing directory])
+AT_CHECK([mkdir does-exist], [0], [], [])
+_AT_TOOLLABS_JSUB([-o does-exist -quiet true], [Your job 501377 ("true") has been submitted
+], [], [0], [-o does-exist -e $HOME/true.err -M $USER@tools.wmflabs.org -N true -hard -l h_vmem=262144k -q task -b y /bin/true
+], [], [], [], [0])
+AT_CHECK([LANG=C ls does-exist/*], [2], [], [ls: cannot access does-exist/*: No such file or directory
+])
+AT_CLEANUP()

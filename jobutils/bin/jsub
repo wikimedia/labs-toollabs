@@ -246,7 +246,7 @@ if($continuous) {
   push @args, '-q', $queue, '-b', 'y', $prog, @ARGV;
 }
 
-my $h = harness(['/usr/bin/qsub', @args], \$qsubinput, \$qsuboutput, \$qsuberror);
+my $h = harness([exists ($ENV {'JOBUTILS_QSUB'}) ? $ENV {'JOBUTILS_QSUB'} : '/usr/bin/qsub', @args], \$qsubinput, \$qsuboutput, \$qsuberror);
 if (!run ($h)) {
     print STDOUT $qsuboutput;
     print STDERR $qsuberror;

@@ -18,7 +18,8 @@ $(srcdir)/package.m4: $(top_srcdir)/configure.ac
 TESTSUITE = $(srcdir)/testsuite
 
 check-local: atconfig $(TESTSUITE)
-	$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS)
+	$(SHELL) '$(TESTSUITE)' AUTOTEST_PATH=jobutils/bin:tests \
+	  $($(TESTSUITEFLAGS)
 
 installcheck-local: atconfig $(TESTSUITE)
 	$(SHELL) '$(TESTSUITE)' AUTOTEST_PATH='$(bindir)' \
@@ -33,3 +34,5 @@ AUTOTEST = $(AUTOM4TE) --language=autotest
 $(TESTSUITE): $(srcdir)/testsuite.at $(srcdir)/package.m4
 	$(AUTOTEST) -I '$(srcdir)' -o $@.tmp $@.at
 	mv $@.tmp $@
+
+check_SCRIPTS = dummy.sh

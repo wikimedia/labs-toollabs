@@ -16,8 +16,55 @@
   <BODY>
     <H1>Four hundred and four!</H1>
     The URI you have requested, <code>http://tools.wmflabs.org<?= $uri ?></code>, doesn't seem to actually exist.
-    <P>
-    You might want to looks at the <A HREF="/?list">list of tools</A> to find what you were looking for,
-    or one of the links on the sidebar to the left.
+    <? $tool = '';
+       if(preg_match("@^/([^/]+)/@", $uri, $part)) {
+         $gr = posix_getgrnam("local-".$part[1]);
+         if($gr) {
+           $tool = $part[1];
+           $maintainers = $gr['members'];
+         }
+       }
+       if($tool != ''):
+    ?>
+      <H2>If you have reached this page from somewhere else...</H2>
+      This URI is managed by the <A href="/?tool=<?= $tool ?>"><code><?= $tool?></code></a> tool, maintained by 
+      <? foreach($maintainers as $num => $maint):
+           $mu = posix_getpwnam($maint);
+           if($mu):
+             $wtu = $mu['gecos'];
+             ?><A HREF="https://wikitech.wikimedia.org/wiki/User:<?= $wtu ?>"><?= ucfirst($wtu) ?></A><?
+           else:
+             echo ucfirst($maint);
+           endif;
+           if($num < count($maintainers)-1) {
+             if($num == count($maintainers)-2) {
+               if($num == 0)
+                 print " and ";
+               else
+                 print ", and ";
+             } else
+               print ", ";
+           }
+           endforeach;
+      ?>.<p>
+      Perhaps its files are on vacation, or the link you've followed doesn't actually lead
+      somewhere useful?
+      <p>
+      You might want to looks at the <A HREF="/?list">list of tools</A> to find what you were looking for,
+      or one of the links on the sidebar to the left.
+      If you're pretty sure this shouldn't be an error, you may wish to notify the tool's maintainers (above)
+      about the error and how you ended up here.
+    <? else: ?>
+      <P>
+      Perhaps the webserver has temporarily lost its mind,
+      or the link you've followed doesn't actually lead somewhere useful?
+      <p>
+      You might want to looks at the <A HREF="/?list">list of tools</A> to find what you were looking for,
+      or one of the links on the sidebar to the left.
+      If you're pretty sure this shouldn't be an error, you may wish to notify the
+      <A href="/?tool=admin">project administrators</A>
+      about the error and how you ended up here.
+    <? endif ?>
   </BODY>
 </HTML>
+

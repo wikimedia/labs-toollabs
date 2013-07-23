@@ -14,10 +14,10 @@
     <META name="robots" content="index, follow">
   </HEAD>
   <BODY>
-    <H1>Internal error</H1>
+    <H1>Forbidden</H1>
     The URI you have requested,
     <A href="http://tools.wmflabs.org<?= $uri ?>"><code>http://tools.wmflabs.org<?= $uri ?></code></A>,
-    appears to be non-functional at this time.<p>
+    might exist but the server has been instructed not to let you reach it.<p>
     <? $tool = '';
        if(preg_match("@^/([^/]+)/@", $uri, $part)) {
          $gr = posix_getgrnam("local-".$part[1]);
@@ -29,7 +29,7 @@
        if($tool != ''):
     ?>
       <H2>If you have reached this page from somewhere else...</H2>
-      This URI is part of the <A href="/?tool=<?= $tool ?>"><code><?= $tool?></code></a> tool, maintained by 
+      This URI is managed by the <A href="/?tool=<?= $tool ?>"><code><?= $tool?></code></a> tool, maintained by 
       <? foreach($maintainers as $num => $maint):
            $mu = posix_getpwnam($maint);
            if($mu):
@@ -49,16 +49,14 @@
            }
            endforeach;
       ?>.<p>
-      Perhaps its magical script elves are temporarily ill, or the link you've followed doesn't actually lead
-      somewhere useful?
+      Perhaps this content can only be accessed from the secret underground lair of the maintainers, or the link
+      you've followed doesn't actually lead somewhere useful?
       <p>
       If you're pretty sure this shouldn't be an error, you may wish to notify the tool's maintainers (above)
       about the error and how you ended up here.
       <H2>If you maintain this tool</H2>
-      The error might be caused by incorrect permission, or by an error in the script or CGI that was meant
-      to execute here.  You may wish to check your logs or 
-      <A href="https://wikitech.wikimedia.org/wiki/Nova_Resource:Tools/Help#Logs">common causes for errors</A> in the help
-      documentation.
+      The error might be caused by incorrect permissions, or by the absence of an index file (this webserver
+      does not list directory contents by default).
     <? else: ?>
       Perhaps the webserver has temporarily lost its mind, or the link you've followed doesn't actually lead
       somewhere useful?

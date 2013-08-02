@@ -1,13 +1,14 @@
 <H1>Wikimedia Tool Labs</H1>
-Welcome to the Tool Labs project, the home of community-maintained external tools supporting Wikimedia projects and their users.
+Welcome to the Tool Labs project, the home of community-maintained external tools supporting Wikimedia projects and their users. On this page you can find a complete list of hosted tools along with any additional information provided by the tool maintainers. Labs users who have been granted access to the Tools project may also create a new tool or add/remove maintainers to or from a tool that they manage.
+
 
 <h2>Useful links</h2>
 <ul>
-    <li><a href="https://wikitech.wikimedia.org/wiki/Nova_Resource:Tools">main page on wikitech</a></li>
+    <li><a href="https://wikitech.wikimedia.org/wiki/Nova_Resource:Tools">Tools project page on wikitech</a> (find out more about the Tools project)</li>
 <br>
-    <li><a href="https://wikitech.wikimedia.org/w/index.php?title=Special:UserLogin&returnto=Main+Page&type=signup">create a new user</a></li>
-    <li><a href="https://wikitech.wikimedia.org/wiki/Special:NovaKey">add a public SSH key</a></li>
-    <li><a href="https://wikitech.wikimedia.org/wiki/Special:FormEdit/Tools_Access_Request">Request access to the project</a></li>
+    <li><a href="https://wikitech.wikimedia.org/w/index.php?title=Special:UserLogin&returnto=Main+Page&type=signup">Create a Labs account</a> (you must have a Labs account to access the Tools project)</li>
+    <li><a href="https://wikitech.wikimedia.org/wiki/Special:NovaKey">Add a public SSH key</a> (you’ll need this to access Labs servers using SSH)</li>
+    <li><a href="https://wikitech.wikimedia.org/wiki/Special:FormEdit/Tools_Access_Request">Request access to the Tools project</a> (Join us!)</li>
 </ul>
 
 <h2><span class="mw-headline" style="display: inline;">Hosted tools</span>

@@ -1,1 +1,1 @@
-SUBDIRS = jobutils misctools
+SUBDIRS = jobutils misctools src

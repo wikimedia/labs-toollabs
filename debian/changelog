@@ -1,3 +1,10 @@
+toollabs (1.0.5) unstable; urgency=low
+
+  * Marc-André Pelletier: jsub should allow -q to override
+    the queue name even when -continuous is used
+
+ -- Marc-André Pelletier <mpelletier@wikimedia.org>  Thu, 5 Sep 2013 14:37:35 -0400
+
 toollabs (1.0.4) unstable; urgency=low
 
   * Marc-André Pelletier: make jsub accept -M and -m for

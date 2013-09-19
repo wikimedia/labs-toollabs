@@ -12,7 +12,7 @@ Welcome to the Tool Labs project, the home of community-maintained external tool
 </ul>
 
 <h2><span class="mw-headline" style="display: inline;">Hosted tools</span>
-     <span class="mw-editsection">[<a href="https://wikitech.wikimedia.org/w/index.php?title=Special:NovaProject&action=addservicegroup&projectname=tools">create new tool</a>]</span>
+     <span class="mw-editsection">[<a href="https://wikitech.wikimedia.org/w/index.php?title=Special:NovaServiceGroup&action=addservicegroup&projectname=tools">create new tool</a>]</span>
 </h2>
   <TABLE CLASS="tool-list" COLS=3>
 <?  $users = shell_exec("/usr/bin/getent group|/bin/grep ^local-");

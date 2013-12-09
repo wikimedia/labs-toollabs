@@ -74,9 +74,14 @@ This is the web server for the Tool Labs project, the home of community-maintain
     $j['tool'] = preg_replace('/^local-(.*)$/', "$1", $tool);
     $j['sub'] = $job['JB_submission_time'];
     $j['name'] = $job['JB_job_name'];
-    foreach($job['JB_hard_resource_list'] as $rval) {
-      if($rval['CE_name'] == 'h_vmem') {
-        $j['mem_alloc'] = intval($rval['CE_doubleval']/1048576);
+    foreach($job['JB_hard_resource_list'] as $rvals) {
+      if(!isset($rvals[0])) {
+        $rvals = array($rvals);
+      }
+      foreach($rvals as $rval){
+        if($rval['CE_name'] == 'h_vmem') {
+          $j['mem_alloc'] = intval($rval['CE_doubleval']/1048576);
+        }
       }
     }
     $j['tasks'] = 0;

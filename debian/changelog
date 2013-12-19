@@ -1,3 +1,9 @@
+toollabs (1.0.6) unstable; urgency=low
+
+  * Marc-André Pelletier: add webservice
+
+ -- Marc-André Pelletier <mpelletier@wikimedia.org>  Thu, 19 Dec 2013 14:51:00 -0500
+
 toollabs (1.0.5) unstable; urgency=low
 
   * Marc-André Pelletier: jsub should allow -q to override

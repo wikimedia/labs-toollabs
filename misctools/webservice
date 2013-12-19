@@ -1,0 +1,93 @@
+#! /bin/bash
+
+tool=$(/usr/bin/id -nu|sed -e 's/^local-//')
+user="local-$tool"
+home=$(getent passwd $user | cut -d : -f 6 | sed -e 's/\/$//')
+if [ "$(getent group $user | cut -d : -f 1)" != "$user" ]; then
+    echo "$0: $tool does not appear to be a tool" >&2
+    exit 1
+fi
+spool="/var/run/lighttpd"
+runbase="$spool/$tool"
+
+if [ "$home" = "" -o ! -d "$home/public_html" ]; then
+    echo "$tool does not have a public_html" >&2
+    exit 1
+fi
+
+job=$(qstat -q 'webgrid' -j "httpd-$tool" 2>&1 | grep job_number: | sed -e 's/^.*  *\(.*\)$/\1/')
+if [ "$job" != "" ]; then
+    si=$(qstat -j "$job" 2>&1 | grep 'scheduling info': | sed -e 's/^.*: *\(.*\)$/\1/')
+fi
+
+waitdown() {
+    wj="$1"
+    while [ "$wj" = "$1" ]; do
+        wj=$(qstat -j "$1" 2>&1 | grep job_number: | sed -e 's/^.*  *\(.*\)$/\1/')
+        echo -n .
+        sleep 1
+    done
+}
+
+case "$1" in
+    start)
+
+        echo -n "Starting webservice..."
+        if [ "$job" != "" ]; then
+            echo "Webservice already running."
+        else
+            if qsub -e $home/error.log -o $home/error.log -i /dev/null -q webgrid -l h_vmem=4g -b y -N "httpd-$tool" /usr/local/bin/tool-lighttpd >/dev/null 2>&1 ; then
+                echo " started."
+            else
+                echo " failed."
+            fi
+        fi
+        ;;
+
+    restart)
+        echo -n "Restarting webservice.."
+        if [ "$job" != "" ]; then
+            qdel -j "$job" >/dev/null 2>&1
+            waitdown "$job"
+        else
+            echo -n .
+        fi
+        if qsub -e $home/error.log -o /dev/null -i /dev/null -q webgrid -l h_vmem=4g -b y -N "httpd-$tool" /usr/local/bin/tool-lighttpd >/dev/null 2>&1; then
+            echo " restarted."
+        else
+            echo " failed."
+        fi
+        ;;
+
+    status)
+        if [ "$job" != "" ]; then
+            if [ "$si" != "" ]; then
+                echo "Your webservice is scheduled:"
+                echo "  $si"
+            else
+                echo "Your webservice is running (job $job)."
+            fi
+            exit 0
+        else
+            echo "Your webservice is not running."
+            exit 1
+        fi
+        ;;
+
+    stop)
+        if [ "$job" != "" ]; then
+            echo -n "Stopping webservice.."
+            qdel -j "$job" >/dev/null 2>&1
+            waitdown "$job"
+            echo " stopped."
+        else
+            echo "Webservice not running."
+        fi
+        ;;
+
+    *)
+        echo "usage: $(basename $0) start|restart|status|stop" >&2
+        exit 1
+        ;;
+esac
+

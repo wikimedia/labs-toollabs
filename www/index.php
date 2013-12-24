@@ -27,39 +27,71 @@
     $config->set('URI.DisableExternalResources', true);
     $purifier = new HTMLPurifier($config);
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<HTML>
-  <HEAD>
-    <TITLE>Tool Labs</TITLE>
-    <LINK rel="StyleSheet" href="/style.css" type="text/css" media=screen>
-    <META charset="utf-8">
-    <META name="title" content="Tool Labs">
-    <META name="description" content="This is the Tool Labs project for community-developed tools assisting the Wikimedia projects.">
-    <META name="author" content="Wikimedia Foundation">
-    <META name="copyright" content="Creative Commons Attribution-Share Alike 3.0">
-    <META name="publisher" content="Wikimedia Foundation">
-    <META name="language" content="Many">
-    <META name="robots" content="index, follow">
-  </HEAD>
-  <BODY>
-    <TABLE border="0" cellpadding="1em"><TR>
-    <TD valign="top">
-      <A HREF="/">
-        <IMG SRC="https://wikitech.wikimedia.org/w/images/c/cf/Labslogo_thumb.png" ALT="Wikitech and Wikimedia Labs">
-      </A>
-      <DIV CLASS="sidebar">
-        <HR>
-        <A HREF="/?list">Tools</A>
-        <A HREF="/?status">Status</A>
-        <A HREF="/?Privacy">Privacy policy</A>
-        <HR>
-        Maintainers:
-        <A HREF="/?Help">Help</A>
-        <A HREF="/?Rules">Rules</A>
-        <HR>
-      </DIV>
-    </TD><TD class="content"><?
+<html>
+  <head>
+    <title>Tool Labs</title>
+    <meta charset="utf-8" />
+    <meta name="title" content="Tool Labs" />
+    <meta name="description" content="This is the Tool Labs project for community-developed tools assisting the Wikimedia projects." />
+    <meta name="author" content="Wikimedia Foundation" />
+    <meta name="copyright" content="Creative Commons Attribution-Share Alike 3.0" />
+    <meta name="publisher" content="Wikimedia Foundation" />
+    <meta name="language" content="Many" />
+    <meta name="robots" content="index, follow" />
+    <link rel="StyleSheet" href="style.css" type="text/css" media="screen" />
+    <!--[if lt IE 7]>
+    <style media="screen" type="text/css">
+    .col1 {
+      width:100%;
+    }
+    </style>
+    <![endif]-->
+    <script src="libs/jquery.js"></script>
+    <script src="libs/jquery.tablesorter.min.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function() 
+          { 
+            $(".tablesorter").tablesorter({
+                sortList: [[0,0]],
+                // initialize zebra striping of the table
+                widgets: ["zebra"],
+                // change the default striping class names
+                // updated in v2.1 to use widgetOptions.zebra = ["even", "odd"]
+                // widgetZebra: { css: [ "normal-row", "alt-row" ] } still works
+                widgetOptions : {
+                  zebra : [ "normal-row", "alt-row" ]
+                }
+              });
+          } 
+      );   
+    </script>
+  </head>
+  <body>
+    <div class="colmask leftmenu">
+      <div class="colright">
+        <div class="col1wrap">
+          <div class="col1">
+    <?
       include "content/$content.php";
-    ?></TD>
-  </BODY>
-</HTML>
+    ?>
+          </div>
+        </div>
+        <div class="col2">
+          <div id="logo"><a href="/"><img src="./Tool_Labs_logo_thumb.png" width="122" height="138" alt="Wikitech and Wikimedia Labs" /></a></div>
+
+          <ul>
+            <li><a href="?list">Tools</a></li>
+            <li><a href="?status">Status</a></li>
+            <li><a href="?Privacy">Privacy policy</a></li>
+          </ul>
+          <em>Maintainers:</em>
+          <ul>
+            <li><a href="?Help">Help</a></li>
+            <li><a href="?Rules">Rules</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
 

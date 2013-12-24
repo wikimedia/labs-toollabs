@@ -60,9 +60,11 @@
 	  }
   }
 ?>
-<H1>Wikimedia Tool Labs</H1>
-This is the web server for the Tool Labs project, the home of community-maintained external tools supporting Wikimedia projects and their users.
-<H2>Grid status</H2>
+            <h1>Wikimedia Tool Labs</h1>
+            <p>This is the web server for the Tool Labs project, the home of community-maintained external tools supporting Wikimedia projects and their users.</p>
+
+            <h2>Grid Status</h2>
+
 <?
   $jobs = array();
   foreach($rawjobs['queue_info']['job_list'] as $jl) {
@@ -127,32 +129,47 @@ This is the web server for the Tool Labs project, the home of community-maintain
   ksort($hosts);
   ksort($jobs);
   foreach($hosts as $host => $h):
-      ?><DIV CLASS="hostline">
-	  <SPAN CLASS="hostname"><?= $host ?></SPAN>
-          <SPAN><B>Load:</B> <?= (int)($h['use']*1000)/10 ?>%</SPAN>
-          <SPAN><B>Memory:</B> <?= (int)($h['mem']*1000)/10 ?>%</SPAN>
-          <SPAN><B>Free vmem:</B> <? echo $h_vmem[$host]; ?></SPAN>
-        </DIV>
-      <TABLE CLASS="hostjobs"><?
+      ?>
+            <div class="hostline">
+              <span class="hostname"><?= $host ?></span>
+              <b>Load:</b> <?= (int)($h['use']*1000)/10 ?>%
+              <b>Memory:</b> <?= (int)($h['mem']*1000)/10 ?>%
+              <b>Free vmem:</b> <? echo $h_vmem[$host]; ?>
+            </div>
+            <table class="hostjobs tablesorter">
+              <thead>
+                <tr>
+                  <th>No.</th>
+                  <th>Name</th>
+                  <th>Tool</th>
+                  <th>State</th>
+                  <th>Time</th>
+                  <th>CPU</th>
+                  <th>VMEM</th>
+                </tr>
+              </thead>
+              <tbody>
+      <?
       foreach($jobs as $jobid => $j):
       if($j['host'] != $host)
         continue;
-          ?><TR CLASS="jobline-<?= $j['state'] ?>">
-          <TD CLASS="jobno"><?= $jobid ?></TD>
-          <TD CLASS="jobname"><SPAN><?= htmlspecialchars($j['name']) ?></SPAN></TD>
-          <TD CLASS="jobtool"><A HREF="/?list#<?= $j['tool'] ?>"><?= $j['tool'] ?></A></TD>
-          <TD CLASS="jobstate"><SPAN><?= ucfirst($j['queue']) ?> / <?= ucfirst($j['state']) ?></SPAN></TD>
-          <TD CLASS="jobtime"><SPAN><?= strftime("%F %T", $j['sub']) ?></SPAN></TD>
-          <TD CLASS="jobinfo">
-            <SPAN><B>CPU:</B> <?= humantime($j['cpu']) ?></SPAN>
-            <SPAN><B>VMEM:</B> <?= humanmem($j['mem_used']) ?>/<?= humanmem($j['mem_alloc']) ?>
-              <? if($j['mem_max'] > $j['mem_used']): ?>
-                (peak <?= humanmem($j['mem_max']) ?>)
-              <? endif; ?>
-            </SPAN>
-          </TD>
-        </TR><?
-    endforeach;
-    print "</TABLE>\n";
+          ?>
+                <tr class="jobline-<?= $j['state'] ?>">
+                  <td class="jobno"><?= $jobid ?></td>
+                  <td class="jobname"><?= htmlspecialchars($j['name']) ?></td>
+                  <td class="jobtool"><a href="/?list#<?= $j['tool'] ?>"><?= $j['tool'] ?></a></td>
+                  <td class="jobstate"><?= ucfirst($j['queue']) ?> / <?= ucfirst($j['state']) ?></td>
+                  <td class="jobtime"><?= strftime("%F %T", $j['sub']) ?></td>
+                  <td class="jobcpu"><?= humantime($j['cpu']) ?></td>
+                  <td class="jobvmem">
+                    <?= humanmem($j['mem_used']) ?>/<?= humanmem($j['mem_alloc']) ?> <? if($j['mem_max'] > $j['mem_used']): ?>(peak <?= humanmem($j['mem_max']) ?>)<? endif; ?>
+                  </td>
+                </tr>
+      <?
+          endforeach;
+      ?>
+              </tbody>
+            </table>
+<?
   endforeach;
-?></TABLE>
+?>

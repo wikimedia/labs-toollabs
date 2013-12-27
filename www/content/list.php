@@ -44,7 +44,7 @@
     }
     ksort($tools);
     foreach($tools as $tool => $t): ?>
-                <tr class="tool" id="abot">
+                <tr class="tool" id="toollist-<?= $tool ?>">
                   <td class="tool-name"><?
       if(array_key_exists('uri', $t)) {
         print "<a class=\"tool-web\" href=\"" . $t['uri'] . "\">$tool</a>";

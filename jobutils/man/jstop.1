@@ -1,16 +1,17 @@
-.\" Man page for jstart
+.\" Man page for jstop
 .\" Licensed under CC-BY-SA
 .\" Created by Marc-André Pelletier
 .\"
-.TH Jobutils "jstop" "User Manual"
+.TH JSTOP 1 2014-01-10 1.0.5 "Wikimedia Labs Tools jobutils"
 .SH NAME
-usage: jstop [jobname]
-
-Delete a job
-
+jstop \- delete a job from the grid
+.SH SYNOPSIS
+.B jstop
+.I jobname
 .SH DESCRIPTION
-jobutils will insert extra commands to grid engine, these tools were created for wikimedia tools project
-.PP
-.SH "AUTHOR"
+.B jstop
+deletes the job with the name
+.I jobname
+from the grid.
+.SH AUTHORS
 Marc-André Pelletier, Petr Bena
-.br

@@ -1,0 +1,36 @@
+.\" Man page for job
+.\" Licensed under CC-BY-SA
+.\" Created by Marc-André Pelletier
+.\"
+.TH JOB 1 2014-01-10 1.0.5 "Wikimedia Labs Tools jobutils"
+.SH NAME
+job \- output the job number to a name
+.SH SYNOPSIS
+.B job
+.I jobname
+
+.B job
+\-v
+.I jobname
+
+.B job
+\-q
+.I jobname
+.SH DESCRIPTION
+.B job
+outputs the job number corresponding to
+.I jobname
+on standard output.
+.SH OPTIONS
+.TP
+.B -v
+Output verbose (human readable) information.
+.TP
+.B -q
+Do not output anything, just set exit status.
+.SH EXIT STATUS
+.B job
+returns 0 if no job with that name exists, 1 if such a job is
+currently running and 2 if such a job is currently queued.
+.SH AUTHORS
+Marc-André Pelletier, Petr Bena

@@ -1,34 +1,73 @@
-.\" Man page for jstart
+.\" Man page for jsub
 .\" Licensed under CC-BY-SA
 .\" Created by Marc-André Pelletier
 .\"
-.TH Jobutils "jsub" "User Manual"
+.TH JSUB 1 2014-01-10 1.0.5 "Wikimedia Labs Tools jobutils"
 .SH NAME
-usage: jsub [options...] program [arg...]
+jsub, jstart, qcronsub \- submit jobs to the grid
+.SH SYNOPSIS
+.B jsub
+[options] program [args]
 
+.B jstart
+[options] program [args]
+
+.B qcronsub
+[options] program [args]
+.SH DESCRIPTION
+.B jsub
+submits a job to the grid.
+.B qcronsub
+submits a job only if a job with the same name is not already queued or running.
+.B jstart
+submits a self-restarting job on the continuous queue.
+.SH OPTIONS
 Options include many (but not all) qsub options, along with:
- \-stderr           Send errors to stderr rather than the error
-                   output file.
- \-mem <value>      Request <value> amount of memory for the job.
-                   (number prefixed by 'k', 'm' or 'g')
- \-once             Only start one job with that name, fail if
-                   another is already started or queued (default if
-                   invoked as 'jstart').
- \-continuous       Start a self-restarting job on the continuous
-                   queue (default if invoked as 'jstart')
- \-umask <value>    Set umask for output files if they don't exist
- \-quiet            Suppress output if job could be submitted.
-
-Unlike qsub, if you do not specify output and error files, output is appended
-by default to files named <job>.err and <job>.out in your home directory
-(without job numbers), including errors from starting the job itself.
+.TP
+.BI \-stderr
+Send errors to stderr rather than the error output file.
+.TP
+.BI \-mem\  value
+Request
+.I value
+amount of memory for the job (number suffixed by "k", "m" or "g").
+.TP
+.BI \-once
+Only start one job with that name, fail if another is already started
+or queued (default if invoked as
+.B jstart
+or
+.BR qcronsub ).
+.TP
+.BI \-continuous
+Start a self-restarting job on the continuous queue (default if
+invoked as
+.BR jstart ).
+.TP
+.BI \-umask\  value
+Set umask for output files if they don't exist.
+.TP
+.BI \-quiet
+Suppress output if job was submitted successfully.
+.SH EXIT STATUS
+.BR jsub ,
+.B jstart
+and
+.B qcronsub
+return 0 on successful submission, and a different exit code
+otherwise.
+.SH NOTES
+Unlike qsub, if you do not specify output and error files, output is
+appended by default to files named
+.I <job>.err
+and
+.I <job>.out
+in your home directory (without job numbers), including errors from
+starting the job itself.
 
 Additionally, you need to provide an executable on the command line,
-jstart will not read a script from standard input.
-
-.SH DESCRIPTION
-jobutils will insert extra commands to grid engine, these tools were created for wikimedia tools project
-.PP
-.SH "AUTHOR"
+these utilities will not read a script from standard input.
+.SH AUTHORS
 Marc-André Pelletier, Petr Bena
-.br
+.SH SEE ALSO
+.BR qsub (1)

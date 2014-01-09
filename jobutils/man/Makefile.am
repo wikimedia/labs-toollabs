@@ -1,1 +1,1 @@
-man_MANS = jstart.1 jstop.1 jsub.1
+man_MANS = job.1 jstop.1 jsub.1

@@ -15,38 +15,28 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #
 
+cd /data/project/
 export HOME=/root
+prefix=$(/bin/cat /etc/wmflabs-project)
+
 while true;do
-	cd /data/project/
-	for tool in $(getent passwd | cut -d : -f 1 | sed -n '/^local-/{s///;p}'); do
-		if [ ! -d "/data/project/$tool" ]; then
+
+	getent passwd | grep "^$prefix\\." | cut -d : -f 1 | sed -n '/^[^.]*./{s///;p}' | while read tool; do
+
+		if [ ! -d "$tool" ]; then
 			logger -t toolwatcher "Creating tool $tool"
 
 			mkdir "$tool"
 			mkdir "$tool/public_html"
 			mkdir "$tool/cgi-bin"
 			chmod -R g+rw,o+r "$tool"
-			chown -R "local-$tool:local-$tool" "$tool"
+			chown -R "$prefix.$tool:$prefix.$tool" "$tool"
 			find "$tool" -type d | xargs chmod g+sx,o+x
 		fi
 
-    if [ -r $tool/replica.my.cnf -a ! -r /data/project/.system/cache/localdb-$tool ]; then
-      user="$(sed -n -e "/user='\(.*\)'/{;s//\1/;p;}" $tool/replica.my.cnf)"
-      password="$(sed -n -e "/password='\(.*\)'/{;s//\1/;p;}" $tool/replica.my.cnf)"
-      /usr/bin/mysql -h tools-db -u root <<-END
-        grant usage on *.* to '$user'@'%' identified by '$password';
-        grant all privileges on \`${user}__%\`.* to '$user'@'%' with grant option;
-        grant select on \`%_p\`.* to '$user'@'%';
-END
-      touch /data/project/.system/cache/localdb-$tool
-    fi
-
-		if ! grep -q "^$tool " /data/project/.system/webservers >/dev/null; then
-      echo "add '$tool' to webservers again?"
-			echo "$tool tools-webserver-01" >>/data/project/.system/webservers
-		fi
 	done
-	cd /tmp
+
 	sleep 120
+
 done
 

@@ -1,3 +1,9 @@
+toollabs (1.0.7) unstable; urgency=low
+
+  * Marc-André Pelletier: fixes for eqiad
+
+ -- Marc-André Pelletier <mpelletier@wikimedia.org>  Fri, 28 Feb 2014 23:20:00 -0500
+
 toollabs (1.0.6) unstable; urgency=low
 
   * Marc-André Pelletier: add webservice

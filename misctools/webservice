@@ -1,7 +1,8 @@
 #! /bin/bash
 
-tool=$(/usr/bin/id -nu|sed -e 's/^local-//')
-user="local-$tool"
+prefix=(/bin/cat /etc/wmflabs-project)
+tool=$(/usr/bin/id -nu|sed -e "s/^$prefix.//")
+user="$prefix.$tool"
 home=$(getent passwd $user | cut -d : -f 6 | sed -e 's/\/$//')
 if [ "$(getent group $user | cut -d : -f 1)" != "$user" ]; then
     echo "$0: $tool does not appear to be a tool" >&2

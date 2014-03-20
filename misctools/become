@@ -16,7 +16,7 @@
 #
 
 prefix=$(/bin/cat /etc/wmflabs-project)
-if [ $# -lt 1 ]; then
+if [ $# -lt 1 -o "$1" = "--help" ]; then
   echo "usage: $(basename $0) <toolname> [command [args...]]" >&2
   exit 1
 fi

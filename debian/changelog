@@ -8,6 +8,7 @@ toollabs (1.0.9) unstable; urgency=low
     Work around pbuilder not properly setting $USER [Tim Landscheidt]
     Fix Lintian errors in jobutils man pages [Tim Landscheidt]
     Fix Lintian errors in misctools man pages [Tim Landscheidt]
+    Simplify toolwatcher [Tim Landscheidt]
 
  -- Marc-André Pelletier <mpelletier@wikimedia.org>  Thu, 25 Jul 2014 11:00:00 -0400
 

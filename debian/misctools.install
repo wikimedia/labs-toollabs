@@ -1,4 +1,5 @@
 usr/bin/become
 usr/bin/take
+usr/bin/webservice
 usr/sbin/rmtool
 usr/sbin/toolwatcher

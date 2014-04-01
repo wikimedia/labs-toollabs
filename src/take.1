@@ -1,0 +1,18 @@
+.TH TAKE 1 2014-04-01 1.0.8dev "Wikimedia Labs Tools misctools"
+.SH NAME
+take \- assume ownership of files and directories
+.SH SYNOPSIS
+.B take
+.RI [ files ]
+.SH DESCRIPTION
+.B take
+changes the ownership of files and directories to that of the calling
+user provided that the containing directory is owned by the calling
+user and the calling user shares a group with the file or directory.
+Directories are processed recursively.
+.SH EXIT STATUS
+.B take
+returns 0 in case of success.  Otherwise, the exit status is greater
+than 0.
+.SH AUTHORS
+Marc-André Pelletier

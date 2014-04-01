@@ -1,0 +1,19 @@
+.TH TOOLWATCHER 8 2014-04-01 1.0.8dev "Wikimedia Labs Tools misctools"
+.SH NAME
+toolwatcher \- create home directories for tool accounts
+.SH SYNOPSIS
+.B toolwatcher
+.SH DESCRIPTION
+.B toolwatcher
+is a daemon that creates a basic directory structure with useful
+permissions for (new) tool accounts.  This encompasses the home
+directory and two subdirectories
+.I cgi-bin
+and
+.I public_html
+with the permissions u=rwx,g=rwsx,o=rx.
+.SH EXIT STATUS
+.B toolwatcher
+does not return.
+.SH AUTHORS
+Marc-André Pelletier, Petr Bena

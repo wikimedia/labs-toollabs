@@ -1,0 +1,21 @@
+.TH BECOME 1 2014-04-01 1.0.8dev "Wikimedia Labs Tools misctools"
+.SH NAME
+become \- switch to a tool account
+.SH SYNOPSIS
+.B become
+.I tool
+.RI [ sudo-args ]
+.SH DESCRIPTION
+.B become
+switches to a tool account by calling sudo.  Optional arguments are
+passed on to sudo.
+.SH EXIT STATUS
+If no tool account's name is provided or the tool account does not
+exist,
+.B become
+returns 1.  Otherwise, the exit status of the created sudo process is
+returned.
+.SH AUTHORS
+Marc-André Pelletier, Petr Bena
+.SH SEE ALSO
+.BR sudo (8)

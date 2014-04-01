@@ -1,9 +1,13 @@
 toollabs (1.0.9) unstable; urgency=low
 
   * Merge of a number of patches:
-    become: Add --help option. [Tim Landscheidt]
+    become: Add --help option [Tim Landscheidt]
     Package webservice [Tim Landscheidt]
     become: Made more user-friendly [Tim Landscheidt]
+    Fix build and run-time dependencies [Tim Landscheidt]
+    Work around pbuilder not properly setting $USER [Tim Landscheidt]
+    Fix Lintian errors in jobutils man pages [Tim Landscheidt]
+    Fix Lintian errors in misctools man pages [Tim Landscheidt]
 
  -- Marc-André Pelletier <mpelletier@wikimedia.org>  Thu, 25 Jul 2014 11:00:00 -0400
 

@@ -1,16 +1,18 @@
 <?
     $dr = $_SERVER['DOCUMENT_ROOT'];
-    $orig = $_SERVER['HTTP_X_ORIGINAL_URI'];
-    if(!isset($orig)) {
-      $orig = $_SERVER['REQUEST_URI'];
-    }
-    if(preg_match('/^(.*)\?(.*)$/', $orig, $m)) {
+    $orig = $_SERVER['REQUEST_URI'];
+    if(preg_match('/^\/\.([^?]*)$/', $orig, $m)) {
+      # Hack for error_document not allowing queries
+      $qstring = $m[1];
+      $orig = '/';
+    } elseif(preg_match('/^(.*)\?(.*)$/', $orig, $m)) {
       $qstring = $m[2];
       $orig = $m[1];
     }
     $uri = $orig;
     $uri = preg_replace('/^\/admin/', '', $uri);
     $uri = preg_replace("/^(\\$_SERVER[SCRIPT_NAME])+\/?/", '/', $uri);
+
     if(preg_match('/^\/([^\/]+)(\/.*)?/', $uri, $m)) {
       if(is_dir("/data/project/$m[1]/public_html")) {
         if(!isset($m[2])) {
@@ -22,8 +24,10 @@
           exit(0);
         }
         header("HTTP/1.0 503 No Webservice");
+        exit(0);
       }
     }
+
     if(is_file("$dr$uri") and is_readable("$dr$uri")) {
       $mime = 'text/html';
       if(preg_match('/\.(.+)$/', $uri, $m)) switch($m[1]) {

@@ -1,10 +1,10 @@
 <? $uri = $_SERVER['X_ORIGINAL_URI']; ?>
-      <h1>Internal error</h1>
+      <h1>No webservice</h1>
       <p>The URI you have requested, <a href="http://tools.wmflabs.org<?= $uri ?>"><code>http://tools.wmflabs.org<?= $uri ?></code></a>,
-      appears to be non-functional at this time.</p>
+        is not currently serviced.</p>
       <? $tool = '';
          if(preg_match("@^/([^/]+)/@", $uri, $part)) {
-           $gr = posix_getgrnam("local-".$part[1]);
+           $gr = posix_getgrnam("tools.".$part[1]);
            if($gr) {
              $tool = $part[1];
              $maintainers = $gr['members'];
@@ -33,15 +33,14 @@
              }
              endforeach;
         ?>.</p>
-        <p>Perhaps its magical script elves are temporarily ill, or the link you've followed doesn't actually lead
-        somewhere useful?<p>
+        <p>That tool might not have a web interface, or it may currently be disabled.</p>
         <p>If you're pretty sure this shouldn't be an error, you may wish to notify the tool's maintainers (above)
         about the error and how you ended up here.</p>
         <h2>If you maintain this tool</h2>
-        <p>The error might be caused by incorrect permission, or by an error in the script or CGI that was meant
-        to execute here.  You may wish to check your logs or <a href="https://wikitech.wikimedia.org/wiki/Nova_Resource:Tools/Help#Logs">common causes for errors</a> in the help documentation.</p>
+        <p>You have not enabled a web service for your tool, or it has stopped working because of a fatal error.
+        You may wish to check your logs or <a href="https://wikitech.wikimedia.org/wiki/Nova_Resource:Tools/Help#Logs">common causes for errors</a> in the help documentation.</p>
       <? else: ?>
-        <p>Perhaps the webserver has temporarily lost its mind, or the link you've followed doesn't actually lead
-        somewhere useful?</p>
+        <h2>If you have reached this page from somewhere else...</h2>
+        <p>This URI is not currently part of any tool.</p>
         <p>If you're pretty sure this shouldn't be an error, you may wish to notify the <a href="/?tool=admin">project administrators</a> about the error and how you ended up here.</p>
       <? endif ?>

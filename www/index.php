@@ -46,8 +46,8 @@
     }
     </style>
     <![endif]-->
-    <script src="libs/jquery.js"></script>
-    <script src="libs/jquery.tablesorter.min.js"></script>
+    <script src="/libs/jquery.js"></script>
+    <script src="/libs/jquery.tablesorter.min.js"></script>
     <script type="text/javascript">
       $(document).ready(function() 
           { 
@@ -77,17 +77,17 @@
           </div>
         </div>
         <div class="col2">
-          <div id="logo"><a href="/"><img src="./Tool_Labs_logo_thumb.png" width="122" height="138" alt="Wikitech and Wikimedia Labs" /></a></div>
+          <div id="logo"><a href="/"><img src="/Tool_Labs_logo_thumb.png" width="122" height="138" alt="Wikitech and Wikimedia Labs" /></a></div>
 
           <ul>
-            <li><a href="?list">Tools</a></li>
-            <li><a href="?status">Status</a></li>
-            <li><a href="?Privacy">Privacy policy</a></li>
+            <li><a href="/?list">Tools</a></li>
+            <li><a href="/?status">Status</a></li>
+            <li><a href="/?Privacy">Privacy policy</a></li>
           </ul>
           <em>Maintainers:</em>
           <ul>
-            <li><a href="?Help">Help</a></li>
-            <li><a href="?Rules">Rules</a></li>
+            <li><a href="/?Help">Help</a></li>
+            <li><a href="/?Rules">Rules</a></li>
           </ul>
         </div>
       </div>

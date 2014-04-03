@@ -1,4 +1,4 @@
-<? $uri = $_SERVER['REQUEST_URI']; ?>
+<? $uri = $_SERVER['X_ORIGINAL_URI']; ?>
       <h1>Forbidden</h1>
       <p>The URI you have requested, <a href="http://tools.wmflabs.org<?= $uri ?>"><code>http://tools.wmflabs.org<?= $uri ?></code></a>, might exist but the server has been instructed not to let you reach it.</p>
       <? $tool = '';

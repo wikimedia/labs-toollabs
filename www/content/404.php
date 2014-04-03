@@ -1,4 +1,4 @@
-<? $uri = $_SERVER['REQUEST_URI']; ?>
+<? $uri = $_SERVER['X_ORIGINAL_URI']; ?>
       <h1>Four hundred and four!</h2>
       <p>The URI you have requested, <code>http://tools.wmflabs.org<?= $uri ?></code>, doesn't seem to actually exist.</p>
       <? $tool = '';

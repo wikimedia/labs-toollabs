@@ -9,7 +9,7 @@
       $orig = $m[1];
     }
     $uri = $orig;
-    $uri = preg_replace('/^\/csbot/', '', $uri);
+    $uri = preg_replace('/^\/admin/', '', $uri);
     $uri = preg_replace("/^(\\$_SERVER[SCRIPT_NAME])+\/?/", '/', $uri);
     if(preg_match('/^\/([^\/]+)(\/.*)?/', $uri, $m)) {
       if(is_dir("/data/project/$m[1]/public_html")) {
@@ -25,7 +25,14 @@
       }
     }
     if(is_file("$dr$uri") and is_readable("$dr$uri")) {
-      $mime = system("/usr/bin/file -b -i ".escapeshellarg("$dr$uri"));
+      $mime = 'text/html';
+      if(preg_match('/\.(.+)$/', $uri, $m)) switch($m[1]) {
+        case 'png': $mime = 'image/png'; break;
+        case 'svg': $mime = 'image/svg+xml'; break;
+        case 'ico': $mime = 'image/x-icon'; break;
+        case 'css': $mime = 'text/css'; break;
+        case 'php': $mime = 'application/x-httpd-php-source'; breal;
+      }
       header("Content-Type: $mime");
       header("X-Sendfile: $dr$uri");
       exit(0);

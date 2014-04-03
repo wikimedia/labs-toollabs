@@ -46,8 +46,8 @@
     }
     </style>
     <![endif]-->
-    <script src="/libs/jquery.js"></script>
-    <script src="/libs/jquery.tablesorter.min.js"></script>
+    <script src="/admin/libs/jquery.js"></script>
+    <script src="/admin/libs/jquery.tablesorter.min.js"></script>
     <script type="text/javascript">
       $(document).ready(function() 
           { 

@@ -38,7 +38,7 @@
     <meta name="publisher" content="Wikimedia Foundation" />
     <meta name="language" content="Many" />
     <meta name="robots" content="index, follow" />
-    <link rel="StyleSheet" href="style.css" type="text/css" media="screen" />
+    <link rel="StyleSheet" href="/style.css" type="text/css" media="screen" />
     <!--[if lt IE 7]>
     <style media="screen" type="text/css">
     .col1 {

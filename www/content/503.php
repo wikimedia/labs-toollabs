@@ -1,6 +1,6 @@
 <? $uri = $_SERVER['X_ORIGINAL_URI']; ?>
       <h1>No webservice</h1>
-      <p>The URI you have requested, <a href="http://tools.wmflabs.org<?= $uri ?>"><code>http://tools.wmflabs.org<?= $uri ?></code></a>,
+      <p>The URI you have requested, <a href="<?= $uri ?>"><code><?= $uri ?></code></a>,
         is not currently serviced.</p>
       <? $tool = '';
          if(preg_match("@^/([^/]+)/@", $uri, $part)) {

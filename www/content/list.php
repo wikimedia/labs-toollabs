@@ -21,7 +21,7 @@
                 </tr>
               </thead>
               <tbody>
-<?  $users = shell_exec("/usr/bin/getent group|/bin/grep ^local-");
+<?  $users = shell_exec("/usr/bin/getent group|/bin/grep ^tools.");
     foreach(split("\n", $users) as $ln) {
       $fields = split(":", $ln);
       if(array_key_exists(3, $fields)) {
@@ -29,7 +29,7 @@
         $u = posix_getpwuid($gid);
         $home = $u['dir'];
         $indices = glob("$home/public_html/index.*");
-        $user = preg_replace("/^local-/", '', $user);
+        $user = preg_replace("/^tools./", '', $user);
         $tool = array( 'home' => $home );
         $tool['maints'] = array();
         foreach(split(",", $members) as $uid) {
@@ -53,8 +53,8 @@
       }
 ?>
                       <span class="mw-editsection">
-                        [<a href="https://wikitech.wikimedia.org/w/index.php?title=Special:NovaServiceGroup&action=addmember&projectname=tools&servicegroupname=local-<?=$tool?>">add</a> / 
-                        <a href="https://wikitech.wikimedia.org/w/index.php?title=Special:NovaServiceGroup&action=deletemember&projectname=tools&servicegroupname=local-<?=$tool?>">remove</a> maintainers]
+                        [<a href="https://wikitech.wikimedia.org/w/index.php?title=Special:NovaServiceGroup&action=addmember&projectname=tools&servicegroupname=tools.<?=$tool?>">add</a> / 
+                        <a href="https://wikitech.wikimedia.org/w/index.php?title=Special:NovaServiceGroup&action=deletemember&projectname=tools&servicegroupname=tools.<?=$tool?>">remove</a> maintainers]
                       </span>
                   </td>
                   <td class="tool-maintainers"><?

@@ -1,10 +1,10 @@
 <? $uri = $_SERVER['X_ORIGINAL_URI']; ?>
       <h1>Internal error</h1>
-      <p>The URI you have requested, <a href="http://tools.wmflabs.org<?= $uri ?>"><code>http://tools.wmflabs.org<?= $uri ?></code></a>,
+      <p>The URI you have requested, <a href="<?= $uri ?>"><code><?= $uri ?></code></a>,
       appears to be non-functional at this time.</p>
       <? $tool = '';
          if(preg_match("@^/([^/]+)/@", $uri, $part)) {
-           $gr = posix_getgrnam("local-".$part[1]);
+           $gr = posix_getgrnam("tools.".$part[1]);
            if($gr) {
              $tool = $part[1];
              $maintainers = $gr['members'];

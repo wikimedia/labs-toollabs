@@ -73,7 +73,7 @@
     $job = $job['djob_info']['element'];
     $j = array();
     $tool = $job['JB_owner'];
-    $j['tool'] = preg_replace('/^local-(.*)$/', "$1", $tool);
+    $j['tool'] = preg_replace('/^tools.(.*)$/', "$1", $tool);
     $j['sub'] = $job['JB_submission_time'];
     $j['name'] = $job['JB_job_name'];
     foreach($job['JB_hard_resource_list'] as $rvals) {

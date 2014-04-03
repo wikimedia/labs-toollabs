@@ -1,9 +1,9 @@
-<? $uri = $_SERVER['X_ORIGINAL_URI']; ?>
+<? $uri = $_SERVER['HTTP_X_ORIGINAL_URI']; ?>
       <h1>Forbidden</h1>
-      <p>The URI you have requested, <a href="http://tools.wmflabs.org<?= $uri ?>"><code>http://tools.wmflabs.org<?= $uri ?></code></a>, might exist but the server has been instructed not to let you reach it.</p>
+      <p>The URI you have requested, <a href="<?= $uri ?>"><code><?= $uri ?></code></a>, might exist but the server has been instructed not to let you reach it.</p>
       <? $tool = '';
          if(preg_match("@^/([^/]+)/@", $uri, $part)) {
-           $gr = posix_getgrnam("local-".$part[1]);
+           $gr = posix_getgrnam("tools.".$part[1]);
            if($gr) {
              $tool = $part[1];
              $maintainers = $gr['members'];

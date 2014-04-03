@@ -1,8 +1,8 @@
 <H1>Wikimedia Tool Labs</H1>
 Welcome to the Tool Labs project, the home of community-maintained external tools supporting Wikimedia projects and their users.
   <? $tool='';
-     $g = posix_getgrnam("local-" . $_REQUEST['tool']);
-     $u = posix_getpwnam("local-" . $_REQUEST['tool']);
+     $g = posix_getgrnam("tools." . $_REQUEST['tool']);
+     $u = posix_getpwnam("tools." . $_REQUEST['tool']);
      if($g and $u) {
        $tool = $_REQUEST['tool'];
        $maintainers = $g['members'];

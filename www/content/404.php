@@ -1,9 +1,9 @@
-<? $uri = $_SERVER['X_ORIGINAL_URI']; ?>
+<? $uri = $_SERVER['HTTP_X_ORIGINAL_URI']; ?>
       <h1>Four hundred and four!</h2>
-      <p>The URI you have requested, <code>http://tools.wmflabs.org<?= $uri ?></code>, doesn't seem to actually exist.</p>
+      <p>The URI you have requested, <code><?= $uri ?></code>, doesn't seem to actually exist.</p>
       <? $tool = '';
          if(preg_match("@^/([^/]+)/@", $uri, $part)) {
-           $gr = posix_getgrnam("local-".$part[1]);
+           $gr = posix_getgrnam("tools.".$part[1]);
            if($gr) {
              $tool = $part[1];
              $maintainers = $gr['members'];

@@ -1,23 +1,58 @@
 <?
-    $why = '';
-    $content = $_SERVER['QUERY_STRING'];
+    $dr = $_SERVER['DOCUMENT_ROOT'];
+    $orig = $_SERVER['HTTP_X_ORIGINAL_URI'];
+    if(!isset($orig)) {
+      $orig = $_SERVER['REQUEST_URI'];
+    }
+    if(preg_match('/^(.*)\?(.*)$/', $orig, $m)) {
+      $qstring = $m[2];
+      $orig = $m[1];
+    }
+    $uri = $orig;
+    $uri = preg_replace('/^\/csbot/', '', $uri);
+    $uri = preg_replace("/^(\\$_SERVER[SCRIPT_NAME])+\/?/", '/', $uri);
+    if(preg_match('/^\/([^\/]+)(\/.*)?/', $uri, $m)) {
+      if(is_dir("/data/project/$m[1]/public_html")) {
+        if(!isset($m[2])) {
+          $to = "$orig/";
+          if(isset($qstring)) {
+              $to .= "?$qstring";
+          }
+          header("Location: $to");
+          exit(0);
+        }
+        header("HTTP/1.0 503 No Webservice");
+      }
+    }
+    if(is_file("$dr$uri") and is_readable("$dr$uri")) {
+      $mime = system("/usr/bin/file -b -i ".escapeshellarg("$dr$uri"));
+      header("Content-Type: $mime");
+      header("X-Sendfile: $dr$uri");
+      exit(0);
+    }
+
+    if($uri != '/') {
+      header("HTTP/1.0 404 Not Found");
+      exit(0);
+    }
+
+    $content = $qstring;
     if(preg_match("/^[A-Z]/", $content) === 1) {
       header("Location: https://wikitech.wikimedia.org/wiki/Nova_Resource:Tools/" . urlencode($content));
       exit;
     }
     if($content == '') {
-      $why = 'no content';
       $content = 'list';
     }
     if(preg_match("/^([a-z0-9]+)(=(.*))?$/", $content, $values) !== 1) {
-      $why = "not valid: $content";
-      $content = "404";
+      header("HTTP/1.0 404 Not Found");
+      exit(0);
     }
     $content = $values[1];
     $param = $values[3];
-    if(!file_exists("$_SERVER[DOCUMENT_ROOT]/content/$content.php")) {
-      $why = "unreadable: $content";
-      $content = "404";
+    if(!file_exists("$dr/content/$content.php")) {
+      header("HTTP/1.0 404 Not Found");
+      exit(0);
     }
 
     require_once 'htmlpurifier/library/HTMLPurifier.standalone.php';

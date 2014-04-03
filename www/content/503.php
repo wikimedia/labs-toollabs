@@ -1,4 +1,4 @@
-<? $uri = $_SERVER['X_ORIGINAL_URI']; ?>
+<? $uri = $_SERVER['HTTP_X_ORIGINAL_URI']; ?>
       <h1>No webservice</h1>
       <p>The URI you have requested, <a href="<?= $uri ?>"><code><?= $uri ?></code></a>,
         is not currently serviced.</p>

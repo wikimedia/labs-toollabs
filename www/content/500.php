@@ -1,4 +1,4 @@
-<? $uri = $_SERVER['X_ORIGINAL_URI']; ?>
+<? $uri = $_SERVER['HTTP_X_ORIGINAL_URI']; ?>
       <h1>Internal error</h1>
       <p>The URI you have requested, <a href="<?= $uri ?>"><code><?= $uri ?></code></a>,
       appears to be non-functional at this time.</p>

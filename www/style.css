@@ -219,11 +219,11 @@ table.tablesorter tbody tr.odd td {
   background-color:#f8f8f8;
 }
 table.tablesorter thead tr .headerSortUp {
-  background-image: url(img/asc_dark.png);
+  background-image: url(/admin/img/asc_dark.png);
   border-bottom: 2px solid #1b61dd;
 }
 table.tablesorter thead tr .headerSortDown {
-  background-image: url(img/desc_dark.png);
+  background-image: url(/admin/img/desc_dark.png);
   border-bottom: 2px solid #1b61dd;
 }
 table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {

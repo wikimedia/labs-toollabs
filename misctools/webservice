@@ -1,22 +1,38 @@
 #! /bin/bash
 
-prefix=(/bin/cat /etc/wmflabs-project)
+prefix=$(/bin/cat /etc/wmflabs-project)
 tool=$(/usr/bin/id -nu|sed -e "s/^$prefix.//")
 user="$prefix.$tool"
+server="lighttpd"
+public="public_html"
+
+case "$1" in
+  -tomcat)
+    server="tomcat"
+    public="public_tomcat"
+    shift
+    ;;
+  -lighttpd)
+    shift
+    ;;
+  -*)
+    echo "Unknown webservice type $1" >&2
+    exit 1
+    ;;
+esac
+
 home=$(getent passwd $user | cut -d : -f 6 | sed -e 's/\/$//')
 if [ "$(getent group $user | cut -d : -f 1)" != "$user" ]; then
     echo "$0: $tool does not appear to be a tool" >&2
     exit 1
 fi
-spool="/var/run/lighttpd"
-runbase="$spool/$tool"
 
-if [ "$home" = "" -o ! -d "$home/public_html" ]; then
-    echo "$tool does not have a public_html" >&2
+if [ "$home" = "" -o ! -d "$home/$public" ]; then
+    echo "$tool does not have a $public" >&2
     exit 1
 fi
 
-job=$(qstat -q 'webgrid' -j "httpd-$tool" 2>&1 | grep job_number: | sed -e 's/^.*  *\(.*\)$/\1/')
+job=$(qstat -q "webgrid-$server" -j "$server-$tool" 2>&1 | grep job_number: | sed -e 's/^.*  *\(.*\)$/\1/')
 if [ "$job" != "" ]; then
     si=$(qstat -j "$job" 2>&1 | grep 'scheduling info': | sed -e 's/^.*: *\(.*\)$/\1/')
 fi
@@ -37,7 +53,7 @@ case "$1" in
         if [ "$job" != "" ]; then
             echo "Webservice already running."
         else
-            if qsub -e $home/error.log -o $home/error.log -i /dev/null -q webgrid -l h_vmem=4g -b y -N "httpd-$tool" /usr/local/bin/tool-lighttpd >/dev/null 2>&1 ; then
+            if qsub -e $home/error.log -o $home/error.log -i /dev/null -q "webgrid-$server" -l h_vmem=4g -b y -N "$server-$tool" /usr/local/bin/tool-$server >/dev/null 2>&1 ; then
                 echo " started."
             else
                 echo " failed."
@@ -53,7 +69,7 @@ case "$1" in
         else
             echo -n .
         fi
-        if qsub -e $home/error.log -o /dev/null -i /dev/null -q webgrid -l h_vmem=4g -b y -N "httpd-$tool" /usr/local/bin/tool-lighttpd >/dev/null 2>&1; then
+        if qsub -e $home/error.log -o /dev/null -i /dev/null -q "webgrid-$server" -l h_vmem=4g -b y -N "$server-$tool" /usr/local/bin/tool-$server >/dev/null 2>&1; then
             echo " restarted."
         else
             echo " failed."

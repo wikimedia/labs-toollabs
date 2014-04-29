@@ -1,0 +1,23 @@
+#! /bin/bash
+
+prefix=$(/bin/cat /etc/wmflabs-project)
+tool=$(/usr/bin/id -nu|sed -e "s/^$prefix.//")
+user="$prefix.$tool"
+
+home=$(getent passwd $user | cut -d : -f 6 | sed -e 's/\/$//')
+if [ "$(getent group $user | cut -d : -f 1)" != "$user" ]; then
+    echo "$0: $tool does not appear to be a tool" >&2
+    exit 1
+fi
+
+if [ -d "$home/public_tomcat" ]; then
+    echo "This tool already has a public_tomcat directory" >&2
+    exit 1
+fi
+
+echo "Setting up your public_tomcat directory..."
+/usr/bin/qsub -sync y -o /dev/null -e /dev/null -i /dev/null -q "webgrid-tomcat" -l h_vmem=512m -b y -N "setup-$tool" tomcat7-instance-create public_tomcat >/dev/null
+
+conf="$home/public_tomcat/conf/server.xml"
+echo "All done."
+echo "You can edit the configuration in $conf as needed."

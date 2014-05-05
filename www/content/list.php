@@ -53,8 +53,7 @@
       }
 ?>
                       <span class="mw-editsection">
-                        [<a href="https://wikitech.wikimedia.org/w/index.php?title=Special:NovaServiceGroup&action=addmember&projectname=tools&servicegroupname=tools.<?=$tool?>">add</a> / 
-                        <a href="https://wikitech.wikimedia.org/w/index.php?title=Special:NovaServiceGroup&action=deletemember&projectname=tools&servicegroupname=tools.<?=$tool?>">remove</a> maintainers]
+                        [<a href="https://wikitech.wikimedia.org/w/index.php?title=Special:NovaServiceGroup&action=managemembers&projectname=tools&servicegroupname=tools.<?=$tool?>">manage</a> maintainers]
                       </span>
                   </td>
                   <td class="tool-maintainers"><?

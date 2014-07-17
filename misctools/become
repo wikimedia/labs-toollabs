@@ -1,11 +1,11 @@
-#! /bin/bash
+#!/bin/bash
 #
 # Copyright © 2013 Marc-André Pelletier <mpelletier@wikimedia.org>
-# 
+#
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
 # copyright notice and this permission notice appear in all copies.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
 # WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
 # MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
@@ -20,17 +20,29 @@ if [ $# -lt 1 -o "$1" = "--help" ]; then
   echo "usage: $(basename $0) <toolname> [command [args...]]" >&2
   exit 1
 fi
-if ! id "$prefix.$1" >/dev/null 2>&1
-then
-  echo "$(basename $0): no such tool '$1'" >&2
-  exit 1
-fi
-if ! [ -d "/data/project/$1" ]
-then
-  echo "$(basename $0): no such tool '$1'" >&2
-  exit 1
-fi
-user="$1"
+tool="$1"
 shift
-exec /usr/bin/sudo -niu "$prefix.$user" "$@"
 
+# Test whether the given tool exists.
+if ! id "$prefiX.$tool" >/dev/null 2>&1 || ! [ -d "/data/project/$tool" ]; then
+  echo "$(basename $0): no such tool '$tool'" >&2
+  exit 1
+fi
+
+# Test whether the user is a member of the tool's group in this
+# session unless the user is root.
+if [ $EUID -ne 0 ] && ! echo " $(groups) " | fgrep -q " $prefix.$tool "; then
+    # Test whether the user is a member of the tool's group at all.
+    if echo ",$(getent group "$prefix.$tool" | cut -d : -f 4)," | fgrep -q ",$(id -nu),"; then
+        echo "You were added to the group $prefix.$tool after you started this login session." >&2
+        echo "You need to log out and in again to be able to \"become $tool\"." >&2
+    else
+        echo "You are not a member of the group $prefix.$tool." >&2
+        echo "Any existing member of the tool's group can add you to that." >&2
+    fi
+
+    exit 1
+fi
+
+# Execute sudo.
+exec /usr/bin/sudo -niu "$prefix.$tool" "$@"

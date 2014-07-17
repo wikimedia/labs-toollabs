@@ -1,4 +1,4 @@
-AC_INIT([toollabs], [1.0.8dev], [mpelletier@wikimedia.org])
+AC_INIT([toollabs], [1.0.9], [mpelletier@wikimedia.org])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_TESTDIR([tests])
 

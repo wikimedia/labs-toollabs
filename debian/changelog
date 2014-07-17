@@ -2,7 +2,8 @@ toollabs (1.0.9) unstable; urgency=low
 
   * Merge of a number of patches:
     become: Add --help option. [Tim Landscheidt]
-    Package webservice [Tim Landscheidt]]
+    Package webservice [Tim Landscheidt]
+    become: Made more user-friendly [Tim Landscheidt]
 
  -- Marc-André Pelletier <mpelletier@wikimedia.org>  Thu, 25 Jul 2014 11:00:00 -0400
 

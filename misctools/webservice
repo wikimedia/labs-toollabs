@@ -6,6 +6,11 @@ user="$prefix.$tool"
 server="lighttpd"
 public="public_html"
 
+memlimit=4g
+if [ -r "/data/project/.system/config/$tool.web-memlimit" ]; then
+  memlimit=$(cat "/data/project/.system/config/$tool.web-memlimit")
+fi
+
 case "$1" in
   -tomcat)
     server="tomcat"
@@ -53,7 +58,7 @@ case "$1" in
         if [ "$job" != "" ]; then
             echo "Webservice already running."
         else
-            if qsub -e $home/error.log -o $home/error.log -i /dev/null -q "webgrid-$server" -l h_vmem=4g -b y -N "$server-$tool" /usr/local/bin/tool-$server >/dev/null 2>&1 ; then
+            if qsub -e $home/error.log -o $home/error.log -i /dev/null -q "webgrid-$server" -l h_vmem=$memlimit -b y -N "$server-$tool" /usr/local/bin/tool-$server >/dev/null 2>&1 ; then
                 echo " started."
             else
                 echo " failed."
@@ -69,7 +74,7 @@ case "$1" in
         else
             echo -n .
         fi
-        if qsub -e $home/error.log -o /dev/null -i /dev/null -q "webgrid-$server" -l h_vmem=4g -b y -N "$server-$tool" /usr/local/bin/tool-$server >/dev/null 2>&1; then
+        if qsub -e $home/error.log -o /dev/null -i /dev/null -q "webgrid-$server" -l h_vmem=$memlimit -b y -N "$server-$tool" /usr/local/bin/tool-$server >/dev/null 2>&1; then
             echo " restarted."
         else
             echo " failed."
@@ -107,4 +112,3 @@ case "$1" in
         exit 1
         ;;
 esac
-

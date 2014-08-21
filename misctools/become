@@ -24,7 +24,7 @@ tool="$1"
 shift
 
 # Test whether the given tool exists.
-if ! id "$prefiX.$tool" >/dev/null 2>&1 || ! [ -d "/data/project/$tool" ]; then
+if ! id "$prefix.$tool" >/dev/null 2>&1 || ! [ -d "/data/project/$tool" ]; then
   echo "$(basename $0): no such tool '$tool'" >&2
   exit 1
 fi

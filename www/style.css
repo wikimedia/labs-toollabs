@@ -161,12 +161,31 @@ img {
 .col2 ul li {
   padding: 0;
 }
-.tool-name, .tool-maintainers, .tool-desc {
+.tool-name, .tool-maintainers, .tool-desc, .subtool-name, .subtool-desc {
   text-align: left;
   vertical-align: top;
 }
 span.mw-editsection {
   display: block;
+}
+div.subtool {
+  display: block;
+  padding-bottom: 3px;
+  border-top: dotted thin #888;
+  width: 100%;
+}
+div.subtool.first {
+  border-top: none;
+}
+span.subtool-name {
+  display: inline-block;
+  padding-right: 4px;
+  width: 20%;
+}
+span.subtool-desc {
+  display: inline-block;
+  padding-left: 1ex;
+  width: 75%;
 }
 
 /* Backwards and goofy */

@@ -21,33 +21,47 @@
                 </tr>
               </thead>
               <tbody>
-<?  $users = shell_exec("/usr/bin/getent group|/bin/grep ^tools.");
-    foreach(split("\n", $users) as $ln) {
-      $fields = split(":", $ln);
-      if(array_key_exists(3, $fields)) {
-        list($user, $pass, $gid, $members) = $fields;
-        $u = posix_getpwuid($gid);
-        $home = $u['dir'];
-        $indices = glob("$home/public_html/index.*");
-        $user = preg_replace("/^tools./", '', $user);
-        $tool = array( 'home' => $home );
-        $tool['maints'] = array();
-        foreach(split(",", $members) as $uid) {
-          $u = posix_getpwnam($uid);
-          $tool['maints'][] = $u['gecos'];
-        }
-        if(array_key_exists(0, $indices))
-          $tool['uri'] = "/$user/";
-        if(is_dir("$home/public_html"))
-          $tools[$user] = $tool;
-      }
+<?
+  function describe($t) {
+    if(array_key_exists('description', $t)) {
+      global $purifier;
+      print  $purifier->purify($t['description']);
+      if(array_key_exists('author', $t))
+        print "<BR/><I>Author(s): " . $purifier->purify($t['author']) . "</I>";
+      if(array_key_exists('repository', $t))
+        print "<BR/><a href=\"" . htmlspecialchars($t['repository']) . "\">Source</a>";
     }
-    ksort($tools);
-    foreach($tools as $tool => $t): ?>
+  }
+
+  $ini = parse_ini_file("/data/project/admin/replica.my.cnf");
+  $db = new mysqli("tools.labsdb", $ini['user'], $ini['password'], "toollabs_p");
+  
+  $res = $db->query("SELECT * FROM users");
+  while($row = $res->fetch_assoc()) {
+    $users[$row['name']] = $row;
+  }
+  $res->free();
+  
+  $res = $db->query("SELECT * FROM tools ORDER BY name ASC");
+  while($row = $res->fetch_assoc()):
+
+    $tool = $row['name'];
+    if($row['toolinfo'] != '') {
+        $json = json_decode($row['toolinfo'], true);
+    } else {
+        $json = array(
+            "description" => $row['description'],
+        );
+    }
+
+    if(array_key_exists(0, $json) && !array_key_exists(1, $json)) {
+        $json = $json[0];
+    }
+?>
                 <tr class="tool" id="toollist-<?= $tool ?>">
                   <td class="tool-name"><?
-      if(array_key_exists('uri', $t)) {
-        print "<a class=\"tool-web\" href=\"" . $t['uri'] . "\">$tool</a>";
+      if(array_key_exists('url', $json)) {
+        print "<a class=\"tool-web\" href=\"" . $json['url'] . "\">$tool</a>";
       } else {
         print $tool;
       }
@@ -57,19 +71,35 @@
                       </span>
                   </td>
                   <td class="tool-maintainers"><?
-        foreach($t['maints'] as $maint):
-          ?><a href="https://wikitech.wikimedia.org/wiki/User:<?= $maint ?>"><?= ucfirst($maint) ?></a><?
+        foreach(explode(' ', $row['maintainers']) as $maint):
+          if(array_key_exists($maint, $users)):
+            $maint = htmlspecialchars($users[$maint]['wikitech']);
+            ?><a href="https://wikitech.wikimedia.org/wiki/User:<?= $maint ?>"><?= ucfirst($maint) ?></a><?
+          endif;
         endforeach;
 ?></td>
-
                   <td class="tool-desc"><?
-        if(is_readable($t['home']."/.description")) {
-          $desc = file_get_contents($t['home']."/.description", false, NULL, 0, 2048);
-          print  $purifier->purify($desc);
+        if(array_key_exists(1, $json)) {
+            $first = " first";
+            foreach($json as $sub) {
+              echo "<div class=\"subtool$first\"><span class=\"subtool-name\">";
+              if(array_key_exists('url', $sub))
+                echo "<a href=\"" . htmlspecialchars($sub['url']) . "\">";
+              echo htmlspecialchars($sub['title']);
+              if(array_key_exists('url', $sub))
+                echo "</a>";
+              echo "</span><span class=\"subtool-desc\">";
+              describe($sub);
+              echo "</span></div>";
+              $first = '';
+            }
+        } else {
+          describe($json);
         }
       ?></td>
                 </tr>
-<?  endforeach; 
+<?  endwhile;
+    $res->free();
 ?>
               </tbody>
             </table>

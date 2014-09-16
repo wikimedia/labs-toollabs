@@ -18,24 +18,9 @@
       $megs /= 10.0;
       return "$megs"."G";
     }
+    $megs = (int)($megs*10);
+    $megs /= 10.0;
     return "$megs"."M";
-  }
-
-  function toarray($XML) {
-    $array = array();
-
-    if(is_object($XML)) {
-      $XML = get_object_vars($XML);
-    }
-    if(is_array($XML)) {
-      foreach($XML as $i => $val) {
-        if(is_object($val) || is_array($val)) {
-          $val = toarray($val);
-        }
-        $array[$i] = $val;
-      }
-    }
-    return $array;
   }
 
   function mmem($str) {
@@ -48,93 +33,98 @@
     return -1;
   }
 
-  $rawjobs = toarray(simplexml_load_string(`PATH=/bin:/usr/bin /usr/bin/qstat -u '*' -r -xml`));
-  $rawhosts = toarray(simplexml_load_string(`PATH=/bin:/usr/bin /usr/bin/qhost -F h_vmem -xml`));
-  $vmem = toarray(simplexml_load_string(`PATH=/bin:/usr/bin /usr/bin/qstat -F h_vmem -xml`));
-  foreach ($vmem['queue_info']['Queue-List'] as $vm) {
-	  $server = $vm['name'];
-	  $server = substr($server, strpos($server, "@") + 1);
-	  $server = substr($server, 0, strpos($server, "."));
-	  if ( $server !== false ) {
-	      $h_vmem[$server] = $vm['resource'];
-	  }
+  $raw = `PATH=/bin:/usr/bin qstat -xml -j '*'|sed -e 's/JATASK:[^>]*/jatask/g'`;
+  $xml = simplexml_load_string($raw);
+  unset($raw);
+
+  foreach($xml->djob_info->element as $xjob) {
+      $job = array(
+          'num'    => (string)$xjob->JB_job_number,
+          'name'   => (string)$xjob->JB_job_name,
+          'submit' => (string)$xjob->JB_submission_time,
+          'owner'  => (string)$xjob->JB_owner,
+          'tool'   => preg_replace('/^tools\.(.*)$/', '$1', (string)$xjob->JB_owner),
+          'queue'  => (string)$xjob->JB_hard_queue_list->destin_ident_list->QR_name,
+      );
+      if($job['queue'] == '')
+          $job['queue'] = '(manual)';
+      foreach($xjob->JB_hard_resource_list->qstat_l_requests as $lreq) {
+          if($lreq->CE_name == 'h_vmem')
+              $job['h_vmem'] = (int)$lreq->CE_doubleval;
+      }
+      foreach($xjob->JB_ja_tasks->jatask->JAT_scaled_usage_list->scaled as $usage) {
+          $job[(string)$usage->UA_name] = (int)$usage->UA_value;
+      }
+      foreach($xjob->JB_ja_tasks->ulong_sublist->JAT_scaled_usage_list->scaled as $usage) {
+          $job[(string)$usage->UA_name] = (int)$usage->UA_value;
+      }
+      $jobs[$job['num']] = $job;
   }
+  unset($xml);
+
+  $raw = `PATH=/bin:/usr/bin qhost -xml -j -F h_vmem`;
+  $xml = simplexml_load_string($raw);
+  unset($raw);
+
+  foreach($xml->host as $xhost) {
+      $hname = preg_replace('/^([^\.]*)\..*/', '$1', (string)$xhost->attributes()->name);
+      if($hname != 'global') {
+          $host = array(
+              'name'        => $hname,
+              'h_vmem'      => mmem((string)$xhost->resourcevalue)*1024*1024,
+              'jobs'        => array(),
+          );
+          foreach($xhost->job as $xjob) {
+              $jid = (int)$xjob->attributes()->name;
+              $job = array();
+              foreach($xjob->jobvalue as $jv) {
+                  $job[(string)$jv->attributes()->name] = (string)$jv;
+              }
+              $jobs[$jid]['state'] = $job['job_state'];
+              if(stristr($job['job_state'], 'R') !== false)
+                  $jobs[$jid]['state'] = 'Running';
+              if(stristr($job['job_state'], 's') !== false)
+                  $jobs[$jid]['state'] = 'Suspended';
+              if(stristr($job['job_state'], 'd') !== false)
+                  $jobs[$jid]['state'] = 'Deleting';
+              $jobs[$jid]['host'] = $hname;
+              $jobs[$jid]['priority'] = $job['priority'];
+              $host['jobs'][] = $jid;
+          }
+          foreach($xhost->hostvalue as $hv) {
+             $host[(string)$hv->attributes()->name] = (string)$hv;
+          }
+          $host['mem'] = mmem($host['mem_used'])/mmem($host['mem_total']);
+          $hosts[$hname] = $host;
+      }
+  }
+
 ?>
             <h1>Wikimedia Tool Labs</h1>
             <p>This is the web server for the Tool Labs project, the home of community-maintained external tools supporting Wikimedia projects and their users.</p>
 
             <h2>Grid Status</h2>
-
 <?
-  $jobs = array();
-  foreach($rawjobs['queue_info']['job_list'] as $jl) {
-    $jobid = $jl['JB_job_number'];
-    $job = toarray(simplexml_load_string(`PATH=/bin:/usr/bin /usr/bin/qstat -xml -j $jobid|sed -e 's/JATASK:[^>]*/jatask/g'`));
-    $job = $job['djob_info']['element'];
-    $j = array();
-    $tool = $job['JB_owner'];
-    $j['tool'] = preg_replace('/^tools.(.*)$/', "$1", $tool);
-    $j['sub'] = $job['JB_submission_time'];
-    $j['name'] = $job['JB_job_name'];
-    foreach($job['JB_hard_resource_list'] as $rvals) {
-      if(!isset($rvals[0])) {
-        $rvals = array($rvals);
-      }
-      foreach($rvals as $rval){
-        if($rval['CE_name'] == 'h_vmem') {
-          $j['mem_alloc'] = intval($rval['CE_doubleval']/1048576);
-        }
-      }
-    }
-    $j['tasks'] = 0;
-    $j['mem_used'] = 0;
-    $j['mem_max'] = 0;
-    $j['cpu'] = 0;
-    $j['state'] = $jl['@attributes']['state'];
-    $j['start'] = $jl['JAT_start_time'];
-    $j['slots'] = $jl['slots'];
-    $host = $jl['queue_name'];
-    $j['host'] = preg_replace('/^.*@([^\.]*)\..*$/', "$1", $host);
-    $j['queue'] = preg_replace('/^(.*)@[^\.]*\..*$/', "$1", $host);
-    foreach($job['JB_ja_tasks'] as $task) {
-      $j['tasks']++;
-      foreach($task['JAT_scaled_usage_list']['scaled'] as $usage) {
-        switch($usage['UA_name']) {
-        case 'cpu':
-          $j['cpu'] += $usage['UA_value'];
-          break;
-        case 'vmem':
-          $j['mem_used'] += intval($usage['UA_value']/1048576);
-          break;
-        case 'maxvmem':
-          if(intval($usage['UA_value']/1048576) > $j['mem_max'])
-            $j['mem_max'] = intval($usage['UA_value']/1048576);
-          break;
-        }
-      }
-    }
-    $jobs[$job['JB_job_number']] = $j;
-  }
-  foreach($rawhosts['host'] as $hl) {
-    $h = array();
-    $host = $hl['@attributes']['name'];
-    $hname = preg_replace('/^([^\.]*)\..*$/', "$1", $host);
-    if($hname === 'global')
-      continue;
-    $h['arch'] = $hl['hostvalue'][0];
-    $h['use'] = $hl['hostvalue'][2] / $hl['hostvalue'][1];
-    $h['mem'] = mmem($hl['hostvalue'][4]) / mmem($hl['hostvalue'][3]);
-    $hosts[$hname] = $h;
-  }
+
   ksort($hosts);
   ksort($jobs);
+
   foreach($hosts as $host => $h):
+      $hvmem = $h['h_vmem'];
+      foreach($h['jobs'] as $jn) {
+          $hvmem -= $jobs[$jn]['h_vmem'];
+      }
+      $hvmem = (int)($hvmem/(1024*1024));
+      if($hvmem < 0)
+          $hvmem = 0;
       ?>
             <div class="hostline">
               <span class="hostname"><?= $host ?></span>
-              <b>Load:</b> <?= (int)($h['use']*1000)/10 ?>%
+              <b>Load:</b> <?= (int)($h['load_avg']*1000)/($h['num_proc']*10) ?>%
               <b>Memory:</b> <?= (int)($h['mem']*1000)/10 ?>%
-              <b>Free vmem:</b> <? echo $h_vmem[$host]; ?>
+              <? if($h['h_vmem'] > 0): ?>
+                  <b>Free vmem:</b> <? echo humanmem($hvmem); ?>
+              <? endif; ?>
             </div>
             <table class="hostjobs tablesorter">
               <thead>
@@ -159,10 +149,10 @@
                   <td class="jobname"><?= htmlspecialchars($j['name']) ?></td>
                   <td class="jobtool"><a href="/?list#toollist-<?= $j['tool'] ?>"><?= $j['tool'] ?></a></td>
                   <td class="jobstate"><?= ucfirst($j['queue']) ?> / <?= ucfirst($j['state']) ?></td>
-                  <td class="jobtime"><?= strftime("%F %T", $j['sub']) ?></td>
+                  <td class="jobtime"><?= strftime("%F %T", $j['submit']) ?></td>
                   <td class="jobcpu"><?= humantime($j['cpu']) ?></td>
                   <td class="jobvmem">
-                    <?= humanmem($j['mem_used']) ?>/<?= humanmem($j['mem_alloc']) ?> <? if($j['mem_max'] > $j['mem_used']): ?>(peak <?= humanmem($j['mem_max']) ?>)<? endif; ?>
+                    <?= humanmem($j['vmem']/(1024*1024)) ?>/<?= humanmem($j['h_vmem']/(1024*1024)) ?> <? if($j['maxvmem'] > $j['vmem']*1.02): ?>(peak <?= humanmem($j['maxvmem']/(1024*1024)) ?>)<? endif; ?>
                   </td>
                 </tr>
       <?

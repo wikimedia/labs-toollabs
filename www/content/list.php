@@ -33,6 +33,13 @@
     }
   }
 
+  $dyn = fopen("/data/project/.system/dynamic", "r");
+  while(!feof($dyn)) {
+    list($tname, $where) = fscanf($dyn, "%s %s\n");
+    $tooldyn{$tname} = 1;
+  }
+  fclose($dyn);
+
   $ini = parse_ini_file("/data/project/admin/replica.my.cnf");
   $db = new mysqli("tools.labsdb", $ini['user'], $ini['password'], "toollabs_p");
   
@@ -60,11 +67,15 @@
 ?>
                 <tr class="tool" id="toollist-<?= $tool ?>">
                   <td class="tool-name"><?
+
       if(array_key_exists('url', $json)) {
         print "<a class=\"tool-web\" href=\"" . $json['url'] . "\">$tool</a>";
+      } elseif(array_key_exists($tool, $tooldyn) && !array_key_exists(0, $json)) {
+        print "<a class=\"tool-web\" href=\"/$tool/\">$tool</a>";
       } else {
         print $tool;
       }
+
 ?>
                       <span class="mw-editsection">
                         [<a href="https://wikitech.wikimedia.org/w/index.php?title=Special:NovaServiceGroup&action=managemembers&projectname=tools&servicegroupname=tools.<?=$tool?>">manage</a> maintainers]

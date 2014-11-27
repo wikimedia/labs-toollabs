@@ -1,3 +1,10 @@
+toollabs (1.0.12) unstable; urgency=low
+
+  * webservice2: Added port of webservice to python [Yuvi Panda]
+  * webservice2: Added support for running webservices on Trusty [Yuvi Panda]
+
+ -- Yuvi Panda <yuvipanda@gmail.com>  Fri, 28 Nov 2014 02:09:01 +0530
+
 toollabs (1.0.11) unstable; urgency=low
 
   * become: Fix typo [Merlijn van Deen]

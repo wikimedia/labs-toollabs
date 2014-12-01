@@ -121,7 +121,7 @@ MEMLIMIT = read_file(
         '/data/project/.system/config/',
         '%s.web-memlimit' % TOOL
     ), '4g'
-)
+).strip()
 
 parser = argparse.ArgumentParser()
 parser.add_argument('server', help='Type of server to start',

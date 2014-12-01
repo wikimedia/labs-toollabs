@@ -1,3 +1,9 @@
+toollabs (1.0.13) unstable; urgency=low
+
+  * webservice2: Fix crash for tools with special memory limits [Yuvi Panda]
+
+ -- Yuvi Panda <yuvipanda@gmail.com>  Tue, 02 Dec 2014 05:30:01 +0530
+
 toollabs (1.0.12) unstable; urgency=low
 
   * webservice2: Added port of webservice to python [Yuvi Panda]

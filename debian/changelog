@@ -1,3 +1,9 @@
+toollabs (1.0.14) unstable; urgency=low
+
+  * webservice2: Add uwsgi-python server type [Yuvi Panda]
+
+ -- Yuvi Panda <yuvipanda@gmail.com>  Tue, 23 Dec 2014 13:00:01 +0530
+
 toollabs (1.0.13) unstable; urgency=low
 
   * webservice2: Fix crash for tools with special memory limits [Yuvi Panda]

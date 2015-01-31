@@ -1,3 +1,9 @@
+toollabs (1.1) unstable; urgency=low
+
+  * Remove webservice2 from package, move to puppet repo [Yuvi Panda]
+
+ -- Yuvi Panda <yuvipanda@gmail.com>  Sat, 31 Jan 2015 13:00:01 +0530
+
 toollabs (1.0.14) unstable; urgency=low
 
   * webservice2: Add uwsgi-python server type [Yuvi Panda]

@@ -1,3 +1,7 @@
 User-agent: *
 Disallow: /betacommand-dev/
 Disallow: /fiwiki-tools/
+
+# Disallow XoviBot.
+User-agent: XoviBot
+Disallow: /

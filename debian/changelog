@@ -1,3 +1,9 @@
+toollabs (1.2) unstable; urgency=low
+
+  * Fix lintian warning for jQuery minified source
+
+ -- Tim Landscheidt <tim@tim-landscheidt.de>  Thu, 26 Feb 2015 00:16:09 +0000
+
 toollabs (1.1) unstable; urgency=low
 
   * Remove webservice2 from package, move to puppet repo [Yuvi Panda]

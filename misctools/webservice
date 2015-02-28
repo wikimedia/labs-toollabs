@@ -13,9 +13,9 @@ fi
 
 case "$1" in
   -tomcat)
-    server="tomcat"
-    public="public_tomcat"
-    shift
+    echo "Use webservice2 tomcat {start|stop|restart} to manage tomcat webservices"
+    echo "Calling webservice2 tomcat $2"
+    exec /usr/local/bin/webservice2 tomcat "$2"
     ;;
   -lighttpd)
     shift

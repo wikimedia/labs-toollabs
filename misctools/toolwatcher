@@ -28,7 +28,7 @@ while true; do
         if [ ! -d "$TOOL" ]; then
             logger -t toolwatcher "Creating tool $TOOL"
 
-            mkdir -m u=rwx,g=rwsx,o=rx "$TOOL" "$TOOL/cgi-bin" "$TOOL/public_html"
+            mkdir -m u=rwx,g=rwsx,o=rx "$TOOL" "$TOOL/public_html"
             chown -R "$PREFIX.$TOOL:$PREFIX.$TOOL" "$TOOL"
         fi
     done

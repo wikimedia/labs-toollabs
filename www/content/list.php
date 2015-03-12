@@ -8,6 +8,7 @@
                 <li><a href="https://wikitech.wikimedia.org/wiki/Special:NovaKey">Add a public SSH key</a> (you’ll need this to access Labs servers using SSH)</li>
                 <li><a href="https://wikitech.wikimedia.org/wiki/Special:FormEdit/Tools_Access_Request">Request access to the Tools project</a> (Join us!)</li>
                 <li><a href="https://wikitech.wikimedia.org/w/index.php?title=Special:NovaServiceGroup&action=addservicegroup&projectname=tools">Create New Tool</a></li>
+                <li><a href="http://git.wikimedia.org/summary/labs%2Ftoollabs.git">Source code repository of this web</a></li>
             </ul>
 
             <h2>Hosted tools</h2>

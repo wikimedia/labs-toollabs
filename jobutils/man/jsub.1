@@ -2,7 +2,7 @@
 .\" Licensed under CC-BY-SA
 .\" Created by Marc-André Pelletier
 .\"
-.TH JSUB 1 2014-08-21 1.0.11 "Wikimedia Labs Tools jobutils"
+.TH JSUB 1 2015-03-17 1.5 "Wikimedia Labs Tools jobutils"
 .SH NAME
 jsub, jstart, qcronsub \- submit jobs to the grid
 .SH SYNOPSIS
@@ -56,6 +56,11 @@ and
 .B qcronsub
 return 0 on successful submission, and a different exit code
 otherwise.
+.SH FILES
+.TP
+.I ~/.jsubrc
+If present, will be read for default options, one per line, applied
+before any option specified on the command line.
 .SH NOTES
 Unlike qsub, if you do not specify output and error files, output is
 appended by default to files named

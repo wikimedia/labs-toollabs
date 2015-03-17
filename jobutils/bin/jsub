@@ -65,6 +65,19 @@ $continuous = $once = 1 if ($script eq 'jstart');
 $once = 1 if $script eq 'qcronsub';
 
 my @options;
+my $jsubrcfilename = exists ($ENV {'JOBUTILS_JSUBRC'}) ? $ENV {'JOBUTILS_JSUBRC'} : (getpwuid ($<)) [7] . '/.jsubrc';
+if(open (my $rc, '<', $jsubrcfilename)) {
+  while(<$rc>) {
+    if(m/^(-[a-z]+)(?:\s+(.+)|\s*)$/) {
+      my($opt, $optarg) = ($1, $2);
+      die "$0: unknown option '$1' in .jsubrc\n"  unless defined $qsubargs{$opt};
+      die "$0: option '$1' in .jsubrc needs an argument\n"  if $qsubargs{$opt} and not defined $optarg;
+      push @options, [ $opt, $optarg ];
+    }
+  }
+  close ($rc);
+}
+
 while($#ARGV > 0) {
   last unless defined $qsubargs{$ARGV[0]};
   my $opt = shift;

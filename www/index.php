@@ -47,20 +47,20 @@
       exit(0);
     }
 
-    $content = $qstring;
-    if(preg_match("/^[A-Z]/", $content) === 1) {
-      header("Location: https://wikitech.wikimedia.org/wiki/Nova_Resource:Tools/" . urlencode($content));
-      exit;
-    }
-    if($content == '') {
+    if (isset($qstring) && $qstring != '') {
+      $content = $qstring;
+      if(preg_match("/^[A-Z]/", $content) === 1) {
+        header("Location: https://wikitech.wikimedia.org/wiki/Nova_Resource:Tools/" . urlencode($content));
+        exit;
+      }
+    } else {
       $content = 'list';
     }
-    if(preg_match("/^([a-z0-9]+)(=(.*))?$/", $content, $values) !== 1) {
+    if(preg_match("/^([a-z0-9]+)(?:=.*)?$/", $content, $values) !== 1) {
       header("HTTP/1.0 404 Not Found");
       exit(0);
     }
     $content = $values[1];
-    $param = $values[3];
     if(!file_exists("$dr/content/$content.php")) {
       header("HTTP/1.0 404 Not Found");
       exit(0);

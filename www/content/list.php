@@ -54,7 +54,7 @@
   while($row = $res->fetch_assoc()):
 
     $tool = $row['name'];
-    if($row['toolinfo'] != '') {
+    if($row['toolinfo'] != '' && !is_null(json_decode($row['toolinfo'], true))) {
         $json = json_decode($row['toolinfo'], true);
     } else {
         $json = array(

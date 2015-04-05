@@ -6,7 +6,7 @@ Uploaders: Marc-André Pelletier <mpelletier@wikimedia.org>,
  Carl Fürstenberg <azatoth@gmail.com>,
  Petr Bena <benapetr@gmail.com>
 Build-Depends: debhelper (>= 8.0.0), dh-autoreconf, libipc-run-perl, libstring-shellquote-perl
-Standards-Version: 3.9.3
+Standards-Version: 3.9.5
 Vcs-Git: https://gerrit.wikimedia.org/r/labs/toollabs
 Vcs-Browser: https://git.wikimedia.org/summary/labs%2Ftoollabs
 

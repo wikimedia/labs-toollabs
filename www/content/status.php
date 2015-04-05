@@ -44,19 +44,25 @@
           'submit' => (string)$xjob->JB_submission_time,
           'owner'  => (string)$xjob->JB_owner,
           'tool'   => preg_replace('/^tools\.(.*)$/', '$1', (string)$xjob->JB_owner),
-          'queue'  => (string)$xjob->JB_hard_queue_list->destin_ident_list->QR_name,
       );
-      if($job['queue'] == '')
+      if($xjob->JB_hard_queue_list) {
+          $job['queue'] = (string)$xjob->JB_hard_queue_list->destin_ident_list->QR_name;
+      } else {
           $job['queue'] = '(manual)';
+      }
       foreach($xjob->JB_hard_resource_list->qstat_l_requests as $lreq) {
           if($lreq->CE_name == 'h_vmem')
               $job['h_vmem'] = (int)$lreq->CE_doubleval;
       }
-      foreach($xjob->JB_ja_tasks->jatask->JAT_scaled_usage_list->scaled as $usage) {
-          $job[(string)$usage->UA_name] = (int)$usage->UA_value;
+      if($xjob->JB_ja_tasks->jatask && $xjob->JB_ja_tasks->jatask->JAT_scaled_usage_list) {
+          foreach($xjob->JB_ja_tasks->jatask->JAT_scaled_usage_list->scaled as $usage) {
+              $job[(string)$usage->UA_name] = (int)$usage->UA_value;
+          }
       }
-      foreach($xjob->JB_ja_tasks->ulong_sublist->JAT_scaled_usage_list->scaled as $usage) {
-          $job[(string)$usage->UA_name] = (int)$usage->UA_value;
+      if($xjob->JB_ja_tasks->ulong_sublist && $xjob->JB_ja_tasks->ulong_sublist->JAT_scaled_usage_list) {
+          foreach($xjob->JB_ja_tasks->ulong_sublist->JAT_scaled_usage_list->scaled as $usage) {
+              $job[(string)$usage->UA_name] = (int)$usage->UA_value;
+          }
       }
       $jobs[$job['num']] = $job;
   }
@@ -141,7 +147,7 @@
               <tbody>
       <?php
       foreach($jobs as $jobid => $j):
-      if($j['host'] != $host)
+      if(!array_key_exists('host', $j) || $j['host'] != $host)
         continue;
           ?>
                 <tr class="jobline-<?= $j['state'] ?>">
@@ -150,9 +156,9 @@
                   <td class="jobtool"><a href="/?tool=<?= $j['tool'] ?>"><?= $j['tool'] ?></a></td>
                   <td class="jobstate"><?= ucfirst($j['queue']) ?> / <?= ucfirst($j['state']) ?></td>
                   <td class="jobtime"><?= strftime("%F %T", $j['submit']) ?></td>
-                  <td class="jobcpu"><?= humantime($j['cpu']) ?></td>
+                  <td class="jobcpu"><?= array_key_exists('cpu', $j) ? humantime($j['cpu']) : 'n/a' ?></td>
                   <td class="jobvmem">
-                    <?= humanmem($j['vmem']/(1024*1024)) ?>/<?= humanmem($j['h_vmem']/(1024*1024)) ?> <?php if($j['maxvmem'] > $j['vmem']*1.02): ?>(peak <?= humanmem($j['maxvmem']/(1024*1024)) ?>)<?php endif; ?>
+                    <?= array_key_exists('vmem', $j) ? sprintf("%d/%d", humanmem($j['vmem']/(1024*1024)), humanmem($j['h_vmem']/(1024*1024))) : 'n/a' ?> <?php if(array_key_exists('maxvmem', $j) && $j['maxvmem'] > $j['vmem']*1.02): ?>(peak <?= humanmem($j['maxvmem']/(1024*1024)) ?>)<?php endif; ?>
                   </td>
                 </tr>
       <?php

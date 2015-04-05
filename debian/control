@@ -2,8 +2,7 @@ Source: toollabs
 Section: utils
 Priority: extra
 Maintainer: Marc-André Pelletier <mpelletier@wikimedia.org>
-Uploaders: Marc-André Pelletier <mpelletier@wikimedia.org>,
- Carl Fürstenberg <azatoth@gmail.com>,
+Uploaders: Carl Fürstenberg <azatoth@gmail.com>,
  Petr Bena <benapetr@gmail.com>
 Build-Depends: debhelper (>= 8.0.0), dh-autoreconf, libipc-run-perl, libstring-shellquote-perl
 Standards-Version: 3.9.5

@@ -147,7 +147,7 @@
                 <tr class="jobline-<?= $j['state'] ?>">
                   <td class="jobno"><?= $jobid ?></td>
                   <td class="jobname"><?= htmlspecialchars($j['name']) ?></td>
-                  <td class="jobtool"><a href="/?list#toollist-<?= $j['tool'] ?>"><?= $j['tool'] ?></a></td>
+                  <td class="jobtool"><a href="/?tool=<?= $j['tool'] ?>"><?= $j['tool'] ?></a></td>
                   <td class="jobstate"><?= ucfirst($j['queue']) ?> / <?= ucfirst($j['state']) ?></td>
                   <td class="jobtime"><?= strftime("%F %T", $j['submit']) ?></td>
                   <td class="jobcpu"><?= humantime($j['cpu']) ?></td>

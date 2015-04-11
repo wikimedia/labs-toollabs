@@ -117,7 +117,7 @@
       <div class="colright">
         <div class="col1wrap">
           <div class="col1">
-    <?
+    <?php
       include "content/$content.php";
     ?>
           </div>

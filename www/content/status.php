@@ -1,4 +1,4 @@
-<?
+<?php
   function humantime($secs) {
     if($secs < 120)
       return "$secs"."s";
@@ -104,7 +104,7 @@
             <p>This is the web server for the Tool Labs project, the home of community-maintained external tools supporting Wikimedia projects and their users.</p>
 
             <h2>Grid Status</h2>
-<?
+<?php
 
   ksort($hosts);
   ksort($jobs);
@@ -122,9 +122,9 @@
               <span class="hostname"><?= $host ?></span>
               <b>Load:</b> <?= (int)($h['load_avg']*1000)/($h['num_proc']*10) ?>%
               <b>Memory:</b> <?= (int)($h['mem']*1000)/10 ?>%
-              <? if($h['h_vmem'] > 0): ?>
-                  <b>Free vmem:</b> <? echo humanmem($hvmem); ?>
-              <? endif; ?>
+              <?php if($h['h_vmem'] > 0): ?>
+                  <b>Free vmem:</b> <?php echo humanmem($hvmem); ?>
+              <?php endif; ?>
             </div>
             <table class="hostjobs tablesorter">
               <thead>
@@ -139,7 +139,7 @@
                 </tr>
               </thead>
               <tbody>
-      <?
+      <?php
       foreach($jobs as $jobid => $j):
       if($j['host'] != $host)
         continue;
@@ -152,14 +152,14 @@
                   <td class="jobtime"><?= strftime("%F %T", $j['submit']) ?></td>
                   <td class="jobcpu"><?= humantime($j['cpu']) ?></td>
                   <td class="jobvmem">
-                    <?= humanmem($j['vmem']/(1024*1024)) ?>/<?= humanmem($j['h_vmem']/(1024*1024)) ?> <? if($j['maxvmem'] > $j['vmem']*1.02): ?>(peak <?= humanmem($j['maxvmem']/(1024*1024)) ?>)<? endif; ?>
+                    <?= humanmem($j['vmem']/(1024*1024)) ?>/<?= humanmem($j['h_vmem']/(1024*1024)) ?> <?php if($j['maxvmem'] > $j['vmem']*1.02): ?>(peak <?= humanmem($j['maxvmem']/(1024*1024)) ?>)<?php endif; ?>
                   </td>
                 </tr>
-      <?
+      <?php
           endforeach;
       ?>
               </tbody>
             </table>
-<?
+<?php
   endforeach;
 ?>

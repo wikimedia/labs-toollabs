@@ -1,4 +1,4 @@
-<?
+<?php
     $dr = $_SERVER['DOCUMENT_ROOT'];
     $orig = $_SERVER['REQUEST_URI'];
     if(preg_match('/^\/\.([^?]*)$/', $orig, $m)) {

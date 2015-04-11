@@ -22,7 +22,7 @@
                 </tr>
               </thead>
               <tbody>
-<?
+<?php
   function describe($t) {
     if(array_key_exists('description', $t)) {
       global $purifier;
@@ -67,7 +67,7 @@
     }
 ?>
                 <tr class="tool" id="toollist-<?= $tool ?>">
-                  <td class="tool-name"><?
+                  <td class="tool-name"><?php
 
       if(array_key_exists('url', $json)) {
         print "<a class=\"tool-web\" href=\"" . $json['url'] . "\">$tool</a>";
@@ -82,15 +82,15 @@
                         [<a href="https://wikitech.wikimedia.org/w/index.php?title=Special:NovaServiceGroup&action=managemembers&projectname=tools&servicegroupname=tools.<?=$tool?>">manage</a> maintainers]
                       </span>
                   </td>
-                  <td class="tool-maintainers"><?
+                  <td class="tool-maintainers"><?php
         foreach(explode(' ', $row['maintainers']) as $maint):
           if(array_key_exists($maint, $users)):
             $maint = htmlspecialchars($users[$maint]['wikitech']);
-            ?><a href="https://wikitech.wikimedia.org/wiki/User:<?= $maint ?>"><?= ucfirst($maint) ?></a><?
+            ?><a href="https://wikitech.wikimedia.org/wiki/User:<?= $maint ?>"><?= ucfirst($maint) ?></a><?php
           endif;
         endforeach;
 ?></td>
-                  <td class="tool-desc"><?
+                  <td class="tool-desc"><?php
         if(array_key_exists(1, $json)) {
             $first = " first";
             foreach($json as $sub) {
@@ -110,7 +110,7 @@
         }
       ?></td>
                 </tr>
-<?  endwhile;
+<?php  endwhile;
     $res->free();
 ?>
               </tbody>

@@ -34,12 +34,20 @@
     }
   }
 
-  $dyn = fopen("/data/project/.system/dynamic", "r");
-  while(!feof($dyn)) {
-    list($tname, $where) = fscanf($dyn, "%s %s\n");
-    $tooldyn{$tname} = 1;
+  # Query list of active web services.
+  $active_proxy = file_get_contents('/etc/active-proxy');
+  $active_proxies_json = file_get_contents('http://' . $active_proxy . ':8081/list');
+  $tooldyn = array();
+  if ($active_proxies_json == false) {
+    error_log('Cannot retrieve list of active proxies from http://' . $active_proxy . ':8081/list');
+  } else {
+    $active_proxies = json_decode($active_proxies_json, true);
+    foreach ($active_proxies as $key => $value) {
+      if(array_key_exists('status', $value) && $value['status'] == 'active') {
+        $tooldyn[$key] = 1;
+      }
+    }
   }
-  fclose($dyn);
 
   $ini = parse_ini_file("/data/project/admin/replica.my.cnf");
   $db = new mysqli("tools.labsdb", $ini['user'], $ini['password'], "toollabs_p");

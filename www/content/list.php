@@ -4,10 +4,10 @@
             <h2>Useful links</h2>
             <ul>
                 <li><a href="https://wikitech.wikimedia.org/wiki/Nova_Resource:Tools">Tools project page on wikitech</a> (find out more about the Tools project)</li>
-                <li><a href="https://wikitech.wikimedia.org/w/index.php?title=Special:UserLogin&returnto=Main+Page&type=signup">Create a Labs account</a> (you must have a Labs account to access the Tools project)</li>
+                <li><a href="https://wikitech.wikimedia.org/w/index.php?title=Special:UserLogin&amp;returnto=Main+Page&amp;type=signup">Create a Labs account</a> (you must have a Labs account to access the Tools project)</li>
                 <li><a href="https://wikitech.wikimedia.org/wiki/Special:NovaKey">Add a public SSH key</a> (you’ll need this to access Labs servers using SSH)</li>
                 <li><a href="https://wikitech.wikimedia.org/wiki/Special:FormEdit/Tools_Access_Request">Request access to the Tools project</a> (Join us!)</li>
-                <li><a href="https://wikitech.wikimedia.org/w/index.php?title=Special:NovaServiceGroup&action=addservicegroup&projectname=tools">Create New Tool</a></li>
+                <li><a href="https://wikitech.wikimedia.org/w/index.php?title=Special:NovaServiceGroup&amp;action=addservicegroup&amp;projectname=tools">Create New Tool</a></li>
                 <li><a href="http://git.wikimedia.org/summary/labs%2Ftoollabs.git">Source code repository of this web</a></li>
             </ul>
 
@@ -28,9 +28,9 @@
       global $purifier;
       print  $purifier->purify($t['description']);
       if(array_key_exists('author', $t))
-        print "<BR/><I>Author(s): " . $purifier->purify($t['author']) . "</I>";
+        print "<br/><i>Author(s): " . $purifier->purify($t['author']) . "</i>";
       if(array_key_exists('repository', $t))
-        print "<BR/><a href=\"" . htmlspecialchars($t['repository']) . "\">Source</a>";
+        print "<br/><a href=\"" . htmlspecialchars($t['repository']) . "\">Source</a>";
     }
   }
 
@@ -79,7 +79,7 @@
 
 ?>
                       <span class="mw-editsection">
-                        [<a href="https://wikitech.wikimedia.org/w/index.php?title=Special:NovaServiceGroup&action=managemembers&projectname=tools&servicegroupname=tools.<?=$tool?>">manage</a> maintainers]
+                        [<a href="https://wikitech.wikimedia.org/w/index.php?title=Special:NovaServiceGroup&amp;action=managemembers&amp;projectname=tools&amp;servicegroupname=tools.<?=$tool?>">manage</a> maintainers]
                       </span>
                   </td>
                   <td class="tool-maintainers"><?php

@@ -24,6 +24,7 @@
           exit(0);
         }
         header("HTTP/1.0 503 No Webservice");
+        include("content/503.php");
         exit(0);
       }
     }
@@ -44,6 +45,7 @@
 
     if($uri != '/') {
       header("HTTP/1.0 404 Not Found");
+      include("content/404.php");
       exit(0);
     }
 
@@ -58,11 +60,13 @@
     }
     if(preg_match("/^([a-z0-9]+)(?:=.*)?$/", $content, $values) !== 1) {
       header("HTTP/1.0 404 Not Found");
+      include("content/404.php");
       exit(0);
     }
     $content = $values[1];
     if(!file_exists("$dr/content/$content.php")) {
       header("HTTP/1.0 404 Not Found");
+      include("content/404.php");
       exit(0);
     }
 

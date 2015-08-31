@@ -1,4 +1,5 @@
 /Makefile
 /Makefile.in
 /become.1
+/list-user-databases.1
 /toolwatcher.8

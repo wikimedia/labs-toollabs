@@ -1,0 +1,20 @@
+.TH LIST-USER-DATABASES 1 @TOOLLABS_RELEASEDATE@ @PACKAGE_VERSION@ "Wikimedia Labs Tools misctools"
+.SH NAME
+list-user-databases \- list databases a MySQL account has access to
+.SH SYNOPSIS
+.B list-user-databases
+.I filename
+.RI [filename ...]
+.SH DESCRIPTION
+.B list-user-databases
+lists all databases on the replica servers and
+.I tools.labsdb
+that the user has access to whose
+.I replica.my.cnf
+file has been given as a command line argument.
+.SH EXIT STATUS
+In case of success,
+.B list-user-databases
+returns 0.
+.SH AUTHORS
+Tim Landscheidt

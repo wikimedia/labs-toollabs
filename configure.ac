@@ -33,6 +33,7 @@ AC_CONFIG_FILES([Makefile
                  jobutils/man/jsub.1
                  misctools/Makefile
                  misctools/become.1
+                 misctools/list-user-databases.1
                  misctools/toolwatcher.8
                  src/Makefile
                  src/take.1

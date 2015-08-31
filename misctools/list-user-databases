@@ -1,0 +1,62 @@
+#!/usr/bin/python
+
+import ConfigParser
+import argparse
+import os
+import re
+
+import mysql.connector
+
+# Servers to search databases on.
+DATABASE_SERVERS = ('c1.labsdb', 'c2.labsdb', 'c3.labsdb', 'tools.labsdb')
+
+if __name__ == '__main__':
+    # Get list of defaults files to extract user information from.
+    parser = argparse.ArgumentParser(description='List databases owned by users, given by the credentials files.')
+    parser.add_argument('mycnffilenames',
+                        metavar='MYCNFFILENAME',
+                        nargs='+',
+                        help='name of MySQL defaults file')
+    args = parser.parse_args()
+
+    for mycnffilename in args.mycnffilenames:
+        c = ConfigParser.ConfigParser()
+        c.read(mycnffilename)
+        username = c.get('client', 'user').strip("'")
+        password = c.get('client', 'password').strip("'")
+        databases_found = []
+        for server in DATABASE_SERVERS:
+            conn = mysql.connector.connect(user=username,
+                                           password=password,
+                                           host=server,
+                                           database='mysql')
+            cur = conn.cursor()
+            cur.execute('SHOW GRANTS')
+            database_patterns = []
+            for (grantstatement, ) in cur.fetchall():
+                # Ignore general grants for replica views.
+                if grantstatement == 'GRANT SELECT, SHOW VIEW ON `%%\\_p`.* TO \'%s\'@\'%%\'' % username:
+                    continue
+                if re.match('^GRANT SHOW VIEW ON \*\.\* TO \'%s\'@\'%%\'(?: IDENTIFIED BY PASSWORD \'\*[0-9A-F]{40}\')?$' % re.escape(username), grantstatement):
+                    continue
+
+                # Gather grants for user-specific databases.
+                m = re.match('^GRANT ALL PRIVILEGES ON `([^`]+)`\.\* TO \'%s\'@\'%%\'(?: WITH GRANT OPTION)?$' % re.escape(username), grantstatement)
+                if m:
+                    database_patterns.append(m.group(1))
+                else:
+                    raise Exception('Cannot parse ' + repr(grantstatement))
+
+            for database_pattern in database_patterns:
+                cur.execute('SHOW DATABASES LIKE %s', (database_pattern, ))
+                for r in cur.fetchall():
+                    databases_found.append([server, r[0]])
+
+            conn.close()
+
+        if databases_found:
+            print('Databases found for user %s ...' % username)
+            for database_found in databases_found:
+                print('... on server %s database %s' % (database_found[0], database_found[1]))
+        else:
+            print('No databases found for user %s' % username)

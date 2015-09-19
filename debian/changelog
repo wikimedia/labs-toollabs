@@ -1,9 +1,10 @@
 toollabs (1.6~dev) unstable; urgency=medium
 
+  * Remove rmtool.
   * Bump Standards-Version to 3.9.5.
   * Fix lintian warning about maintainer also being in uploaders.
 
- -- Tim Landscheidt <tim@tim-landscheidt.de>  Sun, 05 Apr 2015 04:25:45 +0000
+ -- Tim Landscheidt <tim@tim-landscheidt.de>  Sat, 19 Sep 2015 00:18:27 +0000
 
 toollabs (1.5) unstable; urgency=low
 

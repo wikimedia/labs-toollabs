@@ -1,8 +1,10 @@
 toollabs (1.9~dev) unstable; urgency=medium
 
   * Don't call log-command-invocation when testing jsub. [Bryan Davis]
+  * Set versions and dates in man pages from debian/changelog. [Tim
+    Landscheidt]
 
- -- Tim Landscheidt <tim@tim-landscheidt.de>  Mon, 25 Jan 2016 14:24:33 +0000
+ -- Tim Landscheidt <tim@tim-landscheidt.de>  Mon, 01 Feb 2016 03:38:03 +0000
 
 toollabs (1.8.1) unstable; urgency=medium
 

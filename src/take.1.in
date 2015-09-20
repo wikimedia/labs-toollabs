@@ -1,4 +1,4 @@
-.TH TAKE 1 2014-08-21 1.0.11 "Wikimedia Labs Tools misctools"
+.TH TAKE 1 @TOOLLABS_RELEASEDATE@ @PACKAGE_VERSION@ "Wikimedia Labs Tools misctools"
 .SH NAME
 take \- assume ownership of files and directories
 .SH SYNOPSIS

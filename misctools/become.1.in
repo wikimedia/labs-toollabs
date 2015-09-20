@@ -1,4 +1,4 @@
-.TH BECOME 1 2014-08-21 1.0.11 "Wikimedia Labs Tools misctools"
+.TH BECOME 1 @TOOLLABS_RELEASEDATE@ @PACKAGE_VERSION@ "Wikimedia Labs Tools misctools"
 .SH NAME
 become \- switch to a tool account
 .SH SYNOPSIS

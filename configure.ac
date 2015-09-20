@@ -17,12 +17,25 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_CXX
 
+# Parse the release date from debian/changelog.
+AC_SUBST([TOOLLABS_RELEASEDATE], ["$(date --date="$(sed -ne '1,/^ -- .*  /s/^ -- .*  //p;' debian/changelog)" +%Y-%m-%d)"])
+
+# We parse $TOOLLABS_RELEASEDATE and $PACKAGE_VERSION from
+# debian/changelog, so we need to depend config.status on it.
+AC_SUBST([CONFIG_STATUS_DEPENDENCIES], ['$(top_srcdir)/debian/changelog'])
+
 AC_CONFIG_FILES([Makefile
                  jobutils/Makefile
                  jobutils/bin/Makefile
                  jobutils/man/Makefile
+                 jobutils/man/job.1
+                 jobutils/man/jstop.1
+                 jobutils/man/jsub.1
                  misctools/Makefile
+                 misctools/become.1
+                 misctools/toolwatcher.8
                  src/Makefile
+                 src/take.1
                  tests/Makefile])
 
 AC_OUTPUT

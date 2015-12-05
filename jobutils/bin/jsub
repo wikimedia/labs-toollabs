@@ -30,7 +30,7 @@ my %qsubargs = (
 );
 my %qsargs;
 my @args;
-my $memory = memparse_kb('256M');
+my $memory = memparse_kb('400M');
 my $once = 0;
 my $stderr = 0;
 my $continuous = 0;

@@ -1,3 +1,9 @@
+toollabs (1.7) unstable; urgency=low
+
+  * jsub: default memory request now 512M
+
+ -- Marc-André Pelletier <mpelletier@wikimedia.org>  Mon, 7 Dec 2015 18:52:21 +0000
+
 toollabs (1.6~dev) unstable; urgency=medium
 
   * Remove rmtool.

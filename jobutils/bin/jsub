@@ -1,11 +1,11 @@
 #!/usr/bin/perl -w
 #
 # Copyright © 2013 Marc-André Pelletier <mpelletier@wikimedia.org>
-# 
+#
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
 # copyright notice and this permission notice appear in all copies.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
 # WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
 # MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
@@ -20,6 +20,10 @@ use warnings;
 
 use IPC::Run qw(harness run);
 use String::ShellQuote;
+
+# Log this command invocation to EventLogging
+my $full_commandline = join " ", $0, @ARGV;
+system('/usr/local/bin/log-command-invocation', 'jsub', $full_commandline);
 
 my %qsubargs = (
        '-a' => 1, '-b' => 1, '-cwd' => 0, '-e' => 1, '-hard' => 0, '-i' => 1, '-j' => 1,

@@ -1,3 +1,9 @@
+toollabs (1.8.1) unstable; urgency=medium
+
+  * Stop logging for `job` - too much noise
+
+ -- Yuvi Panda <yuvipanda@gmail.com>  Wed, 15 Jan 2016 17:00:00 -1300
+
 toollabs (1.8) unstable; urgency=medium
 
   * Start logging command invocation to EventLogging

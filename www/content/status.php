@@ -36,7 +36,7 @@ function mmem( $str ) {
 	return -1;
 }
 
-$raw = exec( "PATH=/bin:/usr/bin qstat -xml -j '*'|sed -e 's/JATASK:[^>]*/jatask/g'" );
+$raw = shell_exec( "PATH=/bin:/usr/bin qstat -xml -j '*'|sed -e 's/JATASK:[^>]*/jatask/g'" );
 $xml = simplexml_load_string( $raw );
 unset( $raw );
 
@@ -76,7 +76,7 @@ foreach ( $xml->djob_info->element as $xjob ) {
 }
 unset( $xml );
 
-$raw = exec( "PATH=/bin:/usr/bin qhost -xml -j -F h_vmem" );
+$raw = shell_exec( "PATH=/bin:/usr/bin qhost -xml -j -F h_vmem" );
 $xml = simplexml_load_string( $raw );
 unset( $raw );
 

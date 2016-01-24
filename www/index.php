@@ -88,6 +88,7 @@
     <meta name="publisher" content="Wikimedia Foundation" />
     <meta name="language" content="Many" />
     <meta name="robots" content="index, follow" />
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=yes, width=device-width" />
     <link rel="StyleSheet" href="/style.css" type="text/css" media="screen" />
     <!--[if lt IE 7]>
     <style media="screen" type="text/css">

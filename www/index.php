@@ -101,7 +101,7 @@ if ( isset( $errorPages[$content] ) ) {
 	exit( 0 );
 }
 
-require_once 'htmlpurifier/library/HTMLPurifier.standalone.php';
+require_once 'htmlpurifier/HTMLPurifier.standalone.php';
 $config = HTMLPurifier_Config::createDefault();
 $config->set( 'URI.Base', 'https://tools.wmflabs.org' );
 $config->set( 'URI.MakeAbsolute', true );

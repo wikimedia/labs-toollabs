@@ -17,7 +17,7 @@ if ( $tool !== '' ) {
 <?php
 	echo htmlspecialchars( $tool );
 	if ( array_key_exists( 0, glob( "{$home}/public_html/index.*" ) ) ) {
-		echo '<br/><span class="mw-editsection"><a href="/', urlencode( $tool ), '/">(Web interface)</a></span>';
+		echo '<br><span class="mw-editsection"><a href="/', urlencode( $tool ), '/">(Web interface)</a></span>';
 	}
 ?>
 </th><td></td></tr>

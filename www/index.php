@@ -103,24 +103,25 @@ if ( isset( $errorPages[$content] ) ) {
 
 require_once 'htmlpurifier/HTMLPurifier.standalone.php';
 $config = HTMLPurifier_Config::createDefault();
+$config->set( 'HTML.Doctype', 'HTML 4.01 Transitional' );
 $config->set( 'URI.Base', 'https://tools.wmflabs.org' );
 $config->set( 'URI.MakeAbsolute', true );
 $config->set( 'URI.DisableExternalResources', true );
 $purifier = new HTMLPurifier( $config );
-?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+?><!DOCTYPE html>
 <html>
 <head>
 <title>Tool Labs</title>
-<meta charset="utf-8" />
-<meta name="title" content="Tool Labs" />
-<meta name="description" content="This is the Tool Labs project for community-developed tools assisting the Wikimedia projects." />
-<meta name="author" content="Wikimedia Foundation" />
-<meta name="copyright" content="Creative Commons Attribution-Share Alike 3.0" />
-<meta name="publisher" content="Wikimedia Foundation" />
-<meta name="language" content="Many" />
-<meta name="robots" content="index, follow" />
-<meta name="viewport" content="initial-scale=1.0, user-scalable=yes, width=device-width" />
-<link rel="StyleSheet" href="/style.css" type="text/css" media="screen" />
+<meta charset="utf-8">
+<meta name="title" content="Tool Labs">
+<meta name="description" content="This is the Tool Labs project for community-developed tools assisting the Wikimedia projects.">
+<meta name="author" content="Wikimedia Foundation">
+<meta name="copyright" content="Creative Commons Attribution-Share Alike 3.0">
+<meta name="publisher" content="Wikimedia Foundation">
+<meta name="language" content="Many">
+<meta name="robots" content="index, follow">
+<meta name="viewport" content="initial-scale=1.0, user-scalable=yes, width=device-width">
+<link rel="StyleSheet" href="/style.css" type="text/css" media="screen">
 <!--[if lt IE 7]><style media="screen" type="text/css"> .col1 { width:100%; } </style> <![endif]-->
 <script src="/admin/libs/jquery.js"></script>
 <script src="/admin/libs/jquery.tablesorter.min.js"></script>
@@ -146,7 +147,7 @@ $(document).ready(function() {
 <?php include "content/{$content}.php"; ?>
 </div></div>
 <div class="col2">
-<div id="logo"><a href="/"><img src="/Tool_Labs_logo_thumb.png" width="122" height="138" alt="Wikitech and Wikimedia Labs" /></a></div>
+<div id="logo"><a href="/"><img src="/Tool_Labs_logo_thumb.png" width="122" height="138" alt="Wikitech and Wikimedia Labs"></a></div>
 <ul>
 <li><a href="/?list">Tools</a></li>
 <li><a href="/?status">Status</a></li>

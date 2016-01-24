@@ -32,7 +32,7 @@ list( $tool, $maintainers ) = getToolInfo( $uri );
 <?php } ?>
 </div></div>
 <div class="col2">
-<div id="logo"><a href="/"><img src="/Tool_Labs_logo_thumb.png" width="122" height="138" alt="Wikitech and Wikimedia Labs" /></a></div>
+<div id="logo"><a href="/"><img src="/Tool_Labs_logo_thumb.png" width="122" height="138" alt="Wikitech and Wikimedia Labs"></a></div>
 <ul>
 <li><a href="/?list">Tools</a></li>
 <li><a href="/?status">Status</a></li>

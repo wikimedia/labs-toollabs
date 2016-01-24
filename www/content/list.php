@@ -28,10 +28,10 @@ function describe( $t ) {
 		global $purifier;
 		echo  $purifier->purify( $t['description'] );
 		if ( array_key_exists( 'author', $t ) ) {
-			echo '<br/><i>Author(s): ', $purifier->purify( $t['author'] ), '</i>';
+			echo '<br><i>Author(s): ', $purifier->purify( $t['author'] ), '</i>';
 		}
 		if ( array_key_exists( 'repository', $t ) ) {
-			echo '<br/><a href="', htmlspecialchars( $t['repository'] ), '">Source</a>';
+			echo '<br><a href="', htmlspecialchars( $t['repository'] ), '">Source</a>';
 		}
 	}
 }

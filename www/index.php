@@ -124,11 +124,10 @@ $(document).ready(function() {
 </script>
 </head>
 <body>
-<div class="colmask leftmenu">
-<div class="colright">
-<div class="col1wrap">
-<div class="col1"><?php include "content/{$content}.php"; ?></div>
-</div>
+<div class="colmask leftmenu"><div class="colright">
+<div class="col1wrap"><div class="col1">
+<?php include "content/{$content}.php"; ?>
+</div></div>
 <div class="col2">
 <div id="logo"><a href="/"><img src="/Tool_Labs_logo_thumb.png" width="122" height="138" alt="Wikitech and Wikimedia Labs" /></a></div>
 <ul>
@@ -142,7 +141,6 @@ $(document).ready(function() {
 <li><a href="/?Rules">Rules</a></li>
 </ul>
 </div>
-</div>
-</div>
+</div></div>
 </body>
 </html>

@@ -4,8 +4,11 @@
 <meta charset="UTF-8">
 <title>503 Service Unavailable</title>
 <meta name="viewport" content="initial-scale=1.0, user-scalable=yes, width=device-width">
+<link rel="StyleSheet" href="/style.css" type="text/css" media="screen">
 </head>
 <body>
+<div class="colmask leftmenu"><div class="colright">
+<div class="col1wrap"><div class="col1">
 <?php
 require_once dirname( __FILE__ ) . '/common.inc.php';
 $uri = $_SERVER['HTTP_X_ORIGINAL_URI'];
@@ -27,5 +30,20 @@ list( $tool, $maintainers ) = getToolInfo( $uri );
 <p>This URI is not currently part of any tool.</p>
 <p>If you're pretty sure this shouldn't be an error, you may wish to notify the <a href="/?tool=admin">project administrators</a> about the error and how you ended up here.</p>
 <?php } ?>
+</div></div>
+<div class="col2">
+<div id="logo"><a href="/"><img src="/Tool_Labs_logo_thumb.png" width="122" height="138" alt="Wikitech and Wikimedia Labs" /></a></div>
+<ul>
+<li><a href="/?list">Tools</a></li>
+<li><a href="/?status">Status</a></li>
+<li><a href="/?Privacy">Privacy policy</a></li>
+</ul>
+<em>Maintainers:</em>
+<ul>
+<li><a href="/?Help">Help</a></li>
+<li><a href="/?Rules">Rules</a></li>
+</ul>
+</div>
+</div></div>
 </body>
 </html>

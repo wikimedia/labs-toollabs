@@ -88,6 +88,19 @@ if ( !file_exists( "{$dr}/content/{$content}.php" ) ||
 	exit( 0 );
 }
 
+// Make testing error page output easier
+$errorPages = array(
+	'403' => 'Forbidden',
+	'404' => 'Not Found',
+	'500' => 'Internal Server Error',
+	'503' => 'Service Unavailable',
+);
+if ( isset( $errorPages[$content] ) ) {
+	header( "HTTP/1.0 {$content} {$errorPages[$content]}" );
+	include "content/{$content}.php";
+	exit( 0 );
+}
+
 require_once 'htmlpurifier/library/HTMLPurifier.standalone.php';
 $config = HTMLPurifier_Config::createDefault();
 $config->set( 'URI.Base', 'https://tools.wmflabs.org' );

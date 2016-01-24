@@ -192,6 +192,9 @@ span.subtool-desc {
 .tool-name {
   font-size: 150%;
 }
+.tool-name a {
+  font-size: 67%; /* undo giant font */
+}
 .tool-name span.mw-editsection {
   font-size: 50%;
 }

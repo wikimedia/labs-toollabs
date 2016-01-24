@@ -1,3 +1,11 @@
+<!DOCTYPE html>
+<html lang=en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>503 Service Unavailable</title>
+<meta name="viewport" content="initial-scale=1.0, user-scalable=yes, width=device-width">
+</head>
+<body>
 <?php $uri = $_SERVER['HTTP_X_ORIGINAL_URI']; ?>
       <h1>No webservice</h1>
       <p>The URI you have requested, <a href="<?= $uri ?>"><code><?= $uri ?></code></a>,
@@ -44,3 +52,5 @@
         <p>This URI is not currently part of any tool.</p>
         <p>If you're pretty sure this shouldn't be an error, you may wish to notify the <a href="/?tool=admin">project administrators</a> about the error and how you ended up here.</p>
       <?php endif ?>
+</body>
+</html>

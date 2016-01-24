@@ -1,6 +1,14 @@
+<!DOCTYPE html>
+<html lang=en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>404 Not Found</title>
+<meta name="viewport" content="initial-scale=1.0, user-scalable=yes, width=device-width">
+</head>
+<body>
 <?php $uri = $_SERVER['HTTP_X_ORIGINAL_URI']; ?>
-      <h1>Four hundred and four!</h2>
-      <p>The URI you have requested, <code><?= $uri ?></code>, doesn't seem to actually exist.</p>
+      <h1>Four hundred and four!</h1>
+      <p>The URI you have requested, <code><?= htmlspecialchars( $uri ) ?></code>, doesn't seem to actually exist.</p>
       <?php $tool = '';
          if(preg_match("@^/([^/]+)/@", $uri, $part)) {
            $gr = posix_getgrnam("tools.".$part[1]);
@@ -38,5 +46,5 @@
       <p>Perhaps the webserver has temporarily lost its mind, or the link you've followed doesn't actually lead somewhere useful?</p>
       <p>You might want to looks at the <a href="/?list">list of tools</a> to find what you were looking for, or one of the links on the sidebar to the left. If you're pretty sure this shouldn't be an error, you may wish to notify the <a href="/?tool=admin">project administrators</a> about the error and how you ended up here.</p>
       <?php endif ?>
-
-
+</body>
+</html>

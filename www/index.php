@@ -77,8 +77,12 @@ if ( preg_match( '/^([a-z0-9]+)(?:=.*)?$/', $content, $values ) !== 1 ) {
 	exit( 0 );
 }
 
+// Files that should not be exposed from the content directory
+$contentBlacklist = array( 'common.inc' );
 $content = $values[1];
-if ( !file_exists( "{$dr}/content/{$content}.php" ) ) {
+if ( !file_exists( "{$dr}/content/{$content}.php" ) ||
+	in_array( $content, $contentBlacklist )
+) {
 	header( 'HTTP/1.0 404 Not Found' );
 	include 'content/404.php';
 	exit( 0 );

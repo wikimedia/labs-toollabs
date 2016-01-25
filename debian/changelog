@@ -1,3 +1,9 @@
+toollabs (1.9~dev) unstable; urgency=medium
+
+  * Don't call log-command-invocation when testing jsub. [Bryan Davis]
+
+ -- Tim Landscheidt <tim@tim-landscheidt.de>  Mon, 25 Jan 2016 14:24:33 +0000
+
 toollabs (1.8.1) unstable; urgency=medium
 
   * Stop logging for `job` - too much noise

@@ -23,7 +23,7 @@ use String::ShellQuote;
 
 # Log this command invocation to EventLogging
 my $full_commandline = join " ", $0, @ARGV;
-system('/usr/local/bin/log-command-invocation', 'jsub', $full_commandline);
+system('/usr/local/bin/log-command-invocation', 'jsub', $full_commandline) unless (exists ($ENV {'JOBUTILS_QSUB'}));
 
 my %qsubargs = (
        '-a' => 1, '-b' => 1, '-cwd' => 0, '-e' => 1, '-hard' => 0, '-i' => 1, '-j' => 1,

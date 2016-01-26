@@ -123,23 +123,6 @@ $purifier = new HTMLPurifier( $config );
 <meta name="viewport" content="initial-scale=1.0, user-scalable=yes, width=device-width">
 <link rel="StyleSheet" href="/style.css" type="text/css" media="screen">
 <!--[if lt IE 7]><style media="screen" type="text/css"> .col1 { width:100%; } </style> <![endif]-->
-<script src="/admin/libs/jquery.js"></script>
-<script src="/admin/libs/jquery.tablesorter.min.js"></script>
-<script type="text/javascript">
-$(document).ready(function() {
-	$(".tablesorter").tablesorter({
-		sortList: [[0,0]],
-		// initialize zebra striping of the table
-		widgets: ["zebra"],
-		// change the default striping class names
-		// updated in v2.1 to use widgetOptions.zebra = ["even", "odd"]
-		// widgetZebra: { css: [ "normal-row", "alt-row" ] } still works
-		widgetOptions : {
-			zebra : [ "normal-row", "alt-row" ]
-		}
-	});
-);
-</script>
 </head>
 <body>
 <div class="colmask leftmenu"><div class="colright">
@@ -160,5 +143,22 @@ $(document).ready(function() {
 </ul>
 </div>
 </div></div>
+<script src="/admin/libs/jquery.js"></script>
+<script src="/admin/libs/jquery.tablesorter.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+	$(".tablesorter").tablesorter({
+		sortList: [[0,0]],
+		// initialize zebra striping of the table
+		widgets: ["zebra"],
+		// change the default striping class names
+		// updated in v2.1 to use widgetOptions.zebra = ["even", "odd"]
+		// widgetZebra: { css: [ "normal-row", "alt-row" ] } still works
+		widgetOptions : {
+			zebra : [ "normal-row", "alt-row" ]
+		}
+	});
+});
+</script>
 </body>
 </html>

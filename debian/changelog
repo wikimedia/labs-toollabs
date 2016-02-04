@@ -4,8 +4,9 @@ toollabs (1.19~dev) trusty; urgency=medium
   * Do not hardcore database hosts in list-user-databases
   * State dependency on python
   * Set target distribution to Ubuntu Trusty
+  * Import sql from operations/puppet
 
- -- Tim Landscheidt <tim@tim-landscheidt.de>  Sun, 26 Feb 2017 01:38:04 +0000
+ -- Tim Landscheidt <tim@tim-landscheidt.de>  Sun, 26 Feb 2017 20:18:21 +0000
 
 toollabs (1.18) unstable; urgency=medium
 

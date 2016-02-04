@@ -1,12 +1,13 @@
-toollabs (1.19~dev) precise; urgency=medium
+toollabs (1.19~precise+1~dev) precise; urgency=medium
 
   * Remove toolwatcher
   * Do not hardcore database hosts in list-user-databases
   * State dependency on python
   * Set target distribution to Ubuntu Trusty
   * Set target distribution for branch ubuntu/precise to Ubuntu Precise
+  * Import sql from operations/puppet
 
- -- Tim Landscheidt <tim@tim-landscheidt.de>  Sun, 26 Feb 2017 02:49:21 +0000
+ -- Tim Landscheidt <tim@tim-landscheidt.de>  Sun, 26 Feb 2017 21:27:04 +0000
 
 toollabs (1.18) unstable; urgency=medium
 

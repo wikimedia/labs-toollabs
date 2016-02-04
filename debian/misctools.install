@@ -1,4 +1,5 @@
 usr/bin/become
 usr/bin/list-user-databases
+usr/bin/sql
 usr/bin/take
 usr/bin/setup-tomcat

@@ -5,8 +5,9 @@ toollabs (1.19~dev) trusty; urgency=medium
   * State dependency on python
   * Set target distribution to Ubuntu Trusty
   * Import sql from operations/puppet
+  * Add man page for sql
 
- -- Tim Landscheidt <tim@tim-landscheidt.de>  Sun, 26 Feb 2017 20:18:21 +0000
+ -- Tim Landscheidt <tim@tim-landscheidt.de>  Sun, 26 Feb 2017 20:19:56 +0000
 
 toollabs (1.18) unstable; urgency=medium
 

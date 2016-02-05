@@ -1,0 +1,44 @@
+.TH SQL 1 @TOOLLABS_RELEASEDATE@ @PACKAGE_VERSION@ "Wikimedia Labs Tools misctools"
+.SH NAME
+sql \- connect to database or execute SQL command
+.SH SYNOPSIS
+.B sql
+.I database
+
+.B sql
+.I database
+.I statement
+.SH DESCRIPTION
+.B sql
+connects to the named
+.I database
+with
+.BR mysql ;
+if an SQL statement is given, it is executed, otherwise an interactive
+session is started.
+
+There are three categories of databases that can be specified by
+.IR database :
+.IR enwiki_p ,
+etc. refers to the database for the English Wikipedia, etc.  on the
+replica servers.
+.I local
+only works in the form
+.B sql local
+and connects to the
+.I tools-db
+server.
+.IR meta_p ,
+not to be confused with
+.IR metawiki_p ,
+refers to the database that contains meta information about Wikimedia wikis (cf.
+.RB < https://wikitech.wikimedia.org/wiki/Help:Tool_Labs/Database#Metadata_database >).
+.SH EXIT STATUS
+.B sql
+returns the exit status of the spawned
+.B mysql
+command.
+.SH AUTHORS
+Petr Bena
+.SH SEE ALSO
+.BR mysql (1)

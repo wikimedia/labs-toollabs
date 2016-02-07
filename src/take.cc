@@ -38,7 +38,7 @@ bool error(const char* file)
 struct FD {
     int     fd;
 
-            FD(int f): fd(f)        { };
+            explicit FD(int f): fd(f)   { };
             ~FD()               { if(fd >= 0) close(fd); };
             operator int (void) const   { return fd; };
 };
@@ -51,7 +51,7 @@ bool takeover(const char* path, bool trustpath)
 {
     // We open the files and use the file descriptors exclusively
     // to avoid trickery and race conditions
-    FD file = open(path, O_RDONLY|O_NOFOLLOW);
+    FD file = FD(open(path, O_RDONLY|O_NOFOLLOW));
 
     if(file < 0) {
         if(errno == ELOOP)

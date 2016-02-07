@@ -1,5 +1,6 @@
 toollabs (1.9~dev) unstable; urgency=medium
 
+  * Make take's FD constructor explicit. [Tim Landscheidt]
   * Add options --help and --version to take. [Platonides]
   * list-user-databases: List all databases a user has access to. [Tim
     Landscheidt]

@@ -157,6 +157,8 @@ bool takeover(const char* path, bool trustpath)
                 ok &= takeover(d->d_name, true);
             }
             closedir(df);
+
+            return ok;
         } else
             return error(path);
     }

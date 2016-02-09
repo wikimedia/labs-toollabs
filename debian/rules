@@ -18,7 +18,7 @@ export DH_OPTIONS
 
 
 %:
-	dh $@ --with autoreconf
+	dh $@ --with autoreconf --with bash-completion
 
 # Make take setuid.
 override_dh_fixperms:

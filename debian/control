@@ -4,7 +4,7 @@ Priority: extra
 Maintainer: Marc-André Pelletier <mpelletier@wikimedia.org>
 Uploaders: Carl Fürstenberg <azatoth@gmail.com>,
  Petr Bena <benapetr@gmail.com>
-Build-Depends: debhelper (>= 8.0.0), dh-autoreconf, libipc-run-perl, libstring-shellquote-perl
+Build-Depends: debhelper (>= 8.0.0), dh-autoreconf, libipc-run-perl, libstring-shellquote-perl, bash-completion
 Standards-Version: 3.9.5
 Vcs-Git: https://gerrit.wikimedia.org/r/labs/toollabs
 Vcs-Browser: https://git.wikimedia.org/summary/labs%2Ftoollabs

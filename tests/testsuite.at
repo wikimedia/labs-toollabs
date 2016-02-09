@@ -124,8 +124,7 @@ AT_CHECK([mkdir does-exist], [0], [], [])
 _AT_TOOLLABS_JSUB([-o does-exist -quiet true], [], [Your job 501377 ("true") has been submitted
 ], [], [0], [-o does-exist -e $HOME/true.err -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=524288k -q task -b y /bin/true
 ], [], [], [], [0])
-AT_CHECK([LANG=C ls does-exist/*], [2], [], [ls: cannot access does-exist/*: No such file or directory
-])
+AT_CHECK([find does-exist -mindepth 1], [0], [], [])
 AT_CLEANUP()
 
 AT_SETUP([.jsubrc is honoured])

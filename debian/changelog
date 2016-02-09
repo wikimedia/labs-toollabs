@@ -1,5 +1,6 @@
 toollabs (1.9~dev) unstable; urgency=medium
 
+  * Fix test suite's check for empty directory. [Tim Landscheidt]
   * Don't call log-command-invocation when testing jsub. [Bryan Davis]
   * Set versions and dates in man pages from debian/changelog. [Tim
     Landscheidt]

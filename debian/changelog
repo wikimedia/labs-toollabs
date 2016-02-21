@@ -1,4 +1,4 @@
-toollabs (1.9~dev) unstable; urgency=medium
+toollabs (1.9) unstable; urgency=medium
 
   * Make take's FD constructor explicit. [Tim Landscheidt]
   * Add options --help and --version to take. [Platonides]

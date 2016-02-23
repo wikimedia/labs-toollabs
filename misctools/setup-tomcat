@@ -16,7 +16,7 @@ if [ -d "$home/public_tomcat" ]; then
 fi
 
 echo "Setting up your public_tomcat directory..."
-/usr/bin/qsub -sync y -o /dev/null -e /dev/null -i /dev/null -q "webgrid-tomcat" -l h_vmem=512m -b y -N "setup-$tool" tomcat7-instance-create public_tomcat >/dev/null
+/usr/bin/qsub -sync y -o /dev/null -e /dev/null -i /dev/null -q "webgrid-generic" -l h_vmem=512m -l release=trusty -b y -N "setup-$tool" tomcat7-instance-create public_tomcat >/dev/null
 
 conf="$home/public_tomcat/conf/server.xml"
 echo "All done."

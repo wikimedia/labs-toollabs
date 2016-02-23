@@ -1,5 +1,6 @@
 usr/bin/become
 usr/bin/list-user-databases
 usr/bin/take
+usr/bin/setup-tomcat
 usr/bin/webservice
 usr/sbin/toolwatcher

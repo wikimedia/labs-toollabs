@@ -275,3 +275,74 @@ span.hostname {
   font-size: 150%;
   font-weight: bold;
 }
+
+/* Small screen layout */
+@media only screen and (max-width:600px) {
+  body {
+    min-width:initial;
+  }
+  .col2 {
+    border-top:solid;
+    text-align:center;
+  }
+  .col2 ul {
+    padding-left:0;
+  }
+  .col2 ul li {
+    display:inline;
+  }
+  .colmask,
+  .leftmenu .colright,
+  .leftmenu .col1wrap,
+  .leftmenu .col1,
+  .leftmenu .col2 {
+    float:none;
+    margin:.2em;
+    overflow:visible;
+    position:static;
+    width:auto;
+  }
+  #thebigtable,
+  #thebigtable td,
+  #thebigtable th {
+    display:block;
+  }
+  #thebigtable thead tr {
+    position:absolute;
+    top:-9999px;
+    left:-9999px;
+  }
+  #thebigtable tr {
+    border:1px solid #ccc;
+  }
+  #thebigtable td::before {
+    font-style:italic;
+    padding-right:.5em;
+    white-space:nowrap;
+  }
+  #thebigtable td.tool-name span.mw-editsection {
+    float:right;
+  }
+  #thebigtable td.tool-maintainers::before {
+    content:"Maintainer(s):";
+  }
+  #thebigtable td.tool-maintainers {
+    white-space:normal;
+  }
+  #thebigtable td.tool-maintainers a {
+    display:inline;
+    white-space:nowrap;
+  }
+  #thebigtable td.tool-desc {
+    padding-left:1em;
+  }
+  #thebigtable td.tool-desc span.subtool-name,
+  #thebigtable td.tool-desc span.subtool-desc {
+    display:block;
+    width:auto;
+    padding:0;
+  }
+  #thebigtable td.tool-desc span.subtool-desc {
+    padding-left:1em;
+  }
+}

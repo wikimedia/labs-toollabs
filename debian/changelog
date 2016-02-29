@@ -1,4 +1,4 @@
-toollabs (1.10~dev) unstable; urgency=medium
+toollabs (1.10) unstable; urgency=medium
 
   * Install setup-tomcat as well.
   * Change setup-tomcat queue to 'webgrid-generic' as 'webgrid-tomcat'

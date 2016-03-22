@@ -98,7 +98,10 @@ $errorPages = array(
 	'503' => 'Service Unavailable',
 );
 if ( isset( $errorPages[$content] ) ) {
-	header( "HTTP/1.0 {$content} {$errorPages[$content]}" );
+	// Do not set proper HTTP status codes. These pages will be used as error
+	// handlers by nginx/apache and thus are expected to return 200 status to
+	// the calling server. The upstream server will handle putting the right
+	// status code on the page sent to the browser.
 	include "content/{$content}.php";
 	exit( 0 );
 }

@@ -23,7 +23,9 @@ if ( preg_match( '/^\/([^\/]+)(\/.*)?/', $uri, $m ) ) {
 			header( "Location: $to" );
 			exit( 0 );
 		}
-		header( 'HTTP/1.0 503 No Webservice' );
+		// This is endpoint is called as an error hander page by nginx,
+		// so *DO NOT* return an actual 503 status code. If you do nginx will
+		// think that the error handler itself is broken.
 		include 'content/503.php';
 		exit( 0 );
 	}

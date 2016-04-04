@@ -29,7 +29,7 @@ function printMaintainers( $maintainers ) {
 		if ( $mu ) {
 			$wtu = $mu['gecos'];
 			echo '<a href="https://wikitech.wikimedia.org/wiki/User:';
-			echo urlencode( $wtu ), '">', htmlspecialchars( ucfirst($wtu) );
+			echo urlencode( str_replace( ' ', '_', $wtu ) ), '">', htmlspecialchars( ucfirst($wtu) );
 			echo '</a>';
 		} else {
 			echo htmlspecialchars( ucfirst( $maint ) );

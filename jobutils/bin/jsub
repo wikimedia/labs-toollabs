@@ -312,11 +312,13 @@ if($continuous) {
   push @args, '-b', $qsargs{'-b'} if defined $qsargs{'-b'};
   # Write a shell script to stdin that will continue to execute our program
   # until it exits with an exit status of zero.
-  # bd808: this feels like it could use a bit of improvement
-  $qsubinput = "#!/bin/bash\n"                                   .
-               "while ! " . shell_quote($prog, @ARGV) . "; do\n" .
-               "  sleep 5\n"                                     .
-               "done\n";
+  my $cmdline = shell_quote($prog, @ARGV);
+  ($qsubinput = qq{#!/bin/sh
+    until $cmdline ; do
+        echo "[`date +%Y-%d-%mT%H:%M`] $prog exited with code \$?. Respawning..." >&2
+        sleep 5
+    done
+  }) =~ s/^ {4}//gm; # strip the leading whitespace from our script
 } else {
   # Set stdin to an empty string
   $qsubinput = '';

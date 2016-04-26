@@ -1,6 +1,10 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env python2
+# -*- coding: utf-8 -*-
+#
+# Submit a job to the job grid.
 #
 # Copyright © 2013 Marc-André Pelletier <mpelletier@wikimedia.org>
+# Copyright © 2016 Wikimedia Foundation and contributors
 #
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -13,335 +17,606 @@
 # WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-#
 
-use strict;
-use warnings;
-use English;
-
-use IPC::Run qw(harness run);
-use String::ShellQuote;
-
-# Log this command invocation to EventLogging
-my $full_commandline = join " ", $0, @ARGV;
-system('/usr/local/bin/log-command-invocation', 'jsub', $full_commandline) unless (exists ($ENV {'JOBUTILS_QSUB'}));
-
-# Supported qsub options and whether they take an argument or not
-my %qsubargs = (
-       '-a' => 1, '-b' => 1, '-cwd' => 0, '-e' => 1, '-hard' => 0, '-i' => 1, '-j' => 1,
-       '-l' => 1, '-now' => 1, '-N' => 1, '-o' => 1, '-p' => 1, '-q' => 1, '-soft' => 0,
-       '-sync' => 1, '-v' => 1, '-wd' => 1, '-M' => 1, '-m' => 1,
-       '-mem' => 1, '-once' => 0, '-stderr' => 0, '-continuous' => 0, '-quiet' => 0,
-       '-umask' => 1,
-);
-my %qsargs;
-my @args;
-my $memory = memparse_kb('512M');
-my $once = 0;
-my $stderr = 0;
-my $continuous = 0;
-my $quiet = 0;
-my $script = $0;
-my $queue = 'task';
-my $username = $ENV{LOGNAME} || $ENV{USER} || getpwuid($<);
-my $mailto = "$username\@tools.wmflabs.org";
-
-# Set $script to the filename of the current process
-# (e.g. "jsub", "jstart", "qcronsub", ...)
-$script = $1 if $script =~ m{/([^/]+)$};
-
-sub memparse_kb {
-  # parses an XXK, XXm, XXg to the # of kilobytes
-  my $arg = $_[0];
-  if ($arg !~ m/^([1-9][0-9]*)([mgk])$/i) {
-    die "$script: memory value must be an integer followed by 'k', 'm' or 'g': $_[0]\n";
-  }
-
-  my $amount = $1;
-  my $unit = $2;
-  if($unit =~ m/[mg]/i) {$amount *= 1024};
-  if($unit =~ m/[g]/i) {$amount *= 1024};
-
-  return $amount;
-}
-
-# Set default umask for output files depending on whether we're called
-# by a user or a tool.
-my $umask = $EFFECTIVE_USER_ID >= 50000 ? oct ('007') : oct ('077');
-
-# If called as `jstart` set the $continuous and $once flags
-$continuous = $once = 1 if ($script eq 'jstart');
-# If called as `qcronsub` set the $once flag
-$once = 1 if $script eq 'qcronsub';
-
-my @options;
-# Look for $JOBUTILS_JSUBRC or ~/.jsubrc options file with additional options
-my $jsubrcfilename = exists ($ENV {'JOBUTILS_JSUBRC'}) ? $ENV {'JOBUTILS_JSUBRC'} : (getpwuid ($REAL_USER_ID)) [7] . '/.jsubrc';
-if(open (my $rc, '<', $jsubrcfilename)) {
-  while(<$rc>) {
-    if(m/^(-[a-z]+)(?:\s+(.+)|\s*)$/) {
-      my($opt, $optarg) = ($1, $2);
-      die "$0: unknown option '$1' in .jsubrc\n"  unless defined $qsubargs{$opt};
-      die "$0: option '$1' in .jsubrc needs an argument\n"  if $qsubargs{$opt} and not defined $optarg;
-      push @options, [ $opt, $optarg ];
-    }
-  }
-  close ($rc);
-}
-
-# Scan command line arguments
-while($#ARGV > 0) {
-  # Stop when you hit an argument that isn't in the expected list
-  last unless defined $qsubargs{$ARGV[0]};
-  my $opt = shift;
-  my $optarg = undef;
-  if($qsubargs{$opt}) {
-    die "$script: option $opt requires an argument\n" unless $#ARGV > 0;
-    $optarg = shift;
-  }
-  push @options, [ $opt, $optarg ];
-}
+import argparse
+import copy
+import os
+import pipes
+import pwd
+import re
+import subprocess
+import sys
+import textwrap
+import time
 
 
-if($#ARGV<0 or $ARGV[0] =~ m/^-/) {
-  # Ran out of arugments without a program to exec or have an unknown option
-  print STDERR <<"END"
+def argparse_memkb(val):
+    """Parses an XXK, XXm, XXg to the # of kilobytes.
 
-usage: $script [options...] program [arg...]
+    >>> __name__ = 'doctest'
+    >>> execfile('jobutils/bin/jsub')
+    >>> argparse_memkb('1k')
+    1
+    >>> argparse_memkb('1M')
+    1024
+    >>> argparse_memkb('2g')
+    2097152
+    >>> argparse_memkb('pizza') # doctest: +ELLIPSIS
+    Traceback (most recent call last):
+        ...
+    ArgumentTypeError: expected ... followed by 'k', 'm' or 'g'. 'pizza' given.
+    >>>
+    """
+    m = re.match(r'^(?P<digits>\d+)(?P<si>[kmg])(?i)$', val)
+    if m is None:
+        raise argparse.ArgumentTypeError((
+            'expected an integer followed by '
+            "'k', 'm' or 'g'. '%s' given.") % val)
+    ret = int(m.group('digits'))
+    si = m.group('si').lower()
+    if si in ['m', 'g']:
+        ret *= 1024
+    if si == 'g':
+        ret *= 1024
+    return ret
 
-Options include many (but not all) qsub options, along with:
- -stderr           Send errors to stderr rather than the error
-                   output file.
- -mem <value>      Request <value> amount of memory for the job.
-                   (number prefixed by 'k', 'm' or 'g')
- -once             Only start one job with that name, fail if
-                   another is already started or queued (default
-                   if invoked as 'jstart' or 'qcronsub').
- -continuous       Start a self-restarting job on the continuous
-                   queue (default if invoked as 'jstart')
- -umask <value>    Set umask for output files if they don't exist
- -quiet            If successful, don't output anything
 
-Unlike qsub, if you do not specify output and error files, output is appended
-by default to files named <job>.err and <job>.out in your home directory
-(without job numbers), including errors from starting the job itself.
+def argparse_octal(val):
+    """Validate and convert an octal string value to an int.
 
-Additionally, you need to provide an executable on the command line,
-$script will not read a script from standard input.
+    >>> __name__ = 'doctest'
+    >>> execfile('jobutils/bin/jsub')
+    >>> argparse_octal('0777')
+    511
+    >>> argparse_octal('9')
+    Traceback (most recent call last):
+        ...
+    ArgumentTypeError: expected an octal value. '9' given.
+    >>>
+    """
+    if not re.match(r'^[0-7]+$', val):
+        raise argparse.ArgumentTypeError(
+            "expected an octal value. '%s' given." % val)
+    return int(val, 8)
 
-END
-  ;
-  exit 1;
-}
 
-# Next argument is the program to run
-my $exe = shift;
-# Resolve program relative to $PATH
-my $prog = `/usr/bin/which $exe`;
-chomp $prog;
-# Resolve all symlinks
-while(-l $prog) {
-  my $symlink = readlink $prog;
-  if($symlink =~ m{^/}) {
-    $prog = $symlink;
-    next;
-  }
-  $prog =~ s{/[^/]+$}{};
-  while($symlink =~ m{^\.\./(.*)}) {
-    $symlink = $1;
-    $prog =~ s{/[^/]+$}{};
-  }
-  $prog .= "/$symlink";
-}
+def argparse_email(val):
+    """Validate a list of email addresses.
 
-# Check to see if we have an absolute path yet
-unless($prog =~ m{^/}) {
-  # Nope. Then it must be relative to the current working directory
-  my $cwd = `pwd`;
-  chomp $cwd;
-  $prog = "$cwd/$exe";
-  # Collapse '/./' to '/'
-  $prog =~ s{/\./}{/}g;
-}
+    >>> __name__ = 'doctest'
+    >>> execfile('jobutils/bin/jsub')
+    >>> argparse_email('example@example.com')
+    'example@example.com'
+    >>> argparse_email('example@example.com,another@example.org')
+    'example@example.com,another@example.org'
+    >>> argparse_email('foo')
+    Traceback (most recent call last):
+        ...
+    ArgumentTypeError: expected list of email addresses. 'foo' given.
+    >>>
+    """
+    if not re.match(r'^[^@]+@[^,]+(,[^@]+@[^,]+)*$', val):
+        raise argparse.ArgumentTypeError(
+            "expected list of email addresses. '%s' given." % val)
+    return val
 
-# Scan the program looking for more option directives embedded in the script
-# as '#$ -SOMETHING' comments. This mostly matches the behavior of SGE's qsub.
-# See '-C prefix_string' in `man qsub` for more ugly details.
-open EXE, "<$prog" or die "$prog: $!\n";
-my $shebang;
-while(read EXE, $shebang, 2) {        # Read the next 2 characters
-  last unless $shebang =~ m/^#[!\$]/; # Stop unless we read '#!' or '#$'
-  my $rest =<EXE>;                    # Read through the next newline
-  next if $shebang eq '#!';
-  # Capture options from $rest if present
-  # Arguments look like '-FLAG' or '-OPT ARG'
-  next unless $rest =~ m/\s* ( -\S+ ) (?: \s+ ( [^# \n\t]+ ) )?/x;
-  # Add captured values to our growing collection of options
-  unshift @options, [ $1, $2 ];
-}
-close EXE;
 
-# Evaluate the options that we have captured from the rc file, command line,
-# and the script itself.
-foreach my $option (@options) {
-  my($opt, $optval) = @$option;
-  if($opt eq '-mem') {
-    $memory = memparse_kb($optval);
-  } elsif($opt eq '-once') {
-    $once = 1;
-  } elsif($opt eq '-stderr') {
-    $stderr = 1;
-  } elsif($opt eq '-continuous') {
-    $continuous = 1;
-    $once = 1;
-  } elsif($opt eq '-umask') {
-    die ("$script: umask must be an octal value: $optval\n")
-      unless ($optval =~ /^[0-7]+$/);
-    $umask = oct ($optval);
-  } elsif($opt eq '-quiet') {
-    $quiet = 1;
-  } else {
-    if($opt eq '-l') {
-      # Process qsub's insane '-l resource=value,...' options
-      # If there is an 'h_vmem=...' option, remove it and set $memory
-      $memory = memparse_kb($1) if $optval =~ s/h_vmem=([0-9]+[mMgGkK]),?//;
-      # If there is a 'virtual_free=...' option, remove it and ...
-      if ($optval =~ s/virtual_free=([0-9]+[mMgGkK]),?//) {
-        my $vfmem = memparse_kb($1);
-        if ($vfmem > $memory) {
-            # If config asks for more virtual_free than h_vmem,
-            # warn the caller and bump h_vmem.
-            my $new_mem = $vfmem * 1.1;
-            print "WARNING: virtual_free=${vfmem}k is larger than h_vmem=${memory}k. Setting h_vmem=${new_mem}k\n";
-            $memory = $new_mem;
-        }
-      }
-      # Continue to next option if we have chopped out all of the values in
-      # this one (skips adding to $qsargs below).
-      next if $optval =~ m/^,?$/;
-    }
-    # Add parsed option to $qsargs map
-    $qsargs{$opt} = $optval;
+def argparse_qsub_bool(val):
+    """Validate and coerce a qsub-style boolean value.
 
-    # Continue to next option if we saw '-N NAME', '-q QUEUE', or '-b y|n'
-    next if $opt eq '-N' or $opt eq '-q' or $opt eq '-b';
+    >>> __name__ = 'doctest'
+    >>> execfile('jobutils/bin/jsub')
+    >>> argparse_qsub_bool('y')
+    True
+    >>> argparse_qsub_bool('yES')
+    True
+    >>> argparse_qsub_bool('n')
+    False
+    >>> argparse_qsub_bool('NO')
+    False
+    >>> argparse_qsub_bool('foo')
+    Traceback (most recent call last):
+        ...
+    ArgumentTypeError: expected y[es]|n[o]. 'foo' given.
+    >>>
+    """
+    if not re.match(r'^y(es)?|no?$', val.lower()):
+        raise argparse.ArgumentTypeError(
+            "expected y[es]|n[o]. '%s' given." % val)
+    return val.lower()[0] == 'y'
 
-    # Add option and value to argument stack
-    push @args, $opt;
-    push @args, $optval if defined $optval;
-  }
-}
 
-# Take the program filename minus any extension as the job name
-# (e.g. '/home/foo/fobar.sh' -> 'foobar')
-my $jobname = $1 if $prog =~ m{([^/.]+)(\.[^/]*)?$};
-# If we found a '-N NAME' option earlier, use that name instead
-$jobname = $qsargs{'-N'} if defined $qsargs{'-N'};
+def argparse_whence(prog):
+    """Resolve the canonical path to a program.
 
-# Decide on filenames for stderr and stdout
-# Defaults are: $HOME/$jobname.(err|out)
-my $err = (getpwuid ($REAL_USER_ID)) [7] . '/' . $jobname . '.err';
-my $out = (getpwuid ($REAL_USER_ID)) [7] . '/' . $jobname . '.out';
+    >>> __name__ = 'doctest'
+    >>> execfile('jobutils/bin/jsub')
+    >>> argparse_whence('/usr/bin/env')
+    '/usr/bin/env'
+    >>> argparse_whence('env')
+    '/usr/bin/env'
+    >>> argparse_whence('jsub.notfound')
+    Traceback (most recent call last):
+        ...
+    ArgumentTypeError: Program 'jsub.notfound' not found.
+    >>>
+    """
+    # Already a full path?
+    if prog[0] == os.sep and os.path.exists(prog):
+        return os.path.realpath(prog)
+    if prog[0] != os.curdir:
+        # Look in each dir of $PATH
+        for path in os.environ.get('PATH', '').split(os.pathsep):
+            if os.path.exists(os.path.join(path, prog)):
+                return os.path.realpath(os.path.join(path, prog))
+    # Not found in $PATH so try looking in $PWD
+    if os.path.exists(os.path.join(os.getcwd(), prog)):
+        return os.path.realpath(os.path.join(os.getcwd(), prog))
+    raise argparse.ArgumentTypeError("Program '%s' not found." % prog)
 
-# If we got an '-e /path/to/stderr' option, use it
-$err = $qsargs{'-e'} if defined $qsargs{'-e'};
-# If we got an '-o /path/to/stdout' option, use it
-$out = $qsargs{'-o'} if defined $qsargs{'-o'};
-# Use the same file for stderr as stdout if we saw a '-j y' option
-$err = $out if defined $qsargs{'-j'} and $qsargs{'-j'} =~ m/^[yY]/;
 
-# For STDOUT and STDERR we do the same dance:
-# - If the output file exists, we do nothing (the output file being a
-#   directory is a subset of this).
-# - Otherwise, we touch the output file once with the set umask.
-my $oldumask = umask ($umask);
-if (!-e $out) {
-  open (my $tempfh, '>>', $out) or
-    die ("Couldn't touch '$out': $!");
-  close ($tempfh);
-}
-if (!-e $err) {
-  open (my $tempfh, '>>', $err) or
-    die ("Couldn't touch '$err': $!");
-  close ($tempfh);
-}
-# - If -stderr is not given and the error output file is not a
-#   directory, we redirect STDERR to it.
-if (!$stderr && !-d $err) {
-  open (STDERR, '>>', $err) or
-    die ("Couldn't redirect STDERR to '$err': $!");
-}
-umask ($oldumask);
+class QsubAction(argparse.Action):
+    """Handle argparse arguments that will be passed through to qsub.
 
-my $now = localtime;
+    Generally acts like argparse's built-in 'append' action, but it gives
+    special handling to '-l ...' arguments.
+    """
+    def __init__(self, *args, **kwargs):
+        super(QsubAction, self).__init__(*args, **kwargs)
 
-die "\[$now\] $prog: not an executable file\n" unless -f $prog and -x $prog;
+    def __call__(self, parser, namespace, values, option_string=None):
+        if option_string == '-l':
+            self._process_l(namespace, values[0])
+        else:
+            if type(values) is list:
+                values = values[0]
+            self._append(namespace, values, option_string)
 
-if($once) {
-  # Check to see if this named job is live on the grid if we are only supposed
-  # to run a single copy
-  my $running = system "/usr/bin/job", '-q', $jobname;
-  die "\[$now\] unable to get job status\n" if $running & 127;
-  $running >>= 8;
-  die "\[$now\] there is a job named '$jobname' already active\n" unless $running==0;
-}
+    def _process_l(self, namespace, values):
+        """Process qsub's insane '-l resource=value,...' options.
 
-# Add default arguments for /usr/bin/qsub
-$mailto = $qsargs{'-M'} if defined $qsargs{'-M'};
-# Set stderr log file for the job unless we saw a '-e /path/to/stderr' option
-# bd808: I think this is a bug as $qsargs{'-e'} is not used later
-push @args, '-e', $err unless defined $qsargs{'-e'};
-# Set stdout log file for the job unless we saw a '-o /path/to/stdout' option
-# bd808: I think this is a bug as $qsargs{'-o'} is not used later
-push @args, '-o', $out unless defined $qsargs{'-o'};
-# Set the email recipient for the job
-push @args, '-M', $mailto;
-# Set the jobname,
-# make all resource limits hard,
-# and set the hard virtual memory limit
-push @args, '-N', $jobname, '-hard', '-l', "h_vmem=${memory}k";
+        We intercept h_vmem=value and virtual_free=value arguments and instead
+        adjust the mem argument value. Other resource=value pairs are stored
+        unaltered except they are expanded so each 'resource=value' pair is
+        attached to its own '-l' flag.
+        """
+        for opt in values.split(','):
+            (resource, value) = opt.split('=')
+            if resource == 'h_vmem':
+                vmem = argparse_memkb(value)
+                if vmem > namespace.mem:
+                    setattr(namespace, 'mem', vmem)
+            elif resource == 'virtual_free':
+                vfree = int(argparse_memkb(value) * 1.1)
+                if vfree > namespace.mem:
+                    namespace.mem = vfree
+            else:
+                self._append(namespace, opt, '-l')
 
-# Define stdin, stdout, and stderr to be used when we run /usr/bin/qsub
-my ($qsubinput, $qsuboutput, $qsuberror);
+    def _ensure_value(self, namespace, name, value):
+        """Get a value from the namespace."""
+        if getattr(namespace, name, None) is None:
+            setattr(namespace, name, value)
+        return getattr(namespace, name)
 
-if($continuous) {
-  # Try to make a job that will automatically restart if it crashes
-  # Submit the job to the 'continuous' queue (or an explictly named queue)
-  push @args, '-q', (defined $qsargs{'-q'})? $qsargs{'-q'}: 'continuous';
-  # Add the '-b y|n' option if we have it (not sure why we do this)
-  push @args, '-b', $qsargs{'-b'} if defined $qsargs{'-b'};
-  # Write a shell script to stdin that will continue to execute our program
-  # until it exits with an exit status of zero.
-  my $cmdline = shell_quote($prog, @ARGV);
-  ($qsubinput = qq{#!/bin/sh
-    until $cmdline ; do
-        echo "[`date +%Y-%d-%mT%H:%M`] $prog exited with code \$?. Respawning..." >&2
-        sleep 5
-    done
-  }) =~ s/^ {4}//gm; # strip the leading whitespace from our script
-} else {
-  # Set stdin to an empty string
-  $qsubinput = '';
-  # Change queue name if explictly provided (will be 'task' otherwise)
-  $queue = $qsargs{'-q'} if defined $qsargs{'-q'};
-  # Add queue name argument,
-  # set the binary submission flag,
-  # and add the program and its arguments
-  push @args, '-q', $queue, '-b', 'y', $prog, @ARGV;
-}
+    def _append(self, namespace, values, option_string):
+        """Accumulate options and their args in a namespace array."""
+        items = copy.copy(self._ensure_value(namespace, self.dest, []))
+        items.append(option_string)
+        if self.nargs != 0:
+            items.append(values)
+        setattr(namespace, self.dest, items)
 
-# Execute $JOBUTILS_QSUB or /usr/bin/qsub using the arguments we just built
-my $h = harness([exists ($ENV {'JOBUTILS_QSUB'}) ? $ENV {'JOBUTILS_QSUB'} : '/usr/bin/qsub', @args], \$qsubinput, \$qsuboutput, \$qsuberror);
-if (!run ($h)) {
-    # Print stdout and stderr
-    print STDOUT $qsuboutput;
-    print STDERR $qsuberror;
-    # Exit with the same exit code as /usr/bin/qsub
-    exit ($h->result ());
-}
 
-# Suppress output if the user requested so.
-if (!$quiet) {
-    print STDOUT $qsuboutput;
-    print STDERR $qsuberror;
-}
+def effective_username():
+    """Get the username of the effective user."""
+    return os.environ.get(
+        'LOGNAME', os.environ.get('USER', pwd.getpwuid(os.getuid())[0]))
+
+
+def homedir():
+    """Get the homedir of the real user."""
+    return pwd.getpwuid(os.getuid())[5]
+
+
+def die(msg):
+    """Exit with an error status and the provided message."""
+    sys.exit("[%s] %s" % (time.ctime(), msg))
+
+
+def touch(path, umask):
+    """Touch the named file if it doesn't already exist."""
+    if not os.path.exists(path):
+        old_mask = os.umask(umask)
+        try:
+            open(path, 'a').close()
+        except IOError, e:
+            die("Failed to touch '%s': %e" % (path, e))
+        finally:
+            os.umask(old_mask)
+
+
+def is_running(name):
+    """Check status of a named job."""
+    try:
+        running = subprocess.call(['/usr/bin/job', '-q', name])
+    except OSError, e:
+        die('unable to get job status: e' % e)
+    else:
+        return running != 0
+
+
+def as_qsub_bool(val):
+    """Make a 'yes' or 'no' for passing to qsub."""
+    if val:
+        return 'yes'
+    else:
+        return 'no'
+
+
+def make_cmd(exe, args):
+    """Join a executable and a possibly empty list of arguments."""
+    cmd = [exe]
+    if args:
+        cmd.extend(args)
+    return cmd
+
+
+def build_qsub_argparser():
+    """Build an argparse parser that understands qsub arguments.
+
+    This parser tries to do most of the heavy lifting for dealing with the
+    wide range of arguments that are handled by qsub. As such it does some
+    "interesting" things. Usage of the QsubAction custom action is probably
+    the most interesting.
+
+    The generated parser is a suitable for use as a parent parser for another
+    ArgumentParser instance.
+    """
+    parser = argparse.ArgumentParser(add_help=False)
+    # The time and date at which the job is eligible for execution.
+    parser.add_argument(
+        '-a', nargs=1, metavar='[[CC]]YY]MMDDhhmm[.SS]',
+        action=QsubAction, dest='qsub_args', help=argparse.SUPPRESS)
+    # Treat the program as a binary.
+    parser.add_argument(
+        '-b', metavar='y[es]|n[o]', dest='binary',
+        type=argparse_qsub_bool, default=False, help=argparse.SUPPRESS)
+    # Execute the job from the current working directory.
+    parser.add_argument(
+        '-cwd', nargs=0,
+        action=QsubAction, dest='qsub_args', help=argparse.SUPPRESS)
+    # The path used for the standard error stream of the job
+    parser.add_argument(
+        '-e', metavar='path', dest='log_err', help=argparse.SUPPRESS)
+    # Signifies that all -q and -l resource requirements following in the
+    # command line will be hard requirements and must be satisfied in full
+    # before a job can be scheduled.
+    parser.add_argument(
+        '-hard', nargs=0,
+        action=QsubAction, dest='qsub_args', help=argparse.SUPPRESS)
+    # The file used for the standard input stream of the job.
+    parser.add_argument(
+        '-i', nargs=1, metavar='[[hostname]:]file,...',
+        action=QsubAction, dest='qsub_args', help=argparse.SUPPRESS)
+    # Merge standard error stream into the standard ouput stream.
+    parser.add_argument(
+        '-j', metavar='y[es]|n[o]', dest='log_join',
+        type=argparse_qsub_bool, default=False, help=argparse.SUPPRESS)
+    # Launch the job in a queue meeting the given resource request list.
+    parser.add_argument(
+        '-l', nargs=1, metavar='resource=value,...',
+        action=QsubAction, dest='qsub_args', help=argparse.SUPPRESS)
+    # Under which circumstances mail is to be sent to the job owner or to the
+    # users defined with the -M option. See `man qsub` for details.
+    parser.add_argument(
+        '-m', nargs=1, metavar='b|e|a|s|n,...',
+        action=QsubAction, dest='qsub_args', help=argparse.SUPPRESS)
+    # The list of users to which to send email about the job.
+    parser.add_argument(
+        '-M', metavar='user@host,...', dest='mailto', type=argparse_email,
+        default='%s@tools.wmflabs.org' % effective_username(),
+        help=argparse.SUPPRESS)
+    # Start the job immediately or not at all.
+    parser.add_argument(
+        '-now', nargs=1, metavar='y[es]|n[o]',
+        action=QsubAction, dest='qsub_args', help=argparse.SUPPRESS)
+    parser.add_argument(
+        '-N', metavar='name', dest='jobname', help='The name of the job')
+    # The path used for the standard output stream of the job.
+    parser.add_argument(
+        '-o', metavar='path', dest='log_out', help=argparse.SUPPRESS)
+    # The priority of the job relative to other jobs.
+    parser.add_argument(
+        '-p', nargs=1, metavar='priority',
+        action=QsubAction, dest='qsub_args', help=argparse.SUPPRESS)
+    # A list of cluster queues, queue domains or queue instances which may be
+    # used to execute this job.
+    parser.add_argument(
+        '-q', metavar='wc_queue_list', dest='queue', default='task',
+        help=argparse.SUPPRESS)
+    # Signifies that all resource requirements following in the command line
+    # will be soft requirements and are to be filled on an "as available"
+    # basis.
+    parser.add_argument(
+        '-soft', nargs=0,
+        action=QsubAction, dest='qsub_args', help=argparse.SUPPRESS)
+    # Wait for the job to complete before exiting.
+    parser.add_argument(
+        '-sync', nargs=1, metavar='y[es]|n[o]',
+        action=QsubAction, dest='qsub_args', help=argparse.SUPPRESS)
+    # Environment variables to be exported to the execution context of the
+    # job.
+    parser.add_argument(
+        '-v', nargs=1, metavar='variable[=value],...',
+        action=QsubAction, dest='qsub_args', help=argparse.SUPPRESS)
+    # Execute the job from the specified directory.
+    parser.add_argument(
+        '-wd', nargs=1, metavar='working_dir',
+        action=QsubAction, dest='qsub_args', help=argparse.SUPPRESS)
+    return parser
+
+
+def build_jsub_argparser():
+    """Build an argparse parser for jsub specific options."""
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument(
+        '-continuous', action='store_true',
+        help=(
+            'Start a self-restarting job on the continuous queue '
+            "(default if invoked as 'jstart')"))
+    parser.add_argument(
+        '-mem', type=argparse_memkb, default=524288,
+        help=(
+            'Requested amount of memory for the job. '
+            "(integer prefixed by 'k', 'm' or 'g')"))
+    parser.add_argument(
+        '-once', action='store_true',
+        help=(
+            'Only start one job, fail if another is already started or queued '
+            "(default if invoked as 'jstart' or 'qcronsub')."))
+    parser.add_argument(
+        '-quiet', action='store_true',
+        help="If successful, don't output anything")
+    parser.add_argument(
+        '-stderr', action='store_true',
+        help='Send errors to stderr rather than the error output file.')
+    parser.add_argument(
+        '-umask', type=argparse_octal,
+        default=0007 if os.geteuid() > 50000 else 0077,
+        help="Set umask for output files if they don't exist")
+    return parser
+
+
+def build_parser(parents=None):
+    """Build argparse parser."""
+    parser = argparse.ArgumentParser(
+        usage='%(prog)s [options...] program [arg...]',
+        description='Submit a job to the job grid.',
+        epilog="\n\n".join([
+            "\n".join(textwrap.wrap(
+                'Many (but not all) qsub options are also supported.'
+            )),
+            "\n".join(textwrap.wrap(
+                'Output is appended by default to files named <job>.err and '
+                '<job>.out in your home directory (without job numbers), '
+                'including errors from starting the job itself.'
+            )),
+            "\n".join(textwrap.wrap(
+                'You must to provide an executable on the command line, '
+                '%(prog)s will not read a script from standard '
+                'input.'
+            ))
+        ]),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        parents=[build_jsub_argparser(), build_qsub_argparser()])
+
+    # Positional arguments
+    parser.add_argument(
+        'program', type=argparse_whence,
+        help='Path to binary or script to execute.')
+    parser.add_argument(
+        'program_args', metavar='args...', nargs=argparse.REMAINDER,
+        help='Optional arguments for program.')
+    return parser
+
+
+class ThrowingArgumentParser(argparse.ArgumentParser):
+    """ArgumentParser subclass that throws errors rather than exiting.
+
+    From https://stackoverflow.com/a/14728477/8171
+    """
+    def error(self, message):
+        raise ValueError(message)
+
+
+def parse_arglist(args, namespace=None):
+    """Parse a collection of arguments using a lenient parser.
+
+    The parser will raise ValueError on parse failure rather than causing
+    a hard exit.
+    """
+    parser = ThrowingArgumentParser(
+        add_help=False,
+        parents=[build_jsub_argparser(), build_qsub_argparser()])
+    return parser.parse_args(args=args, namespace=namespace)
+
+
+def parse_jsubrc():
+    """Read options from a ~/.jsubrc file if it exists."""
+    jsubrc = os.environ.get(
+        'JOBUTILS_JSUBRC', os.path.join(homedir(), '.jsubrc'))
+    if os.path.exists(jsubrc):
+        args = []
+        pat = re.compile(r'^(?P<opt>-[a-z]+)(?:\s+(?P<arg>.+)|\s*)$')
+        with open(jsubrc, 'r') as fh:
+            for line in fh:
+                m = pat.match(line)
+                if m:
+                    args.extend(g for g in m.groups() if g is not None)
+        try:
+            return parse_arglist(args)
+        except ValueError, e:
+            die("Error parsing %s: %s" % (jsubrc, e))
+    else:
+        return None
+
+
+def read_script_comments(fh):
+    """Generator to read header comments from file.
+
+    Emitted lines have the comment characters stripped.
+    """
+    while True:
+        peek = fh.read(2)
+        if peek in ['#!', '#$']:
+            line = fh.readline()
+            if peek == '#!':
+                # Skip the #!... header
+                continue
+            else:
+                yield line
+        else:
+            raise StopIteration
+
+
+def parse_script_comments(namespace):
+    """Read options embedded in comments in the executable.
+
+    This mostly matches the behavior of SGE's qsub for non-binary programs.
+    See '-C prefix_string' in `man qsub` for more ugly details.
+    """
+    pat = re.compile(r'\s*(?P<opt>-[a-z]+)(?:\s+(?P<arg>.+)|\s*)')
+    args = []
+    with open(namespace.program, 'r') as fh:
+        for line in read_script_comments(fh):
+            m = pat.match(line)
+            if m:
+                args.extend(g for g in m.groups() if g is not None)
+    try:
+        return parse_arglist(args=args, namespace=namespace)
+    except ValueError, e:
+        die("Error options embedded in %s: %s" % (namespace.program, e))
+    return namespace
+
+
+def running_as_test():
+    """Are we being tested?"""
+    return 'JOBUTILS_QSUB' in os.environ
+
+
+def main():
+    """Submit a job to the job grid."""
+    if not running_as_test():
+        # Log this command invocation to EventLogging
+        subprocess.call([
+            '/usr/local/bin/log-command-invocation',
+            'jsub', ' '.join(sys.argv)])
+
+    # Gather default arguments from ~/.jsubrc
+    args = parse_jsubrc()
+    # Parse command line options
+    args = build_parser().parse_args(namespace=args)
+    # Parse options embedded in the command itself
+    args = parse_script_comments(args)
+
+    # Set options based on the name we were invoked as
+    script_name = os.path.basename(sys.argv[0])
+    if script_name == 'jstart':
+        args.continuous = True
+        args.once = True
+    elif script_name == 'qcronsub':
+        args.once = True
+
+    if args.continuous:
+        args.once = True
+        # Respect explict queue name if passed as an argument
+        if args.queue == 'task':
+            args.queue = 'continuous'
+    else:
+        # Non-continuous jobs are always treated as binary
+        args.binary = True
+
+    if args.jobname is None:
+        # Take the program filename minus any extension as the job name
+        args.jobname = os.path.basename(args.program).split('.')[0]
+
+    # Compute filenames for stderr and stdout output from job
+    if args.log_out is None:
+        args.log_out = os.path.join(homedir(), '%s.out' % args.jobname)
+    if args.log_join:
+        args.log_err = args.log_out
+    if args.log_err is None:
+        args.log_err = os.path.join(homedir(), '%s.err' % args.jobname)
+
+    # Ensure that stderr and stdout files exist
+    touch(args.log_out, args.umask)
+    touch(args.log_err, args.umask)
+
+    # If -stderr is not given and the error output file is not a directory, we
+    # redirect this script's STDERR to it.
+    if not args.stderr and not os.path.isdir(args.log_err):
+        try:
+            sys.stderr = open(args.log_err, 'a')
+        except IOError, e:
+            die("Failed to redirect STDERR to '%s': %s" % (args.log_err, e))
+
+    if not os.access(args.program, os.X_OK):
+        die('%s: not an executable file' % args.program)
+
+    if args.once and is_running(args.jobname):
+        die("there is a job named '%s' already active" % args.jobname)
+
+    # Build argument list for calling qsub
+    qsub_args = args.qsub_args or []
+    qsub_args.extend([
+        '-j', as_qsub_bool(args.log_join),
+        '-e', args.log_err,
+        '-o', args.log_out,
+        '-M', args.mailto,
+        '-N', args.jobname,
+        '-hard', '-l', 'h_vmem=%dk' % args.mem,
+        '-q', args.queue,
+        '-b', as_qsub_bool(args.binary),
+    ])
+
+    qsub_stdin = None
+    job = make_cmd(args.program, args.program_args)
+    if args.continuous:
+        # Send qsub a shell script that executes the given job repeatedly until
+        # the program exits with exit code 0.
+        qsub_stdin = textwrap.dedent(
+            '''\
+            #!/bin/sh
+            until %(job)s ; do
+                echo "[%(ts)s] %(prog)s exited with code $?. Respawning..." >&2
+                sleep 5
+            done
+            ''' % {
+                'job': ' '.join(pipes.quote(arg) for arg in job),
+                'ts': '`date +%Y-%d-%mT%H:%M`',
+                'prog': args.program,
+            })
+    else:
+        qsub_args.extend(job)
+
+    qsub = make_cmd(os.environ.get('JOBUTILS_QSUB', '/usr/bin/qsub'),
+                    qsub_args)
+    try:
+        proc = subprocess.Popen(
+            qsub,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
+    except OSError, e:
+        die("Failed to execute '%s': %s" % (' '.join(qsub), e))
+    else:
+        (out, err) = proc.communicate(qsub_stdin)
+        if not args.quiet or proc.returncode != 0:
+            sys.stdout.write(out)
+            sys.stderr.write(err)
+        sys.exit(proc.returncode)
+
+
+if __name__ == '__main__':
+    main()

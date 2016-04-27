@@ -1,3 +1,9 @@
+toollabs (1.11) unstable; urgency=medium
+
+  * Get rid of old webservice code
+
+ -- Yuvi Panda <yuvipanda@gmail.com>  Wed, 27 Apr 2016 15:57:00 +0530
+
 toollabs (1.10) unstable; urgency=medium
 
   * Install setup-tomcat as well.

@@ -1,4 +1,5 @@
 User-agent: *
+Crawl-delay: 3
 Disallow: /betacommand-dev/
 Disallow: /fiwiki-tools/
 

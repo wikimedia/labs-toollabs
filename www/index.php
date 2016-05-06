@@ -47,6 +47,9 @@ if ( is_file( "{$dr}{$uri}" ) && is_readable( "{$dr}{$uri}" ) ) {
 			case 'css':
 				$mime = 'text/css';
 				break;
+			case 'txt':
+				$mime = 'text/plain';
+				break;
 			case 'php':
 				$mime = 'application/x-httpd-php-source';
 				break;

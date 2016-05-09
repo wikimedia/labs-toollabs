@@ -23,6 +23,7 @@
 </thead>
 <tbody>
 <?php
+require_once dirname( __FILE__ ) . '/htmlpurifier.inc.php';
 function describe( $t ) {
 	if ( array_key_exists( 'description', $t ) ) {
 		global $purifier;

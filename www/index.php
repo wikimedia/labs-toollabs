@@ -1,7 +1,7 @@
 <?php
 $dr = $_SERVER['DOCUMENT_ROOT'];
 $orig = $_SERVER['REQUEST_URI'];
-if ( preg_match( '/^\/\.([^?]*)$/', $orig, $m ) ) {
+if ( preg_match( '@^/\.([^?]*)$@', $orig, $m ) ) {
 	// Hack for error_document not allowing queries
 	$qstring = $m[1];
 	$orig = '/';
@@ -10,70 +10,76 @@ if ( preg_match( '/^\/\.([^?]*)$/', $orig, $m ) ) {
 	$orig = $m[1];
 }
 $uri = $orig;
-$uri = preg_replace( '/^\/admin/', '', $uri );
-$uri = preg_replace( "/^(\\$_SERVER[SCRIPT_NAME])+\/?/", '/', $uri );
+$uri = preg_replace( '@^/admin@', '', $uri );
+$uri = preg_replace( "@^({$_SERVER[SCRIPT_NAME]})+/?@", '/', $uri );
 
-if ( preg_match( '/^\/([^\/]+)(\/.*)?/', $uri, $m ) ) {
-	if ( is_dir( "/data/project/{$m[1]}/public_html" ) ) {
-		if ( !isset( $m[2] ) ) {
-			$to = "$orig/";
-			if ( isset( $qstring ) ) {
-				$to .= "?$qstring";
+if ( $uri !== '/' ) {
+	// Are we handling a request for a static resource?
+	if ( is_file( "{$dr}{$uri}" ) && is_readable( "{$dr}{$uri}" ) ) {
+		$mime = 'text/html';
+		if ( preg_match( '/\.(.+)$/', $uri, $m ) ) {
+			switch( $m[1] ) {
+				case 'png':
+					$mime = 'image/png';
+					break;
+				case 'svg':
+					$mime = 'image/svg+xml';
+					break;
+				case 'ico':
+					$mime = 'image/x-icon';
+					break;
+				case 'css':
+					$mime = 'text/css';
+					break;
+				case 'txt':
+					$mime = 'text/plain';
+					break;
+				case 'php':
+					$mime = 'application/x-httpd-php-source';
+					break;
 			}
-			header( "Location: $to" );
-			exit( 0 );
 		}
-		// This is endpoint is called as an error hander page by nginx,
-		// so *DO NOT* return an actual 503 status code. If you do nginx will
-		// think that the error handler itself is broken.
-		include 'content/503.php';
+		header( "Content-Type: $mime" );
+		header( "X-Sendfile: {$dr}{$uri}" );
 		exit( 0 );
 	}
-}
 
-if ( is_file( "{$dr}{$uri}" ) && is_readable( "{$dr}{$uri}" ) ) {
-	$mime = 'text/html';
-	if ( preg_match( '/\.(.+)$/', $uri, $m ) ) {
-		switch( $m[1] ) {
-			case 'png':
-				$mime = 'image/png';
-				break;
-			case 'svg':
-				$mime = 'image/svg+xml';
-				break;
-			case 'ico':
-				$mime = 'image/x-icon';
-				break;
-			case 'css':
-				$mime = 'text/css';
-				break;
-			case 'txt':
-				$mime = 'text/plain';
-				break;
-			case 'php':
-				$mime = 'application/x-httpd-php-source';
-				break;
+	// Check to see if we are handling a bare tool name or acting as the nginx
+	// 503 error handler page by checking to see if a tool matches the first
+	// part of the URI path.
+	if ( preg_match( '@^/(?P<tool>[^/]+)(?P<path>/.*)?@', $uri, $m ) ) {
+		if ( is_dir( "/data/project/{$m['tool']}/public_html" ) ) {
+			if ( !isset( $m['path'] ) ) {
+				// Redirect bare /<toolname> links to /<toolname>/
+				$to = "{$orig}/";
+				if ( isset( $qstring ) ) {
+					$to .= "?{$qstring}";
+				}
+				header( 'HTTP/1.0 301 Moved Permanently' );
+				header( "Location: {$to}" );
+				exit( 0 );
+			}
+			// This endpoint is called as an error hander page by nginx, so
+			// *DO NOT* return an actual 503 status code. If you do nginx will
+			// think that the error handler itself is broken.
+			include 'content/503.php';
+			exit( 0 );
 		}
 	}
-	header( "Content-Type: $mime" );
-	header( "X-Sendfile: {$dr}{$uri}" );
-	exit( 0 );
-}
 
-if ( $uri != '/' ) {
 	header( 'HTTP/1.0 404 Not Found' );
 	include 'content/404.php';
 	exit( 0 );
 }
 
+// Default action is to serve the list of all tools
+$content = 'list';
 if ( isset( $qstring ) && $qstring !== '' ) {
 	$content = $qstring;
 	if ( preg_match( '/^[A-Z]/', $content ) === 1 ) {
 		header( 'Location: https://wikitech.wikimedia.org/wiki/Nova_Resource:Tools/' . urlencode($content) );
 		exit( 0 );
 	}
-} else {
-	$content = 'list';
 }
 
 if ( preg_match( '/^([a-z0-9]+)(?:=.*)?$/', $content, $values ) !== 1 ) {
@@ -83,10 +89,10 @@ if ( preg_match( '/^([a-z0-9]+)(?:=.*)?$/', $content, $values ) !== 1 ) {
 }
 
 // Files that should not be exposed from the content directory
-$contentBlacklist = array( 'common.inc' );
+$contentBlacklist = array( 'common.inc', 'htmlpurifier.inc' );
 $content = $values[1];
-if ( !file_exists( "{$dr}/content/{$content}.php" ) ||
-	in_array( $content, $contentBlacklist )
+if ( in_array( $content, $contentBlacklist ) ||
+	!file_exists( "{$dr}/content/{$content}.php" )
 ) {
 	header( 'HTTP/1.0 404 Not Found' );
 	include 'content/404.php';
@@ -108,28 +114,6 @@ if ( isset( $errorPages[$content] ) ) {
 	include "content/{$content}.php";
 	exit( 0 );
 }
-
-require_once 'htmlpurifier/HTMLPurifier.standalone.php';
-$config = HTMLPurifier_Config::createDefault();
-$config->set( 'HTML.Doctype', 'HTML 4.01 Transitional' );
-$config->set( 'URI.Base', 'https://tools.wmflabs.org' );
-$config->set( 'URI.MakeAbsolute', true );
-$config->set( 'URI.DisableExternalResources', true );
-$config->set( 'CSS.ForbiddenProperties',
-	array(
-		'margin' => true,
-		'margin-top' => true,
-		'margin-right' => true,
-		'margin-bottom' => true,
-		'margin-left' => true,
-		'padding' => true,
-		'padding-top' => true,
-		'padding-right' => true,
-		'padding-bottom' => true,
-		'padding-left' => true
-	)
-);
-$purifier = new HTMLPurifier( $config );
 ?><!DOCTYPE html>
 <html>
 <head>

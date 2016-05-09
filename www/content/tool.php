@@ -73,6 +73,7 @@ if ( $tool !== '' ) {
 </td></tr>
 <tr><th>Tool<?= count($info) > 1 ? 's' : '' ?></th><td>
 <?php
+	require_once dirname( __FILE__ ) . '/htmlpurifier.inc.php';
 	$first = ' first';
 	foreach ( $info as $toolinfo ) {
 		echo '<div class="subtool', $first, '"><span class="subtool-name">';

@@ -79,7 +79,11 @@ if ( $tool !== '' ) {
 		if ( isset( $toolinfo['url'] ) ) {
 			echo "<a href=\"" . htmlspecialchars( $toolinfo['url'] ) . "\">";
 		}
-		echo htmlspecialchars( $toolinfo['title'] );
+		if ( isset( $toolinfo['title'] ) ) {
+			echo htmlspecialchars( $toolinfo['title'] );
+		} elseif ( isset( $toolinfo['url'] ) ) {
+			echo htmlspecialchars( $toolinfo['url'] );
+		}
 		if ( isset( $toolinfo['url'] ) ) {
 			echo '</a>';
 		}

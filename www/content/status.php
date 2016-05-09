@@ -36,6 +36,10 @@ function mmem( $str ) {
 	return -1;
 }
 
+function array_get( $arr, $key, $default = '' ) {
+	return array_key_exists( $key, $arr ) ? $arr[$key] : $default;
+}
+
 $raw = shell_exec( "PATH=/bin:/usr/bin qstat -xml -j '*'|sed -e 's/JATASK:[^>]*/jatask/g'" );
 $xml = simplexml_load_string( $raw );
 unset( $raw );
@@ -161,15 +165,15 @@ foreach ( $hosts as $host => $h ) {
 			continue;
 		}
 ?>
-<tr class="jobline-<?= htmlspecialchars( $j['state'] ) ?>">
+<tr class="jobline-<?= htmlspecialchars( array_get( $j, 'state' ) ) ?>">
 <td class="jobno"><?= $jobid ?></td>
-<td class="jobname"><?= htmlspecialchars( $j['name'] ) ?></td>
-<td class="jobtool"><a href="/?tool=<?= urlencode( $j['tool'] ) ?>"><?= htmlspecialchars( $j['tool'] ) ?></a></td>
-<td class="jobstate"><?= htmlspecialchars( ucfirst( $j['queue'] ) ) ?> / <?= htmlspecialchars( ucfirst( $j['state'] ) ) ?></td>
-<td class="jobtime"><?= strftime( '%F %T', $j['submit'] ) ?></td>
+<td class="jobname"><?= htmlspecialchars( array_get( $j, 'name' ) ) ?></td>
+<td class="jobtool"><a href="/?tool=<?= urlencode( array_get( $j, 'tool' ) ) ?>"><?= htmlspecialchars( array_get( $j, 'tool' ) ) ?></a></td>
+<td class="jobstate"><?= htmlspecialchars( ucfirst( array_get( $j, 'queue' ) ) ) ?> / <?= htmlspecialchars( ucfirst( array_get( $j, 'state' ) ) ) ?></td>
+<td class="jobtime"><?= strftime( '%F %T', array_get( $j, 'submit', 0 ) ) ?></td>
 <td class="jobcpu"><?= array_key_exists('cpu', $j) ? humantime( $j['cpu'] ) : 'n/a' ?></td>
 <td class="jobvmem">
-<?= array_key_exists('vmem', $j) ? sprintf( '%d/%d', humanmem( $j['vmem'] / 1024 / 1024 ), humanmem( $j['h_vmem'] / 1024 / 1024 ) ) : 'n/a' ?>
+<?= array_key_exists('vmem', $j) ? sprintf( '%d/%d', humanmem( $j['vmem'] / 1024 / 1024 ), humanmem( array_get( $j, 'h_vmem', 0 ) / 1024 / 1024 ) ) : 'n/a' ?>
 <?php
 		if ( array_key_exists('maxvmem', $j) &&
 			$j['maxvmem'] > $j['vmem'] * 1.02

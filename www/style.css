@@ -276,6 +276,14 @@ span.hostname {
   font-weight: bold;
 }
 
+.seealso {
+  border-bottom:1px solid #ccc;
+  color:#555;
+  font-style:italic;
+  margin-bottom:.5em;
+  padding:0 0 .5em 0;
+}
+
 /* Small screen layout */
 @media only screen and (max-width:600px) {
   body {

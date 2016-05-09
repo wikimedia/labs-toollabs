@@ -1,18 +1,7 @@
 <h1>Wikimedia Tool Labs</h1>
-<p>Welcome to the Tool Labs project, the home of community-maintained external tools supporting Wikimedia projects and their users. On this page you can find a complete list of hosted tools along with any additional information provided by the tool maintainers. Labs users who have been granted access to the Tools project may also create a new tool or add/remove maintainers to or from a tool that they manage.</p>
-
-<h2>Useful links</h2>
-<ul>
-<li><a href="https://wikitech.wikimedia.org/wiki/Nova_Resource:Tools">Tools project page on wikitech</a> (find out more about the Tools project)</li>
-<li><a href="https://wikitech.wikimedia.org/w/index.php?title=Special:UserLogin&amp;returnto=Main+Page&amp;type=signup">Create a Labs account</a> (you must have a Labs account to access the Tools project)</li>
-<li><a href="https://wikitech.wikimedia.org/wiki/Special:NovaKey">Add a public SSH key</a> (you’ll need this to access Labs servers using SSH)</li>
-<li><a href="https://wikitech.wikimedia.org/wiki/Special:FormEdit/Tools_Access_Request">Request access to the Tools project</a> (Join us!)</li>
-<li><a href="https://wikitech.wikimedia.org/w/index.php?title=Special:NovaServiceGroup&amp;action=addservicegroup&amp;projectname=tools">Create New Tool</a></li>
-<li><a href="http://git.wikimedia.org/summary/labs%2Ftoollabs.git">Source code repository of this web</a></li>
-</ul>
+<p>This is the web server for the Tool Labs project, the home of community-maintained external tools supporting Wikimedia projects and their users.</p>
 
 <h2>Hosted tools</h2>
-
 <table id="thebigtable" class="tablesorter">
 <thead>
 <tr>

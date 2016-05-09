@@ -73,7 +73,7 @@ if ( $uri !== '/' ) {
 }
 
 // Default action is to serve the list of all tools
-$content = 'list';
+$content = 'splash';
 if ( isset( $qstring ) && $qstring !== '' ) {
 	$content = $qstring;
 	if ( preg_match( '/^[A-Z]/', $content ) === 1 ) {
@@ -149,6 +149,7 @@ if ( isset( $errorPages[$content] ) ) {
 </ul>
 </div>
 </div></div>
+<?php if ( $content === 'list' ) { ?>
 <script src="/admin/libs/jquery.js"></script>
 <script src="/admin/libs/jquery.tablesorter.min.js"></script>
 <script type="text/javascript">
@@ -166,5 +167,6 @@ $(document).ready(function() {
 	});
 });
 </script>
+<?php } // end if ?list ?>
 </body>
 </html>

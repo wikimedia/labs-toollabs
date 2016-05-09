@@ -1,5 +1,6 @@
 <h1>Wikimedia Tool Labs</h1>
-<p>Welcome to the Tool Labs project, the home of community-maintained external tools supporting Wikimedia projects and their users.</p>
+<p>This is the web server for the Tool Labs project, the home of community-maintained external tools supporting Wikimedia projects and their users.</p>
+
 <?php
 $tool='';
 if ( $_REQUEST['tool'] ) {

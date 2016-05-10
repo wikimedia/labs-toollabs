@@ -30,6 +30,24 @@ import textwrap
 import time
 
 
+class NonAbbreviatingArgumentParser(argparse.ArgumentParser):
+    """ArgumentParser that doesn't process abbreviated arguments.
+
+    From https://bugs.python.org/issue14910#msg204678
+    """
+    def _get_option_tuples(self, option_string):
+        return []
+
+
+class ThrowingArgumentParser(NonAbbreviatingArgumentParser):
+    """ArgumentParser subclass that throws errors rather than exiting.
+
+    From https://stackoverflow.com/a/14728477/8171
+    """
+    def error(self, message):
+        raise ValueError(message)
+
+
 def argparse_memkb(val):
     """Parses an XXK, XXm, XXg to the # of kilobytes.
 
@@ -273,7 +291,7 @@ def build_qsub_argparser():
     The generated parser is a suitable for use as a parent parser for another
     ArgumentParser instance.
     """
-    parser = argparse.ArgumentParser(add_help=False)
+    parser = NonAbbreviatingArgumentParser(add_help=False)
     # The time and date at which the job is eligible for execution.
     parser.add_argument(
         '-a', nargs=1, metavar='[[CC]]YY]MMDDhhmm[.SS]',
@@ -359,7 +377,7 @@ def build_qsub_argparser():
 
 def build_jsub_argparser():
     """Build an argparse parser for jsub specific options."""
-    parser = argparse.ArgumentParser(add_help=False)
+    parser = NonAbbreviatingArgumentParser(add_help=False)
     parser.add_argument(
         '-continuous', action='store_true',
         help=(
@@ -390,8 +408,8 @@ def build_jsub_argparser():
 
 def build_parser(parents=None):
     """Build argparse parser."""
-    parser = argparse.ArgumentParser(
-        usage='%(prog)s [options...] program [arg...]',
+    parser = NonAbbreviatingArgumentParser(
+        usage='%(prog)s [options...] program [args...]',
         description='Submit a job to the job grid.',
         epilog="\n\n".join([
             "\n".join(textwrap.wrap(
@@ -419,15 +437,6 @@ def build_parser(parents=None):
         'program_args', metavar='args...', nargs=argparse.REMAINDER,
         help='Optional arguments for program.')
     return parser
-
-
-class ThrowingArgumentParser(argparse.ArgumentParser):
-    """ArgumentParser subclass that throws errors rather than exiting.
-
-    From https://stackoverflow.com/a/14728477/8171
-    """
-    def error(self, message):
-        raise ValueError(message)
 
 
 def parse_arglist(args, namespace=None):

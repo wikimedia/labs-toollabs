@@ -1,3 +1,9 @@
+toollabs (1.12) unstable; urgency=medium
+
+  * Rewrite of jsub + fixes [bd808]
+
+ -- Yuvi Panda <yuvipanda@gmail.com>  Tue, 10 May 2016 08:57:00 +0530
+
 toollabs (1.11) unstable; urgency=medium
 
   * Get rid of old webservice code

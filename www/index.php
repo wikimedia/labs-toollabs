@@ -11,7 +11,7 @@ if ( preg_match( '@^/\.([^?]*)$@', $orig, $m ) ) {
 }
 $uri = $orig;
 $uri = preg_replace( '@^/admin@', '', $uri );
-$uri = preg_replace( "@^({$_SERVER[SCRIPT_NAME]})+/?@", '/', $uri );
+$uri = preg_replace( "@^({$_SERVER['SCRIPT_NAME']})+/?@", '/', $uri );
 
 if ( $uri !== '/' ) {
 	// Are we handling a request for a static resource?

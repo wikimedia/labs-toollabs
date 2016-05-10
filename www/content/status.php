@@ -98,24 +98,25 @@ foreach ( $xml->host as $xhost ) {
 			foreach ( $xjob->jobvalue as $jv ) {
 				$job[(string) $jv->attributes()->name] = (string) $jv;
 			}
-			$jobs[$jid]['state'] = $job['job_state'];
-			if ( stristr( $job['job_state'], 'R' ) !== false ) {
+			$rawState = array_get( $job, 'job_state' );
+			$jobs[$jid]['state'] = $rawState;
+			if ( stristr( $rawState, 'R' ) !== false ) {
 				$jobs[$jid]['state'] = 'Running';
 			}
-			if ( stristr( $job['job_state'], 's' ) !== false ) {
+			if ( stristr( $rawState, 's' ) !== false ) {
 				$jobs[$jid]['state'] = 'Suspended';
 			}
-			if ( stristr( $job['job_state'], 'd' ) !== false ) {
+			if ( stristr( $rawState, 'd' ) !== false ) {
 				$jobs[$jid]['state'] = 'Deleting';
 			}
 			$jobs[$jid]['host'] = $hname;
-			$jobs[$jid]['priority'] = $job['priority'];
+			$jobs[$jid]['priority'] = array_get( $job, 'priority' );
 			$host['jobs'][] = $jid;
 		}
 		foreach ( $xhost->hostvalue as $hv ) {
 			$host[(string) $hv->attributes()->name] = (string) $hv;
 		}
-		$host['mem'] = mmem( $host['mem_used'] ) / mmem( $host['mem_total'] );
+		$host['mem'] = mmem( array_get( $host, 'mem_used', '0M' ) ) / mmem( array_get( $host, 'mem_total', '1M' ) );
 		$hosts[$hname] = $host;
 	}
 }
@@ -129,9 +130,9 @@ ksort( $hosts );
 ksort( $jobs );
 
 foreach ( $hosts as $host => $h ) {
-	$hvmem = $h['h_vmem'];
+	$hvmem = array_get( $h, 'h_vmem', 0 );
 	foreach ( $h['jobs'] as $jn ) {
-		$hvmem -= $jobs[$jn]['h_vmem'];
+		$hvmem -=  array_get( $jobs[$jn], 'h_vmem', 0 );
 	}
 	$hvmem = (int) ( $hvmem / 1024 / 1024 );
 	if ( $hvmem < 0 ) {
@@ -140,9 +141,9 @@ foreach ( $hosts as $host => $h ) {
 ?>
 <div class="hostline">
 <span class="hostname"><?= htmlspecialchars( $host ) ?></span>
-<b>Load:</b> <?= (int) ( $h['load_avg'] * 1000 ) / ( $h['num_proc'] * 10 ) ?>%
-<b>Memory:</b> <?= (int) ( $h['mem'] * 1000 ) / 10 ?>%
-<?php if ( $h['h_vmem'] > 0 ) { ?>
+<b>Load:</b> <?= (int) ( array_get( $h, 'load_avg', 0 ) * 1000 ) / ( array_get( $h, 'num_proc', 1 ) * 10 ) ?>%
+<b>Memory:</b> <?= (int) ( array_get( $h, 'mem', 0 ) * 1000 ) / 10 ?>%
+<?php if ( array_get( $h, 'h_vmem', 0 ) > 0 ) { ?>
 <b>Free vmem:</b> <?= humanmem( $hvmem ); ?>
 <?php } ?>
 </div>
@@ -176,7 +177,7 @@ foreach ( $hosts as $host => $h ) {
 <?= array_key_exists('vmem', $j) ? sprintf( '%d/%d', humanmem( $j['vmem'] / 1024 / 1024 ), humanmem( array_get( $j, 'h_vmem', 0 ) / 1024 / 1024 ) ) : 'n/a' ?>
 <?php
 		if ( array_key_exists('maxvmem', $j) &&
-			$j['maxvmem'] > $j['vmem'] * 1.02
+			$j['maxvmem'] > array_get( $j, 'vmem', 0 ) * 1.02
 		) {
 ?>
 (peak <?= humanmem( $j['maxvmem'] / 1024 / 1024 ) ?>)

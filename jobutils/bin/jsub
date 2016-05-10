@@ -186,7 +186,7 @@ class QsubAction(argparse.Action):
         if option_string == '-l':
             self._process_l(namespace, values[0])
         else:
-            if type(values) is list:
+            if self.nargs != 0 and type(values) is list:
                 values = values[0]
             self._append(namespace, values, option_string)
 

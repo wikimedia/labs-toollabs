@@ -87,7 +87,7 @@ while ( $row = $res->fetch_assoc() ) {
 		if ( array_key_exists( $maint, $users ) ) {
 			$maint = $users[$maint]['wikitech'];
 ?>
-	<a href="https://wikitech.wikimedia.org/wiki/User:<?= urlencode( $maint ) ?>"><?= htmlspecialchars( ucfirst($maint) ) ?></a>
+	<a href="https://wikitech.wikimedia.org/wiki/User:<?= urlencode( strtr( $maint, ' ', '_' ) ) ?>"><?= htmlspecialchars( ucfirst($maint) ) ?></a>
 <?php
 		} // end if
 	} // end foreach

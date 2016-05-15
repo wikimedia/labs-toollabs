@@ -64,7 +64,7 @@ if ( $tool !== '' ) {
 		if ( $mu ) {
 			$wtu = $mu['gecos'];
 ?>
-<a href="https://wikitech.wikimedia.org/wiki/User:<?= urlencode( $wtu ) ?>"><?= htmlspecialchars( ucfirst( $wtu ) ) ?></a>
+<a href="https://wikitech.wikimedia.org/wiki/User:<?= urlencode( strtr( $wtu, ' ', '_' ) ) ?>"><?= htmlspecialchars( ucfirst( $wtu ) ) ?></a>
 <?php
 		} else {
 			echo htmlspecialchars( ucfirst( $maint ) ), ' ';

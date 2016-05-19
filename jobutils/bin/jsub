@@ -173,6 +173,24 @@ def argparse_whence(prog):
     raise argparse.ArgumentTypeError("Program '%s' not found." % prog)
 
 
+def split_l(value):
+    """Iterate over compontents of qsub's '-l resource=value,...' arguments."""
+    for part in value.split(','):
+        yield part.split('=', 1)
+    raise StopIteration
+
+
+def argparse_resource(value):
+    """Validate qsub's '-l resource=value,...' arguments."""
+    releases = ['precise', 'trusty']
+    for label, val in split_l(value):
+        if label == 'release' and val not in releases:
+            raise argparse.ArgumentTypeError(
+                'invalid release=%s. Expected release=[%s].' % (
+                    val, '|'.join(releases)))
+    return value
+
+
 class QsubAction(argparse.Action):
     """Handle argparse arguments that will be passed through to qsub.
 
@@ -198,8 +216,7 @@ class QsubAction(argparse.Action):
         unaltered except they are expanded so each 'resource=value' pair is
         attached to its own '-l' flag.
         """
-        for opt in values.split(','):
-            (resource, value) = opt.split('=')
+        for resource, value in split_l(values):
             if resource == 'h_vmem':
                 vmem = argparse_memkb(value)
                 if vmem > namespace.mem:
@@ -209,7 +226,7 @@ class QsubAction(argparse.Action):
                 if vfree > namespace.mem:
                     namespace.mem = vfree
             else:
-                self._append(namespace, opt, '-l')
+                self._append(namespace, '%s=%s' % (resource, value), '-l')
 
     def _ensure_value(self, namespace, name, value):
         """Get a value from the namespace."""
@@ -324,7 +341,8 @@ def build_qsub_argparser():
     # Launch the job in a queue meeting the given resource request list.
     parser.add_argument(
         '-l', nargs=1, metavar='resource=value,...',
-        action=QsubAction, dest='qsub_args', help=argparse.SUPPRESS)
+        action=QsubAction, type=argparse_resource, dest='qsub_args',
+        help=argparse.SUPPRESS)
     # Under which circumstances mail is to be sent to the job owner or to the
     # users defined with the -M option. See `man qsub` for details.
     parser.add_argument(

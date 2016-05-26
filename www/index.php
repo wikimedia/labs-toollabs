@@ -59,8 +59,8 @@ if ( $uri !== '/' ) {
 				header( "Location: {$to}" );
 				exit( 0 );
 			}
+			header( 'HTTP/1.0 503 Service Unavailable' );
 			include 'content/503.php';
-			http_response_code( 503 );
 			exit( 0 );
 		}
 	}
@@ -70,11 +70,12 @@ if ( $uri !== '/' ) {
 	exit( 0 );
 }
 
-// Default action is to serve the list of all tools
+// Default action is to serve the splash page
 $content = 'splash';
 if ( isset( $qstring ) && $qstring !== '' ) {
 	$content = $qstring;
 	if ( preg_match( '/^[A-Z]/', $content ) === 1 ) {
+		header( 'HTTP/1.0 302 Found' );
 		header( 'Location: https://wikitech.wikimedia.org/wiki/Nova_Resource:Tools/' . urlencode($content) );
 		exit( 0 );
 	}

@@ -59,10 +59,8 @@ if ( $uri !== '/' ) {
 				header( "Location: {$to}" );
 				exit( 0 );
 			}
-			// This endpoint is called as an error hander page by nginx, so
-			// *DO NOT* return an actual 503 status code. If you do nginx will
-			// think that the error handler itself is broken.
 			include 'content/503.php';
+			http_response_code( 503 );
 			exit( 0 );
 		}
 	}

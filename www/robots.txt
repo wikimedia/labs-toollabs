@@ -9,9 +9,6 @@ Disallow: /persondata/
 # T122327
 Disallow: /xtools-articleinfo/
 
-# T136842
-Disallow: /guc/
-
 # Disallow XoviBot.
 User-agent: XoviBot
 Disallow: /

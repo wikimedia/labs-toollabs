@@ -1,3 +1,9 @@
+toollabs (1.14) unstable; urgency=medium
+
+  * Update jsubrc and embedded options parsing
+
+ -- Bryan Davis <bd808@wikimedia.org>  Tue, 21 June 2016 16:38:00 +0000
+
 toollabs (1.13) unstable; urgency=medium
 
   * Validate jsub '-l release=...' values

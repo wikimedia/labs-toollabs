@@ -475,7 +475,7 @@ def parse_jsubrc():
         'JOBUTILS_JSUBRC', os.path.join(homedir(), '.jsubrc'))
     if os.path.exists(jsubrc):
         args = []
-        pat = re.compile(r'^(?P<opt>-[a-z]+)(?:\s+(?P<arg>.+)|\s*)$')
+        pat = re.compile(r'^(?P<opt>-[a-zA-Z]+)(?:\s+(?P<arg>[^#\s]+))?')
         with open(jsubrc, 'r') as fh:
             for line in fh:
                 m = pat.match(line)
@@ -513,7 +513,7 @@ def parse_script_comments(namespace):
     This mostly matches the behavior of SGE's qsub for non-binary programs.
     See '-C prefix_string' in `man qsub` for more ugly details.
     """
-    pat = re.compile(r'\s*(?P<opt>-[a-z]+)(?:\s+(?P<arg>.+)|\s*)')
+    pat = re.compile(r'\s*(?P<opt>-[a-zA-Z]+)(?:\s+(?P<arg>[^#\s]+))?')
     args = []
     with open(namespace.program, 'r') as fh:
         for line in read_script_comments(fh):

@@ -18,6 +18,8 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+from __future__ import print_function
+
 import argparse
 import copy
 import os
@@ -28,6 +30,10 @@ import subprocess
 import sys
 import textwrap
 import time
+
+
+AVAILABLE_RELEASES = ['precise', 'trusty']
+DEFAULT_RELEASE = 'precise'
 
 
 class NonAbbreviatingArgumentParser(argparse.ArgumentParser):
@@ -182,12 +188,11 @@ def split_l(value):
 
 def argparse_resource(value):
     """Validate qsub's '-l resource=value,...' arguments."""
-    releases = ['precise', 'trusty']
     for label, val in split_l(value):
-        if label == 'release' and val not in releases:
+        if label == 'release' and val not in AVAILABLE_RELEASES:
             raise argparse.ArgumentTypeError(
                 'invalid release=%s. Expected release=[%s].' % (
-                    val, '|'.join(releases)))
+                    val, '|'.join(AVAILABLE_RELEASES)))
     return value
 
 
@@ -211,13 +216,19 @@ class QsubAction(argparse.Action):
     def _process_l(self, namespace, values):
         """Process qsub's insane '-l resource=value,...' options.
 
-        We intercept h_vmem=value and virtual_free=value arguments and instead
-        adjust the mem argument value. Other resource=value pairs are stored
-        unaltered except they are expanded so each 'resource=value' pair is
-        attached to its own '-l' flag.
+        Some settings are intercepted and processed specially:
+        * h_vmem=value : adjust '-mem'
+        * virtual_free=value : adjust '-mem'
+        * release=value : adjust '-release'
+
+        Other resource=value pairs are stored unaltered except they are
+        expanded so each 'resource=value' pair is attached to its own '-l'
+        flag.
         """
         for resource, value in split_l(values):
-            if resource == 'h_vmem':
+            if resource == 'release':
+                setattr(namespace, 'release', value)
+            elif resource == 'h_vmem':
                 vmem = argparse_memkb(value)
                 if vmem > namespace.mem:
                     setattr(namespace, 'mem', vmem)
@@ -421,6 +432,9 @@ def build_jsub_argparser():
         '-umask', type=argparse_octal,
         default=0007 if os.geteuid() > 50000 else 0077,
         help="Set umask for output files if they don't exist")
+    parser.add_argument(
+        '-release', choices=AVAILABLE_RELEASES, action='store', metavar='OS',
+        help='Choose operating system version required by this job')
     return parser
 
 
@@ -594,6 +608,24 @@ def main():
     if args.once and is_running(args.jobname):
         die("there is a job named '%s' already active" % args.jobname)
 
+    if not args.release:
+        args.release = DEFAULT_RELEASE
+        print('*' * 78, file=sys.stderr)
+        print(
+            'WARNING: No `-l release=...` argument provided.'
+            '\n\tDefault release will change from precise to trusty in '
+            'October 2016.'
+            '\n\thttps://wikitech.wikimedia.org/wiki/Tools_Precise_deprecation',
+            file=sys.stderr)
+        print('*' * 78, file=sys.stderr)
+    elif args.release == 'precise':
+        print('*' * 78, file=sys.stderr)
+        print(
+            'NOTICE: Precise hosts are being deprecated from Tool Labs'
+            '\n\thttps://wikitech.wikimedia.org/wiki/Tools_Precise_deprecation',
+            file=sys.stderr)
+        print('*' * 78, file=sys.stderr)
+
     # Build argument list for calling qsub
     qsub_args = args.qsub_args or []
     qsub_args.extend([
@@ -602,7 +634,9 @@ def main():
         '-o', args.log_out,
         '-M', args.mailto,
         '-N', args.jobname,
-        '-hard', '-l', 'h_vmem=%dk' % args.mem,
+        '-hard',
+        '-l', 'h_vmem=%dk' % args.mem,
+        '-l', 'release=%s' % args.release,
         '-q', args.queue,
         '-b', as_qsub_bool(args.binary),
     ])
@@ -627,8 +661,8 @@ def main():
     else:
         qsub_args.extend(job)
 
-    qsub = make_cmd(os.environ.get('JOBUTILS_QSUB', '/usr/bin/qsub'),
-                    qsub_args)
+    qsub = make_cmd(
+        os.environ.get('JOBUTILS_QSUB', '/usr/bin/qsub'), qsub_args)
     try:
         proc = subprocess.Popen(
             qsub,

@@ -33,7 +33,7 @@ import time
 
 
 AVAILABLE_RELEASES = ['precise', 'trusty']
-DEFAULT_RELEASE = 'precise'
+DEFAULT_RELEASE = 'trusty'
 
 
 class NonAbbreviatingArgumentParser(argparse.ArgumentParser):
@@ -613,8 +613,7 @@ def main():
         print('*' * 78, file=sys.stderr)
         print(
             'WARNING: No `-l release=...` argument provided.'
-            '\n\tDefault release will change from precise to trusty in '
-            'October 2016.'
+            '\n\tDefault release has changed from precise to trusty!'
             '\n\thttps://wikitech.wikimedia.org/wiki/Tools_Precise_deprecation',
             file=sys.stderr)
         print('*' * 78, file=sys.stderr)

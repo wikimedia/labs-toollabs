@@ -40,7 +40,7 @@ function array_get( $arr, $key, $default = '' ) {
 	return array_key_exists( $key, $arr ) ? $arr[$key] : $default;
 }
 
-$raw = shell_exec( "PATH=/bin:/usr/bin qstat -xml -j '*'|sed -e 's/JATASK:[^>]*/jatask/g'" );
+$raw = shell_exec( "PATH=/bin:/usr/bin qstat -xml -j '*'|sed -e 's/JATASK:[^>]*/jatask/g'|iconv -f utf8 -t utf8 -c" );
 $xml = simplexml_load_string( $raw );
 unset( $raw );
 
@@ -80,7 +80,7 @@ foreach ( $xml->djob_info->element as $xjob ) {
 }
 unset( $xml );
 
-$raw = shell_exec( "PATH=/bin:/usr/bin qhost -xml -j -F h_vmem" );
+$raw = shell_exec( "PATH=/bin:/usr/bin qhost -xml -j -F h_vmem|iconv -f utf8 -t utf8 -c" );
 $xml = simplexml_load_string( $raw );
 unset( $raw );
 

@@ -57,9 +57,13 @@ foreach ( $xml->djob_info->element as $xjob ) {
 	} else {
 		$job['queue'] = '(manual)';
 	}
-	foreach ( $xjob->JB_hard_resource_list->qstat_l_requests as $lreq ) {
-		if ( $lreq->CE_name === 'h_vmem' ) {
-			$job['h_vmem'] = (int) $lreq->CE_doubleval;
+	if ( $xjob->JB_hard_resource_list &&
+		$xjob->JB_hard_resource_list->qstat_l_requests
+	) {
+		foreach ( $xjob->JB_hard_resource_list->qstat_l_requests as $lreq ) {
+			if ( $lreq->CE_name === 'h_vmem' ) {
+				$job['h_vmem'] = (int) $lreq->CE_doubleval;
+			}
 		}
 	}
 	if ( $xjob->JB_ja_tasks->jatask &&

@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python2 -E -s
 # -*- coding: utf-8 -*-
 #
 # Submit a job to the job grid.
@@ -614,14 +614,16 @@ def main():
         print(
             'WARNING: No `-l release=...` argument provided.'
             '\n\tDefault release has changed from precise to trusty!'
-            '\n\thttps://wikitech.wikimedia.org/wiki/Tools_Precise_deprecation',
+            '\n\t'
+            'https://wikitech.wikimedia.org/wiki/Tools_Precise_deprecation',
             file=sys.stderr)
         print('*' * 78, file=sys.stderr)
     elif args.release == 'precise':
         print('*' * 78, file=sys.stderr)
         print(
             'NOTICE: Precise hosts are being deprecated from Tool Labs'
-            '\n\thttps://wikitech.wikimedia.org/wiki/Tools_Precise_deprecation',
+            '\n\t'
+            'https://wikitech.wikimedia.org/wiki/Tools_Precise_deprecation',
             file=sys.stderr)
         print('*' * 78, file=sys.stderr)
 

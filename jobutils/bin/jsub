@@ -277,7 +277,7 @@ def touch(path, umask):
         try:
             open(path, 'a').close()
         except IOError, e:
-            die("Failed to touch '%s': %e" % (path, e))
+            die("Failed to touch '%s': %s" % (path, e))
         finally:
             os.umask(old_mask)
 

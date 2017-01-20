@@ -1,3 +1,10 @@
+toollabs (1.18) unstable; urgency=medium
+
+  * jsub: Change IOError string substitution conversion from '%e'
+    to '%s'
+
+ -- YiFei Zhu <zhuyifei1999@gmail.com>  Fri, 20 Jan 2017 11:15:00 +0000
+
 toollabs (1.17) unstable; urgency=medium
 
   * jsub: guard against PYTHONPATH munging in caller's environment

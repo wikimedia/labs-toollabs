@@ -2,16 +2,27 @@
 .SH NAME
 list-user-databases \- list databases a MySQL account has access to
 .SH SYNOPSIS
-.B list-user-databases
+.B list-user-databases -H
+.I host
+.RB [ -H
+.I host
+\[char46]..]
 .I filename
-.RI [filename ...]
+.RI [ filename
+\[char46]..]
 .SH DESCRIPTION
 .B list-user-databases
-lists all databases on the replica servers and
-.I tools.labsdb
-that the user has access to whose
+lists all databases on the given database servers that the user has
+access to whose
 .I replica.my.cnf
 file has been given as a command line argument.
+
+A list of potential database servers to check against can be gathered
+from
+.IR operation/puppet 's
+.IR modules/role/manifests/labs/db/maintain_dbusers.pp .
+Note that some of the database servers listed there are not accessible
+from Labs and connection attempts will time out.
 .SH EXIT STATUS
 In case of success,
 .B list-user-databases

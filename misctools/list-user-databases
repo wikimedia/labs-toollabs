@@ -7,12 +7,13 @@ import re
 
 import mysql.connector
 
-# Servers to search databases on.
-DATABASE_SERVERS = ('c1.labsdb', 'c2.labsdb', 'c3.labsdb', 'tools.labsdb')
-
 if __name__ == '__main__':
     # Get list of defaults files to extract user information from.
     parser = argparse.ArgumentParser(description='List databases owned by users, given by the credentials files.')
+    parser.add_argument('-H', '--host',
+                        action='append',
+                        required=True,
+                        help='database hosts to check')
     parser.add_argument('mycnffilenames',
                         metavar='MYCNFFILENAME',
                         nargs='+',
@@ -25,7 +26,7 @@ if __name__ == '__main__':
         username = c.get('client', 'user').strip("'")
         password = c.get('client', 'password').strip("'")
         databases_found = []
-        for server in DATABASE_SERVERS:
+        for server in args.host:
             conn = mysql.connector.connect(user=username,
                                            password=password,
                                            host=server,

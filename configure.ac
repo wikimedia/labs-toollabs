@@ -34,7 +34,6 @@ AC_CONFIG_FILES([Makefile
                  misctools/Makefile
                  misctools/become.1
                  misctools/list-user-databases.1
-                 misctools/toolwatcher.8
                  src/Makefile
                  src/take.1
                  tests/Makefile])

@@ -1,0 +1,336 @@
+#! /usr/bin/python3 -Es
+# -*- coding: UTF-8 -*-
+#
+#  Copyright © 2013 Marc-André Pelletier <mpelletier@wikimedia.org>
+#  Copyright © 2017 Zhuyifei1999 <zhuyifei1999@gmail.com>
+#  Copyright © 2017 Wikimedia Foundation and contributors
+#
+#  Permission to use, copy, modify, and/or distribute this software for any
+#  purpose with or without fee is hereby granted, provided that the above
+#  copyright notice and this permission notice appear in all copies.
+#
+#  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+#  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+#  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+#  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+#  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+#  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+#  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+
+#  This goes in /usr/local/bin to override the system crontab (which will
+#  have its permissions restricted).
+
+import argparse
+import os
+import pwd
+import re
+import subprocess
+import sys
+import tempfile
+
+
+JSUB_MODIFIED = '''
+NOTE: some crontab entries have been modified to grid submissions.
+      You may want to examine the result with 'crontab -e'.
+'''
+
+
+DEFAULT_CRONTAB = '''\
+# Edit this file to introduce tasks to be run by cron.
+#
+# Each task to run has to be defined through a single line
+# indicating with different fields when the task will be run
+# and what command to run for the task
+#
+# To define the time you can provide concrete values for
+# minute (m), hour (h), day of month (dom), month (mon),
+# and day of week (dow) or use '*' in these fields (for 'any').
+#
+# Notice that tasks will be started based on the cron's system
+# daemon's notion of time and timezones.
+#
+# Output of the crontab jobs (including errors) is sent through
+# email to the user the crontab file belongs to (unless redirected).
+#
+# For example, you can run a backup of all your user accounts
+# at 5 a.m every week with:
+# 0 5 * * 1 tar -zcf /var/backups/home.tgz /home/
+#
+# For more information see the manual pages of crontab(5) and cron(8)
+#
+# Wikimedia Toolforge specific note:
+#   Please be aware that *only* jsub and jstart are acceptable
+#   commands to schedule via cron.  Any command specified here will
+#   be modified to be invoked through jsub unless it is one of
+#   the two.
+#
+# m	h	dom	mon	dow	command
+'''
+
+
+class NoCrontab(Exception):
+    pass
+
+
+class Crontab(object):
+    def __init__(self, pw, cron_host):
+        self.pw = pw
+        self.cron_host = cron_host
+
+    def _remote(self, stdin=None, *args):
+        """Execute remote crontab command and return stdout."""
+        cmd = ['/usr/bin/ssh', self.cron_host, '/usr/bin/crontab'] + args
+        if self.pw.pw_uid != os.getuid():
+            cmd += ['-u', self.pw.pw_name]
+
+        ssh = subprocess.Popen(
+            cmd,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
+
+        stdoutdata, stderrdata = ssh.communicate(input=stdin)
+
+        if ssh.returncode:
+            if stderrdata.lower().startswith('no crontab for '):
+                raise NoCrontab
+            else:
+                print(stderrdata, end='', file=sys.stderr)
+                err('unable to execute remote crontab command')
+                sys.exit(ssh.returncode)
+
+        return stdoutdata
+
+    def _add_jsub(self, text):
+        """Wrapper for the add_jsub function."""
+        text = text.split('\n')
+        for lineno, line in enumerate(text):
+            newline = add_jsub(line, 'cron-{}'.format(lineno))
+            if newline is not None:
+                text[lineno] = newline
+
+        text = '\n'.join(text)
+        # Make sure there is one and only one line feed at the end
+        text = text.rstrip('\n') + '\n'
+        return text
+
+    def load(self):
+        return self._remote('-l')
+
+    def save(self, text):
+        jsub_text = self._add_jsub(text)
+        if jsub_text.strip() != text.strip():
+            print(JSUB_MODIFIED, file=sys.stderr)
+        self._remote(stdin=jsub_text)
+
+    def remove(self):
+        self._remote('-r')
+
+
+def add_jsub(line, jobname='cronjob'):
+    """
+    Add jsub to each crontab entry when necessary.
+
+    When jsub is added, the name of the submitted job will be the value of
+    jobname parameter.
+
+    cd dir and [ test ] will be stripped before doing the command logic, but
+    unfortuantely executing the cd or test on the submit host instead of grid
+    execution host may produce unexpected results, and using this feature is
+    not recommended.
+
+    >>> __name__ = 'doctest'
+    >>> exec(open("misctools/oge-crontab").read())
+    >>> add_jsub('')  # empty line
+    >>> add_jsub('#')  # empty comment
+    >>> add_jsub('# Foo bar')  # simple comment
+    >>> add_jsub(' # Foo bar')  # comment preceeded with space(s) T75256
+    >>> add_jsub('PATH=/bin')  # environment variable
+    >>> add_jsub('PATH=/bin')  # environment variable
+    >>> add_jsub('* * * * * true')  # simple command
+    '* * * * * /usr/bin/jsub -N cronjob -once -quiet true'
+    >>> add_jsub('* * * * * jsub true')  # jsub-ed (in $PATH) command
+    >>> add_jsub('* * * * * /usr/bin/jsub true')  # jsub-ed (absolute) command
+    >>> add_jsub('0 1 * * 2 true')  # command scheduled with numbers
+    '0 1 * * 2 /usr/bin/jsub -N cronjob -once -quiet true'
+    >>> add_jsub('*/3 1-3,4 * * 1-5 true')  # command scheduled complicatedly
+    '*/3 1-3,4 * * 1-5 /usr/bin/jsub -N cronjob -once -quiet true'
+    >>> add_jsub('@weekly true')  # command scheduled with @-strings T86446
+    '@weekly /usr/bin/jsub -N cronjob -once -quiet true'
+    >>> add_jsub('@weekly cd /bin/; ./true')  # cd handling
+    '@weekly cd /bin/; /usr/bin/jsub -N cronjob -once -quiet ./true'
+    >>> add_jsub('@daily [ -x /bin/ls ] && /bin/ls')  # test handling
+    '@daily [ -x /bin/ls ] && /usr/bin/jsub -N cronjob -once -quiet /bin/ls'
+    >>>
+    """
+    line = line.strip()
+    # skip empty lines
+    if not line:
+        return
+
+    # skip comments
+    if line[0] == '#':
+        return
+
+    # skip environment variables
+    if re.match(r'\S+\s*=', line):
+        return
+
+    # Split each crontab entry into schedule, command, and comment.
+    # Schedule can be either 5 time and date fields seperated by
+    # spaces or tabs, or special strings starting with an "@", such
+    # as @weekly or @daily. See crontab(5) manpage.
+    cmdreobj = re.match(r'(@\S+|\S+\s+\S+\s+\S+\s+\S+\s+\S+)\s+'
+                        r'([^#]*)(#.*)?$', line)
+    if cmdreobj:
+        sched, cmd, cmt = cmdreobj.groups('')
+        prefix = ''
+
+        # Check for common prefixes: (cd dir|[ test ]) (&&|;)
+        # and strip them out before adding jsub to the real command.
+        prereobj = re.match(
+            r'((?:cd\s+\S+|\[[^\]]*\])\s*(?:&&|;)\s*)(.*)',
+            cmd)
+        if prereobj:
+            prefix, cmd = prereobj.groups()
+
+        if not re.match(r'(/usr/(local/)?bin/)?'
+                        r'(jsub|jstart|jmail|qsub|jlocal)\s', cmd):
+            cmd = "{}/usr/bin/jsub -N {} -once -quiet {}".format(
+                prefix, jobname, cmd)
+            return ' '.join([sched, cmd, cmt]).strip()
+
+
+def editor(text):
+    """Open an editor with the given content and return results."""
+    with tempfile.NamedTemporaryFile() as f:
+        f.write(text)
+        f.flush()
+
+        subprocess.check_call(['/usr/bin/sensible-editor', f.name])
+
+        f.seek(0)
+        return f.read()
+
+
+def err(message):
+    """Print an error message to stderr."""
+    print('{}: {}'.format(sys.argv[0], message), file=sys.stderr)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-u', dest='user', help=argparse.SUPPRESS)
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument(
+        'file', default=sys.stdin, nargs='?', type=argparse.FileType('r'),
+        help='replace crontab with file (default)')
+    subgroup = group.add_mutually_exclusive_group()
+    subgroup.add_argument(
+        '-e', action='store_const', const='e', dest='operation',
+        help='edit crontab')
+    subgroup.add_argument(
+        '-l', action='store_const', const='l', dest='operation',
+        help='list crontab')
+    subgroup.add_argument(
+        '-r', action='store_const', const='r', dest='operation',
+        help='delete crontab')
+    parser.add_argument(
+        '-i', action='store_true',
+        help='prompt before deleting crontab')
+
+    args = parser.parse_args()
+
+    if args.i and args.operation != 'r':
+        parser.error('argument -i: only applicable with -r')
+
+    if args.user:
+        if os.getuid():
+            parser.error('argument -u: must be privileged')
+        try:
+            pw = pwd.getpwnam(args.user)
+        except KeyError:
+            parser.error('argument -u: unknown user "{}"'.format(args.user))
+    else:
+        pw = pwd.getpwuid(os.getuid())
+
+    if pw.pw_uid < 500:
+        # If the target user is not managed in LDAP and thus likely
+        # a system user, invoke the original crontab instead.
+        os.execv('/usr/bin/crontab', sys.argv)
+
+    if pw.pw_uid < 40000 and os.getuid():
+        err('only tools are allowed crontabs')
+        sys.exit(1)
+
+    with open('/etc/toollabs-cronhost', 'r') as f:
+        cron_host = f.read().strip()
+
+    try:
+        crontab = Crontab(pw, cron_host)
+
+        if args.operation is None:
+            # Replace
+            crontab.save(args.file.read())
+        elif args.operation == 'e':
+            # Edit
+            try:
+                crontab_text = crontab.load()
+            except NoCrontab:
+                crontab_text = DEFAULT_CRONTAB
+            new_crontab_text = editor(crontab_text)
+
+            if new_crontab_text == crontab_text:
+                print('No modification made', file=sys.stderr)
+            elif not new_crontab_text.strip():
+                err('cowardly refusing to install empty crontab')
+                err('use `{} -r` if you want to remove the crontab'.format(
+                    sys.srgv[0]))
+                sys.exit(1)
+            else:
+                crontab.save(new_crontab_text)
+        elif args.operation == 'l':
+            # List
+            try:
+                print(crontab.load(), end='')  # crontab already has lf
+            except NoCrontab:
+                print(
+                    'no crontab for {}'.format(pw.pw_name), file=sys.stderr)
+                sys.exit(1)
+        elif args.operation == 'r':
+            # Delete
+            try:
+                crontab.load()
+            except NoCrontab:
+                print(
+                    'no crontab for {}'.format(pw.pw_name), file=sys.stderr)
+                sys.exit(1)
+            if args.i:
+                prompt = "{}: really delete {}'s crontab? (y/n) ".format(
+                    sys.argv[0], pw.pw_name)
+                while True:
+                    try:
+                        stdin = input(prompt).lower()
+                    except EOFError:
+                        stdin = ''
+                    except KeyboardInterrupt:
+                        print(file=sys.stderr)
+                        raise
+
+                    if stdin == 'y':
+                        crontab.remove()
+                        break
+                    elif stdin == 'n':
+                        break
+                    else:
+                        prompt = 'Please enter Y or N: '
+
+            else:
+                crontab.remove()
+    except KeyboardInterrupt:
+        pass
+
+
+if __name__ == '__main__':
+    main()

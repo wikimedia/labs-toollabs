@@ -15,6 +15,9 @@
 
 # This has to be exported to make some magic below work.
 export DH_OPTIONS
+# Disable dbgsym package generation
+# https://lists.debian.org/debian-devel/2015/12/msg00262.html
+export DEB_BUILD_OPTIONS=noddebs
 
 
 %:

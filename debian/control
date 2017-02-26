@@ -22,7 +22,8 @@ Description: Miscellaneous Labs-specific tools
 Package: jobutils
 Architecture: all
 Depends: ${misc:Depends}, ${perl:Depends}, ${python:Depends},
- gridengine-client, libipc-run-perl, libstring-shellquote-perl, python
+ gridengine-client, libipc-run-perl, libstring-shellquote-perl,
+ python, python3
 Description: Set of utilities to use on wikimedia bots and tools cluster
  This package will install jstart (jsub) and jstop, the Tool Labs (more)
  user-friendly wrappers to submit jobs to the gridengine

@@ -1,4 +1,4 @@
-#!/usr/bin/python2 -Es
+#!/usr/bin/python -Es
 # -*- coding: utf-8 -*-
 #
 # Submit a job to the job grid.

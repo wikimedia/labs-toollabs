@@ -1,10 +1,11 @@
-toollabs (1.19~dev) unstable; urgency=medium
+toollabs (1.19~dev) trusty; urgency=medium
 
   * Remove toolwatcher
   * Do not hardcore database hosts in list-user-databases
   * State dependency on python
+  * Set target distribution to Ubuntu Trusty
 
- -- Tim Landscheidt <tim@tim-landscheidt.de>  Sun, 26 Feb 2017 00:34:51 +0000
+ -- Tim Landscheidt <tim@tim-landscheidt.de>  Sun, 26 Feb 2017 01:38:04 +0000
 
 toollabs (1.18) unstable; urgency=medium
 

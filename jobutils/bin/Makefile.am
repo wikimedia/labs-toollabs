@@ -1,4 +1,4 @@
-bin_SCRIPTS = job jstop jsub
+bin_SCRIPTS = jmail job jstop jsub
 
 install-exec-hook:
 	cd $(DESTDIR)$(bindir) && \

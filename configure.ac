@@ -28,6 +28,7 @@ AC_CONFIG_FILES([Makefile
                  jobutils/Makefile
                  jobutils/bin/Makefile
                  jobutils/man/Makefile
+                 jobutils/man/jmail.1
                  jobutils/man/job.1
                  jobutils/man/jstop.1
                  jobutils/man/jsub.1

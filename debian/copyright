@@ -5,6 +5,10 @@ Files: *
 Copyright: 2013 Marc-André Pelletier <mpelletier@wikimedia.org>
 License: ISC
 
+Files: jobutils/bin/jmail jobutils/man/jmail.1.in
+Copyright: Copyright 2017 Tim Landscheidt <tim@tim-landscheidt.de>
+License: GPL-3.0+
+
 Files: debian/*
 Copyright: 2013 Carl Fürstenberg <azatoth@gmail.com>
 License: GPL-3.0+

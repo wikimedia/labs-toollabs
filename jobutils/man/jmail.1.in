@@ -1,0 +1,38 @@
+.TH JMAIL 1 @TOOLLABS_RELEASEDATE@ @PACKAGE_VERSION@ "Wikimedia Labs Tools jobutils"
+.SH NAME
+jmail \- execute program synchronously on the grid
+.SH SYNOPSIS
+.RB | jmail
+.IR program
+.RI [ args ]
+.SH DESCRIPTION
+.B jmail
+is used in
+.B .forward
+files to execute a program synchronously on the grid.  In Tool Labs it
+is the only command allowed in
+.B .forward
+files.
+.PP
+.B jmail
+passes its standard input, i. e. the incoming mail, to the specified
+program.  After the program has finished,
+.B jmail
+copies its output to standard output.
+.PP
+Programs are executed in the queue
+.B mailq
+with a memory limit of 500 MBytes and a timeout of 30\~s CPU/60\~s
+wall clock.  It is strongly recommended that programs should not
+attempt any heavy processing, but store the incoming messages for
+later processing by other components.
+.SH EXIT STATUS
+.B jmail
+returns 1 if
+.I program
+cannot be found in
+.BR PATH .
+Otherwise it returns the exit code of the executed
+.IR program .
+.SH AUTHORS
+Marc-André Pelletier, Tim Landscheidt

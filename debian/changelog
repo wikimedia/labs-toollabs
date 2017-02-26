@@ -1,3 +1,9 @@
+toollabs (1.20~dev) trusty; urgency=medium
+
+  * Package jmail
+
+ -- Tim Landscheidt <tim@tim-landscheidt.de>  Mon, 27 Feb 2017 17:50:41 +0000
+
 toollabs (1.19) trusty; urgency=medium
 
   * Remove toolwatcher

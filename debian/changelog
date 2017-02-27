@@ -1,4 +1,4 @@
-toollabs (1.19~dev) trusty; urgency=medium
+toollabs (1.19) trusty; urgency=medium
 
   * Remove toolwatcher
   * Do not hardcore database hosts in list-user-databases

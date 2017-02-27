@@ -1,120 +1,93 @@
-#!/bin/bash
+#!/usr/bin/python3
+#
+# Copyright (C) 2017  Tim Landscheidt
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# this tool allow you to connect quickly to sql database
-# it should work for all newbies
+import argparse
+import logging
+import os
+import os.path
+import socket
+import sys
 
-verbose=0
+parser = argparse.ArgumentParser(description='Connect to or run SQL query ' +
+                                 'on replica or Tools database server',
+                                 epilog='Report bugs to Phabricator: ' +
+                                 'https://phabricator.wikimedia.org')
+parser.add_argument('-v', '--verbose', action='store_true', default=False,
+                    help='show debugging information')
+parser.add_argument('dbname', metavar='DATABASE NAME|WIKI NAME',
+                    help='for example commonswiki_p or enwiki')
+parser.add_argument('sqlquery', metavar='SQL QUERY', nargs=argparse.REMAINDER,
+                    help='SQL query; multiple words will be joined by spaces')
 
-function Log {
-if [ $verbose -eq 1 ];then
-	echo "$1"
-fi
-}
+args = parser.parse_args()
 
-if [ $# -lt 1 ];then
-    echo "Usage: \"sql <database name|wiki name> [-vh]\" type sql --help for more help"
-    exit 0
-fi
+# Set up logging.
+logging.basicConfig(stream=sys.stderr,
+                    format='%(message)s',
+                    level=logging.DEBUG if args.verbose else logging.WARN)
 
-if [ "$1" = "-h" ] || [ "$1" == "--help" ];then
-    echo "Usage: sql <database>[_p] [-vh] [command(s)]"
-	echo
-	echo "This tool allows you to easily open a connection to sql database without having to provide the credentials or a database host server"
-	echo "Example: sql frwiki_p"
-	echo
-	echo "Parameters:"
-	echo "  -v: verbose - produce various information about the resolution of db"
-	echo
-	echo "Report bugs to phabricator: https://phabricator.wikimedia.org"
-	exit 0
-fi
+exec_args = ['mysql']
 
-for i
-do
-	if [ "$i" = "-v" ] || [ "$i" = "--verbose" ]
-	then
-		verbose=1
-	fi
-done
+if os.path.isfile(os.path.expanduser('~/replica.my.cnf')):
+    exec_args += ['--defaults-file=' + os.path.expanduser('~/replica.my.cnf')]
+elif not(os.path.isfile(os.path.expanduser('~/.my.cnf'))):
+    exec_args += ['-p']
+    logging.warn('There is no configuration file for mysql to use, ' +
+                 'you will probably be unable to access the database')
 
-if [ ! -f ~/replica.my.cnf ] && [ ! -f ~/.my.cnf ]
-then
-	Log "WARNING: There is no configuration file for mysql to use, you will probably be unable to access the database"
-fi
+# These aliases have historically been supported; no new ones should
+# be added here.
+if args.dbname in ['commons', 'cs', 'de', 'en', 'fr', 'wikidata']:
+    server = args.dbname + 'wiki.labsdb'
+    db = args.dbname + 'wiki_p'
+elif args.dbname in ['meta', 'meta_p']:
+    # https://wikitech.wikimedia.org/wiki/Help:Tool_Labs/Database#Metadata_database;
+    # not to be confused with metawiki_p.
+    server = 's7.labsdb'
+    db = 'meta_p'
+elif args.dbname == 'local':
+    server = 'tools-db'
+    db = None
+else:
+    logging.debug('This database name is not hardcoded, ' +
+                  'falling back to DNS resolution')
+    if args.dbname.endswith('_p'):
+        db = args.dbname
+    else:
+        db = args.dbname + '_p'
+    server = db[:- len('_p')] + '.labsdb'
+    try:
+        socket.gethostbyname(server)
+        logging.debug('Resolved to %s %s', server, db)
+    except socket.gaierror:
+        errmsg = 'Could not find requested database'
+        if db != args.dbname:
+            errmsg += "\nMake sure to ask for a db in format of <wiki>_p"
+        sys.exit(errmsg)
 
-param=""
-# check if the user has a replica file
-if [ -f ~/replica.my.cnf ];then
-    param=" --defaults-file=~/replica.my.cnf"
-else
-    if [ ! -f ~/.my.cnf ];then
-        param=" -p"
-    fi
-fi
+logging.debug('Connecting to %s', server)
+exec_args += ['-h', server]
+if db:
+    exec_args += [db]
 
-server="enwiki.labsdb"
-db="enwiki_p"
+if args.sqlquery:
+    if len(args.sqlquery) > 1:
+        logging.warn('More than one argument given; ' +
+                     'joining SQL query words with spaces.')
+    exec_args += ['-e', ' '.join(args.sqlquery)]
 
-case "$1" in
-    "en" | "enwiki" | "enwiki_p")
-        server="enwiki.labsdb"
-        db="enwiki_p"
-    ;;
-    "de" | "dewiki" | "dewiki_p")
-        server="dewiki.labsdb"
-        db="dewiki_p"
-    ;;
-    "fr" | "frwiki" | "frwiki_p")
-        server="frwiki.labsdb"
-        db="frwiki_p"
-    ;;
-    "cs" | "cswiki" | "cswiki_p")
-        server="cswiki.labsdb"
-        db="cswiki_p"
-    ;;
-    "commons" | "commonswiki" | "commonswiki_p")
-        server="commonswiki.labsdb"
-        db="commonswiki_p"
-    ;;
-    "wikidata" | "wikidatawiki" | "wikidatawiki_p")
-        server="wikidatawiki.labsdb"
-        db="wikidatawiki_p"
-    ;;
-    "meta" | "meta_p")
-        # Not to confuse with metawiki[_p]
-        # https://wikitech.wikimedia.org/wiki/Nova_Resource:Tools/Help#Metadata_database
-        server="s7.labsdb"
-        db="meta_p"
-    ;;
-    "local")
-        server=tools-db
-        db=""
-        if [ -f ~/.my.cnf ];then
-	    param=""
-        fi
-   ;;
-   *)
-	# we don't know what the database is so we check if it exist first
-	Log "This database name is not known by sql script, fallback to dblist resolution"
-	db="${1%_p}_p"
-	server="${db%_p}.labsdb"
-	if getent hosts -- "$server" > /dev/null
-	then
-		Log "Resolved to $server $db"
-	else
-	        echo "Could not find requested database"
-                if [ "$db" != "$1" ]; then
-                    echo 'Make sure to ask for a db in format of <wiki>_p'
-                fi
-	        exit 1
-	fi
-   ;;
-esac
-
-shift
-Log "Connecting to $server"
-if [ $# -lt 1 ]; then
-  exec mysql $param -h $server $db "$@"
-else
-  echo "$@" | mysql $param -h $server $db
-fi
+os.execvp('mysql', exec_args)

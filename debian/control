@@ -15,7 +15,7 @@ X-Python-Version: >= 2.7
 Package: misctools
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}, ${python:Depends},
- mariadb-client-core-5.5, python, python-mysql.connector
+ mariadb-client-core-5.5, python, python3, python-mysql.connector
 Description: Miscellaneous Labs-specific tools
  Miscellaneous Labs-specific Tools used on Tool Labs
 

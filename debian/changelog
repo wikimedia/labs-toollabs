@@ -1,8 +1,9 @@
 toollabs (1.20~dev) trusty; urgency=medium
 
   * Package jmail
+  * Port sql to Python
 
- -- Tim Landscheidt <tim@tim-landscheidt.de>  Mon, 27 Feb 2017 17:50:41 +0000
+ -- Tim Landscheidt <tim@tim-landscheidt.de>  Tue, 28 Feb 2017 03:12:07 +0000
 
 toollabs (1.19) trusty; urgency=medium
 

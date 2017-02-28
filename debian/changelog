@@ -1,4 +1,4 @@
-toollabs (1.20~dev) trusty; urgency=medium
+toollabs (1.20) trusty; urgency=medium
 
   * Package jmail
   * Port sql to Python

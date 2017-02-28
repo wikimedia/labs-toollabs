@@ -1,4 +1,4 @@
-toollabs (1.20~precise+1~dev) precise; urgency=medium
+toollabs (1.20~precise+1) precise; urgency=medium
 
   * Package jmail
   * Port sql to Python

@@ -32,7 +32,7 @@ import textwrap
 import time
 
 
-AVAILABLE_RELEASES = ['precise', 'trusty']
+AVAILABLE_RELEASES = ['trusty']
 DEFAULT_RELEASE = 'trusty'
 
 
@@ -610,22 +610,13 @@ def main():
 
     if not args.release:
         args.release = DEFAULT_RELEASE
-        print('*' * 78, file=sys.stderr)
-        print(
-            'WARNING: No `-l release=...` argument provided.'
-            '\n\tDefault release has changed from precise to trusty!'
-            '\n\t'
-            'https://wikitech.wikimedia.org/wiki/Tools_Precise_deprecation',
-            file=sys.stderr)
-        print('*' * 78, file=sys.stderr)
     elif args.release == 'precise':
-        print('*' * 78, file=sys.stderr)
-        print(
-            'NOTICE: Precise hosts are being deprecated from Tool Labs'
+        # This may no longer be reachable, but it doesn't hurt anything to
+        # leave it here just in case.
+        die(
+            'ERROR: Precise hosts are deprecated from Tool Labs'
             '\n\t'
-            'https://wikitech.wikimedia.org/wiki/Tools_Precise_deprecation',
-            file=sys.stderr)
-        print('*' * 78, file=sys.stderr)
+            'https://wikitech.wikimedia.org/wiki/Tools_Precise_deprecation')
 
     # Build argument list for calling qsub
     qsub_args = args.qsub_args or []

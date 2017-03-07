@@ -36,7 +36,9 @@ AT_DATA([dummy.out], [$3])
 AT_DATA([dummy.err], [$4])
 AT_DATA([dummy.exitcode], [$5
 ])
-AT_CHECK([JOBUTILS_JSUBRC=jsubrc JOBUTILS_QSUB=dummy.sh jsub $1], [$10], [$8], [$7])
+AT_DATA([dummy.args], [])
+AT_DATA([dummy.in], [])
+AT_CHECK([JOBUTILS_JSUBRC=jsubrc JOBUTILS_QSUB=dummy.sh jsub $1], [$10], [$8], [$9])
 AT_CHECK_UNQUOTED([cat dummy.args], [0], [$6], [])
 AT_CHECK([cat dummy.in], [0], [$7], [])
 ])
@@ -175,14 +177,12 @@ AT_TOOLLABS_JSUB([-l largest wins (default)], [-l h_vmem=1m,virtual_free=1M true
 ], [], [0])
 
 # Test release
-AT_TOOLLABS_JSUB([-l release=precise], [-l release=precise true], [Your job 501377 ("true") has been submitted
-], [], [0], [-j no -e $HOME/true.err -o $HOME/true.out -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=524288k -l release=precise -q task -b yes /bin/true
-], [], [Your job 501377 ("true") has been submitted
-], [], [0])
-AT_TOOLLABS_JSUB([-release precise], [-release precise true], [Your job 501377 ("true") has been submitted
-], [], [0], [-j no -e $HOME/true.err -o $HOME/true.out -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=524288k -l release=precise -q task -b yes /bin/true
-], [], [Your job 501377 ("true") has been submitted
-], [], [0])
+AT_TOOLLABS_JSUB([-l release=precise fails], [-l release=precise true], [], [], [0], [], [], [], [usage: jsub [[options...]] program [[args...]]
+jsub: error: argument -l: invalid release=precise. Expected release=[[trusty]].
+], [2])
+AT_TOOLLABS_JSUB([-release precise fails], [-release precise true], [], [], [0], [], [], [], [usage: jsub [[options...]] program [[args...]]
+jsub: error: argument -release: invalid choice: 'precise' (choose from 'trusty')
+], [2])
 AT_TOOLLABS_JSUB([-l release=trusty], [-l release=trusty true], [Your job 501377 ("true") has been submitted
 ], [], [0], [-j no -e $HOME/true.err -o $HOME/true.out -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=524288k -l release=trusty -q task -b yes /bin/true
 ], [], [Your job 501377 ("true") has been submitted

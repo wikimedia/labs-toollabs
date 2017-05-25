@@ -22,7 +22,7 @@ list( $tool, $maintainers ) = getToolInfo( $uri );
 <p>That tool might not have a web interface, or it may currently be disabled.</p>
 <p>If you're pretty sure this shouldn't be an error, you may wish to notify the tool's maintainers (above) about the error and how you ended up here.</p>
 <h2>If you maintain this tool</h2>
-<p>You have not enabled a web service for your tool, or it has stopped working because of a fatal error. You may wish to check your logs or <a href="https://wikitech.wikimedia.org/wiki/Nova_Resource:Tools/Help#Logs">common causes for errors</a> in the help documentation.</p>
+<p>You have not enabled a web service for your tool, or it has stopped working because of a fatal error. Please check the error logs of your web service.</p>
 <?php
 } else {
 ?>

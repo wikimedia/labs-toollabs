@@ -22,7 +22,7 @@ list( $tool, $maintainers ) = getToolInfo( $uri );
 <p>Perhaps its magical script elves are temporarily ill, or the link you've followed doesn't actually lead somewhere useful?<p>
 <p>If you're pretty sure this shouldn't be an error, you may wish to notify the tool's maintainers (above) about the error and how you ended up here.</p>
 <h2>If you maintain this tool</h2>
-<p>The error might be caused by incorrect permission, or by an error in the script or CGI that was meant to execute here.  You may wish to check your logs or <a href="https://wikitech.wikimedia.org/wiki/Nova_Resource:Tools/Help#Logs">common causes for errors</a> in the help documentation.</p>
+<p>The error might be caused by incorrect permission, or by an error in the script or CGI that was meant to execute here. Please check the error logs for your web service.</p>
 <?php } else { ?>
 <p>Perhaps the webserver has temporarily lost its mind, or the link you've followed doesn't actually lead somewhere useful?</p>
 <p>If you're pretty sure this shouldn't be an error, you may wish to notify the <a href="/?tool=admin">project administrators</a> about the error and how you ended up here.</p>

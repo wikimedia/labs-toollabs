@@ -8,5 +8,5 @@ setuptools.setup(
     scripts=[
         'jobutils/bin/jsub',
     ],
-    description='Utilities for use on Wikimedia Tool Labs',
+    description='Utilities for use on Wikimedia Toolforge',
 )

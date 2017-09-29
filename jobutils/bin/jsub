@@ -1,10 +1,10 @@
-#!/usr/bin/python -Es
+#!/usr/bin/python3 -Es
 # -*- coding: utf-8 -*-
 #
 # Submit a job to the job grid.
 #
 # Copyright © 2013 Marc-André Pelletier <mpelletier@wikimedia.org>
-# Copyright © 2016 Wikimedia Foundation and contributors
+# Copyright © 2017 Wikimedia Foundation and contributors
 #
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -17,8 +17,6 @@
 # WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-
-from __future__ import print_function
 
 import argparse
 import copy
@@ -58,7 +56,7 @@ def argparse_memkb(val):
     """Parses an XXK, XXm, XXg to the # of kilobytes.
 
     >>> __name__ = 'doctest'
-    >>> execfile('jobutils/bin/jsub')
+    >>> exec(open('jobutils/bin/jsub').read())
     >>> argparse_memkb('1k')
     1
     >>> argparse_memkb('1M')
@@ -68,7 +66,7 @@ def argparse_memkb(val):
     >>> argparse_memkb('pizza') # doctest: +ELLIPSIS
     Traceback (most recent call last):
         ...
-    ArgumentTypeError: expected ... followed by 'k', 'm' or 'g'. 'pizza' given.
+    argparse.ArgumentTypeError: expected ... 'k', 'm' or 'g'. 'pizza' given.
     >>>
     """
     m = re.match(r'^(?P<digits>\d+)(?P<si>[kmg])(?i)$', val)
@@ -89,13 +87,13 @@ def argparse_octal(val):
     """Validate and convert an octal string value to an int.
 
     >>> __name__ = 'doctest'
-    >>> execfile('jobutils/bin/jsub')
+    >>> exec(open('jobutils/bin/jsub').read())
     >>> argparse_octal('0777')
     511
     >>> argparse_octal('9')
     Traceback (most recent call last):
         ...
-    ArgumentTypeError: expected an octal value. '9' given.
+    argparse.ArgumentTypeError: expected an octal value. '9' given.
     >>>
     """
     if not re.match(r'^[0-7]+$', val):
@@ -108,7 +106,7 @@ def argparse_email(val):
     """Validate a list of email addresses.
 
     >>> __name__ = 'doctest'
-    >>> execfile('jobutils/bin/jsub')
+    >>> exec(open('jobutils/bin/jsub').read())
     >>> argparse_email('example@example.com')
     'example@example.com'
     >>> argparse_email('example@example.com,another@example.org')
@@ -116,7 +114,7 @@ def argparse_email(val):
     >>> argparse_email('foo')
     Traceback (most recent call last):
         ...
-    ArgumentTypeError: expected list of email addresses. 'foo' given.
+    argparse.ArgumentTypeError: expected list of email addresses. 'foo' given.
     >>>
     """
     if not re.match(r'^[^@]+@[^,]+(,[^@]+@[^,]+)*$', val):
@@ -129,7 +127,7 @@ def argparse_qsub_bool(val):
     """Validate and coerce a qsub-style boolean value.
 
     >>> __name__ = 'doctest'
-    >>> execfile('jobutils/bin/jsub')
+    >>> exec(open('jobutils/bin/jsub').read())
     >>> argparse_qsub_bool('y')
     True
     >>> argparse_qsub_bool('yES')
@@ -141,7 +139,7 @@ def argparse_qsub_bool(val):
     >>> argparse_qsub_bool('foo')
     Traceback (most recent call last):
         ...
-    ArgumentTypeError: expected y[es]|n[o]. 'foo' given.
+    argparse.ArgumentTypeError: expected y[es]|n[o]. 'foo' given.
     >>>
     """
     if not re.match(r'^y(es)?|no?$', val.lower()):
@@ -154,7 +152,7 @@ def argparse_whence(prog):
     """Resolve the canonical path to a program.
 
     >>> __name__ = 'doctest'
-    >>> execfile('jobutils/bin/jsub')
+    >>> exec(open('jobutils/bin/jsub').read())
     >>> argparse_whence('/usr/bin/env')
     '/usr/bin/env'
     >>> argparse_whence('env')
@@ -162,7 +160,7 @@ def argparse_whence(prog):
     >>> argparse_whence('jsub.notfound')
     Traceback (most recent call last):
         ...
-    ArgumentTypeError: Program 'jsub.notfound' not found.
+    argparse.ArgumentTypeError: Program 'jsub.notfound' not found.
     >>>
     """
     # Already a full path?
@@ -276,7 +274,7 @@ def touch(path, umask):
         old_mask = os.umask(umask)
         try:
             open(path, 'a').close()
-        except IOError, e:
+        except IOError as e:
             die("Failed to touch '%s': %s" % (path, e))
         finally:
             os.umask(old_mask)
@@ -286,7 +284,7 @@ def is_running(name):
     """Check status of a named job."""
     try:
         running = subprocess.call(['/usr/bin/job', '-q', name])
-    except OSError, e:
+    except OSError as e:
         die('unable to get job status: e' % e)
     else:
         return running != 0
@@ -430,7 +428,7 @@ def build_jsub_argparser():
         help='Send errors to stderr rather than the error output file.')
     parser.add_argument(
         '-umask', type=argparse_octal,
-        default=0007 if os.geteuid() > 50000 else 0077,
+        default=0o0007 if os.geteuid() > 50000 else 0o0077,
         help="Set umask for output files if they don't exist")
     parser.add_argument(
         '-release', choices=AVAILABLE_RELEASES, action='store', metavar='OS',
@@ -497,7 +495,7 @@ def parse_jsubrc():
                     args.extend(g for g in m.groups() if g is not None)
         try:
             return parse_arglist(args)
-        except ValueError, e:
+        except ValueError as e:
             die("Error parsing %s: %s" % (jsubrc, e))
     else:
         return None
@@ -529,14 +527,14 @@ def parse_script_comments(namespace):
     """
     pat = re.compile(r'\s*(?P<opt>-[a-zA-Z]+)(?:\s+(?P<arg>[^#\s]+))?')
     args = []
-    with open(namespace.program, 'r') as fh:
+    with open(namespace.program, 'r', encoding='latin1') as fh:
         for line in read_script_comments(fh):
             m = pat.match(line)
             if m:
                 args.extend(g for g in m.groups() if g is not None)
     try:
         return parse_arglist(args=args, namespace=namespace)
-    except ValueError, e:
+    except ValueError as e:
         die("Error options embedded in %s: %s" % (namespace.program, e))
     return namespace
 
@@ -599,7 +597,7 @@ def main():
     if not args.stderr and not os.path.isdir(args.log_err):
         try:
             sys.stderr = open(args.log_err, 'a')
-        except IOError, e:
+        except IOError as e:
             die("Failed to redirect STDERR to '%s': %s" % (args.log_err, e))
 
     if not os.access(args.program, os.X_OK):
@@ -661,13 +659,13 @@ def main():
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
-    except OSError, e:
+    except OSError as e:
         die("Failed to execute '%s': %s" % (' '.join(qsub), e))
     else:
         (out, err) = proc.communicate(qsub_stdin)
         if not args.quiet or proc.returncode != 0:
-            sys.stdout.write(out)
-            sys.stderr.write(err)
+            sys.stdout.buffer.write(out)
+            sys.stderr.buffer.write(err)
         sys.exit(proc.returncode)
 
 

@@ -21,7 +21,7 @@ export DEB_BUILD_OPTIONS=noddebs
 
 
 %:
-	dh $@ --with autoreconf --with bash-completion --with python2
+	dh $@ --with autoreconf,bash-completion,python3
 
 # Make take setuid.
 override_dh_fixperms:

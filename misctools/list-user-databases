@@ -1,63 +1,96 @@
-#!/usr/bin/python
+#!/usr/bin/python3 -Es
+# -*- coding: UTF-8 -*-
+#
+#  Copyright © 2013 Marc-André Pelletier <mpelletier@wikimedia.org>
+#  Copyright © 2017 Wikimedia Foundation and contributors
+#
+#  Permission to use, copy, modify, and/or distribute this software for any
+#  purpose with or without fee is hereby granted, provided that the above
+#  copyright notice and this permission notice appear in all copies.
+#
+#  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+#  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+#  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+#  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+#  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+#  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+#  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-import ConfigParser
 import argparse
-import os
+import configparser
 import re
 
 import mysql.connector
 
-if __name__ == '__main__':
-    # Get list of defaults files to extract user information from.
-    parser = argparse.ArgumentParser(description='List databases owned by users, given by the credentials files.')
-    parser.add_argument('-H', '--host',
-                        action='append',
-                        required=True,
-                        help='database hosts to check')
-    parser.add_argument('mycnffilenames',
-                        metavar='MYCNFFILENAME',
-                        nargs='+',
-                        help='name of MySQL defaults file')
-    args = parser.parse_args()
+GRANT_REPLICA = "GRANT SELECT, SHOW VIEW ON `%\\_p`.* TO '{}'@'%'"
+GRANT_ANY_RE = (
+    "^GRANT (SELECT, )?SHOW VIEW ON \*\.\* TO '{}'@'%'"
+    "(?: IDENTIFIED BY PASSWORD '\*[0-9A-F]{{40}}')?$"
+)
+GRANT_ALL_RE = (
+    "^GRANT ALL PRIVILEGES ON `([^`]+)`\.\* TO '{}'@'%'"
+    "(?: WITH GRANT OPTION)?$"
+)
 
-    for mycnffilename in args.mycnffilenames:
-        c = ConfigParser.ConfigParser()
-        c.read(mycnffilename)
-        username = c.get('client', 'user').strip("'")
-        password = c.get('client', 'password').strip("'")
-        databases_found = []
-        for server in args.host:
-            conn = mysql.connector.connect(user=username,
-                                           password=password,
-                                           host=server,
-                                           database='mysql')
-            cur = conn.cursor()
-            cur.execute('SHOW GRANTS')
-            database_patterns = []
-            for (grantstatement, ) in cur.fetchall():
-                # Ignore general grants for replica views.
-                if grantstatement == 'GRANT SELECT, SHOW VIEW ON `%%\\_p`.* TO \'%s\'@\'%%\'' % username:
-                    continue
-                if re.match('^GRANT SHOW VIEW ON \*\.\* TO \'%s\'@\'%%\'(?: IDENTIFIED BY PASSWORD \'\*[0-9A-F]{40}\')?$' % re.escape(username), grantstatement):
-                    continue
+# Get list of defaults files to extract user information from.
+parser = argparse.ArgumentParser(
+    description=(
+        'List databases owned by users, '
+        'given by the credentials files.')
+)
+parser.add_argument(
+    '-H', '--host',
+    action='append',
+    required=True,
+    help='database hosts to check')
+parser.add_argument(
+    'mycnffilenames',
+    metavar='MYCNFFILENAME',
+    nargs='+',
+    help='name of MySQL defaults file')
+args = parser.parse_args()
 
-                # Gather grants for user-specific databases.
-                m = re.match('^GRANT ALL PRIVILEGES ON `([^`]+)`\.\* TO \'%s\'@\'%%\'(?: WITH GRANT OPTION)?$' % re.escape(username), grantstatement)
-                if m:
-                    database_patterns.append(m.group(1))
-                else:
-                    raise Exception('Cannot parse ' + repr(grantstatement))
+for mycnffilename in args.mycnffilenames:
+    c = configparser.ConfigParser()
+    c.read(mycnffilename)
+    dbuser = c['client']['user'].strip("'")
+    dbpass = c['client']['password'].strip("'")
+    databases_found = []
+    for server in args.host:
+        conn = mysql.connector.connect(
+            database='mysql',
+            host=server,
+            user=dbuser,
+            password=dbpass,
+            charset='utf8mb4')
+        cur = conn.cursor()
+        cur.execute('SHOW GRANTS')
+        database_patterns = []
+        for (stmt, ) in cur.fetchall():
+            # Ignore general grants for replica views.
+            if stmt == GRANT_REPLICA.format(dbuser):
+                continue
+            if re.match(GRANT_ANY_RE.format(re.escape(dbuser)), stmt):
+                continue
 
-            for database_pattern in database_patterns:
-                cur.execute('SHOW DATABASES LIKE %s', (database_pattern, ))
-                for r in cur.fetchall():
-                    databases_found.append([server, r[0]])
+            # Gather grants for user-specific databases.
+            m = re.match(GRANT_ALL_RE.format(re.escape(dbuser)), stmt)
+            if m:
+                database_patterns.append(m.group(1))
+            else:
+                raise Exception('Cannot parse ' + repr(stmt))
 
-            conn.close()
+        for database_pattern in database_patterns:
+            cur.execute('SHOW DATABASES LIKE %s', (database_pattern, ))
+            for r in cur.fetchall():
+                databases_found.append([server, r[0]])
 
-        if databases_found:
-            print('Databases found for user %s ...' % username)
-            for database_found in databases_found:
-                print('... on server %s database %s' % (database_found[0], database_found[1]))
-        else:
-            print('No databases found for user %s' % username)
+        conn.close()
+
+    if databases_found:
+        print('Databases found for user {} ...'.format(dbuser))
+        for database_found in databases_found:
+            print('... on server {} database {}'.format(
+                database_found[0], database_found[1]))
+    else:
+        print('No databases found for user {}'.format(dbuser))

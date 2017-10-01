@@ -1,11 +1,17 @@
 toollabs (1.23) unstable; urgency=medium
 
-  * Port crontab from operations/puppet.git and rewrite in Python3
+  * crontab: Port from operations/puppet.git and rewrite in Python3
     [YiFei Zhu, Bryan Davis]
+  * job: Rewrite in Python3 [Bryan Davis]
+  * jsub: Port to Python3 [Bryan Davis]
+  * list-user-databases: Port to Python3 [Bryan Davis]
+  * various: Update branding for Toolforge renaming
+  * debian/compat: Bump for version 9
+  * debian/control: Remove obsolete build and runtime dependecies
   * debian/rules: Added DEB_BUILD_OPTIONS=noddebs to avoid automatic
     generation of debug package. [Bryan Davis]
 
- -- Bryan Davis <bd808@wikimedia.org>  Thu, 28 Sep 2017 04:06:04 +0000
+ -- Bryan Davis <bd808@wikimedia.org>  Sun, 01 Oct 2017 04:50:49 +0000
 
 toollabs (1.22) trusty; urgency=medium
 

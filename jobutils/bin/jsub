@@ -601,7 +601,7 @@ def main():
         # This may no longer be reachable, but it doesn't hurt anything to
         # leave it here just in case.
         die(
-            'ERROR: Precise hosts are deprecated from Tool Labs'
+            'ERROR: Precise hosts are deprecated from Toolforge'
             '\n\t'
             'https://wikitech.wikimedia.org/wiki/Tools_Precise_deprecation')
 

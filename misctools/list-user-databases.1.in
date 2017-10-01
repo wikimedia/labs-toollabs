@@ -1,4 +1,4 @@
-.TH LIST-USER-DATABASES 1 @TOOLLABS_RELEASEDATE@ @PACKAGE_VERSION@ "Wikimedia Labs Tools misctools"
+.TH LIST-USER-DATABASES 1 @TOOLLABS_RELEASEDATE@ @PACKAGE_VERSION@ "Wikimedia Toolforge misctools"
 .SH NAME
 list-user-databases \- list databases a MySQL account has access to
 .SH SYNOPSIS
@@ -22,7 +22,7 @@ from
 .IR operation/puppet 's
 .IR modules/role/manifests/labs/db/maintain_dbusers.pp .
 Note that some of the database servers listed there are not accessible
-from Labs and connection attempts will time out.
+from Toolforge and connection attempts will time out.
 .SH EXIT STATUS
 In case of success,
 .B list-user-databases

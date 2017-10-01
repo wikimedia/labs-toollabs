@@ -195,7 +195,7 @@ int main(int argc, char** argv)
                 return 0;
 
             case 'V':
-                puts("take (Wikimedia Labs Tools misctools) " PACKAGE_VERSION "\n"                         \
+                puts("take (Wikimedia Toolforge misctools) " PACKAGE_VERSION "\n"                         \
                      "Copyright (C) 2013 Marc-André Pelletier\n"                                           \
                      "License ISC: <https://www.isc.org/downloads/software-support-policy/isc-license/>\n" \
                      "This is free software: you are free to change and redistribute it.\n"                \

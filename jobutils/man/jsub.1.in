@@ -2,7 +2,7 @@
 .\" Licensed under CC-BY-SA
 .\" Created by Marc-André Pelletier
 .\"
-.TH JSUB 1 @TOOLLABS_RELEASEDATE@ @PACKAGE_VERSION@ "Wikimedia Labs Tools jobutils"
+.TH JSUB 1 @TOOLLABS_RELEASEDATE@ @PACKAGE_VERSION@ "Wikimedia Toolforge jobutils"
 .SH NAME
 jsub, jstart, qcronsub \- submit jobs to the grid
 .SH SYNOPSIS

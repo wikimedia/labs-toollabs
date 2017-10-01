@@ -1,4 +1,4 @@
-.TH SQL 1 @TOOLLABS_RELEASEDATE@ @PACKAGE_VERSION@ "Wikimedia Labs Tools misctools"
+.TH SQL 1 @TOOLLABS_RELEASEDATE@ @PACKAGE_VERSION@ "Wikimedia Toolforge misctools"
 .SH NAME
 sql \- connect to database or execute SQL command
 .SH SYNOPSIS
@@ -32,7 +32,7 @@ server.
 not to be confused with
 .IR metawiki_p ,
 refers to the database that contains meta information about Wikimedia wikis (cf.
-.RB < https://wikitech.wikimedia.org/wiki/Help:Tool_Labs/Database#Metadata_database >).
+.RB < https://wikitech.wikimedia.org/wiki/Help:Toolforge/Database#Metadata_database >).
 .SH EXIT STATUS
 .B sql
 returns the exit status of the spawned

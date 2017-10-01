@@ -1,4 +1,4 @@
-.TH JMAIL 1 @TOOLLABS_RELEASEDATE@ @PACKAGE_VERSION@ "Wikimedia Labs Tools jobutils"
+.TH JMAIL 1 @TOOLLABS_RELEASEDATE@ @PACKAGE_VERSION@ "Wikimedia Toolforge jobutils"
 .SH NAME
 jmail \- execute program synchronously on the grid
 .SH SYNOPSIS
@@ -9,7 +9,7 @@ jmail \- execute program synchronously on the grid
 .B jmail
 is used in
 .B .forward
-files to execute a program synchronously on the grid.  In Tool Labs it
+files to execute a program synchronously on the grid.  In Toolforge it
 is the only command allowed in
 .B .forward
 files.

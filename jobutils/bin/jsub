@@ -539,19 +539,8 @@ def parse_script_comments(namespace):
     return namespace
 
 
-def running_as_test():
-    """Are we being tested?"""
-    return 'JOBUTILS_QSUB' in os.environ
-
-
 def main():
     """Submit a job to the job grid."""
-    if not running_as_test():
-        # Log this command invocation to EventLogging
-        subprocess.call([
-            '/usr/local/bin/log-command-invocation',
-            'jsub', ' '.join(sys.argv)])
-
     # Gather default arguments from ~/.jsubrc
     args = parse_jsubrc()
     # Parse command line options

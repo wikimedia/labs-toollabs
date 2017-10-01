@@ -15,9 +15,6 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #
 
-# Log this command invocation to EventLogging
-/usr/local/bin/log-command-invocation 'jstop' "$0 $@"
-
 id=$(/usr/bin/job "$1")
 if [ $? != 0 ]; then
   qdel $id

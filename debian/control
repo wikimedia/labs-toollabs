@@ -6,7 +6,7 @@ Uploaders: Petr Bena <benapetr@gmail.com>,
  Carl Fürstenberg <azatoth@gmail.com>,
  Tim Landscheidt <tim@tim-landscheidt.de>,
  Yuvi Panda <yuvipanda@gmail.com>
-Build-Depends: debhelper (>= 8.0.0), dh-autoreconf, libipc-run-perl, libstring-shellquote-perl, bash-completion, python, python3, python-setuptools
+Build-Depends: debhelper (>= 8.0.0), dh-autoreconf, bash-completion, python, python3, python-setuptools
 Standards-Version: 3.9.5
 Vcs-Git: https://gerrit.wikimedia.org/r/labs/toollabs
 Vcs-Browser: https://git.wikimedia.org/summary/labs%2Ftoollabs
@@ -21,9 +21,8 @@ Description: Miscellaneous Labs-specific tools
 
 Package: jobutils
 Architecture: all
-Depends: ${misc:Depends}, ${perl:Depends}, ${python3:Depends},
- gridengine-client, libipc-run-perl, libstring-shellquote-perl,
- python3
+Depends: ${misc:Depends}, ${python3:Depends},
+ gridengine-client, python3
 Description: Set of utilities to use on wikimedia bots and tools cluster
  This package will install jstart (jsub) and jstop, the Tool Labs (more)
  user-friendly wrappers to submit jobs to the gridengine

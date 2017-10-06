@@ -636,7 +636,7 @@ def main():
                 'job': ' '.join(pipes.quote(arg) for arg in job),
                 'ts': '`date +%Y-%d-%mT%H:%M`',
                 'prog': args.program,
-            })
+            }).encode('latin1')
     else:
         qsub_args.extend(job)
 

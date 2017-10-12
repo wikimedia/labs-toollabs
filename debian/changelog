@@ -1,3 +1,9 @@
+toollabs (1.26) unstable; urgency=medium
+
+  * crontab: make tempfile use utf-8 encoding
+
+ -- YiFei Zhu <zhuyifei1999@gmail.com>  Thu, 12 Oct 2017 04:51:04 +0000
+
 toollabs (1.25) unstable; urgency=medium
 
   * jstart: fix python3 encoding issue

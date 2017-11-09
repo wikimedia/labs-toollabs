@@ -9,7 +9,7 @@ Uploaders: Petr Bena <benapetr@gmail.com>,
 Build-Depends: debhelper (>= 8.0.0), dh-autoreconf, bash-completion, python, python3, python-setuptools
 Standards-Version: 3.9.5
 Vcs-Git: https://gerrit.wikimedia.org/r/labs/toollabs
-Vcs-Browser: https://git.wikimedia.org/summary/labs%2Ftoollabs
+Vcs-Browser: https://phabricator.wikimedia.org/source/toollabs/
 X-Python3-Version: >= 3.4
 
 Package: misctools

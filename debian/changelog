@@ -1,3 +1,9 @@
+toollabs (1.2y) unstable; urgency=medium
+
+  * crontab: convert to mostly binary processing, and use surrogates for text
+
+ -- YiFei Zhu <zhuyifei1999@gmail.com>  Mon, 4 Dec 2017 07:34:32 +0000
+
 toollabs (1.26) unstable; urgency=medium
 
   * crontab: make tempfile use utf-8 encoding

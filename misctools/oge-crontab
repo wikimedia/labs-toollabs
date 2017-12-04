@@ -36,7 +36,7 @@ NOTE: some crontab entries have been modified to grid submissions.
 '''
 
 
-DEFAULT_CRONTAB = '''\
+DEFAULT_CRONTAB = b'''\
 # Edit this file to introduce tasks to be run by cron.
 #
 # Each task to run has to be defined through a single line
@@ -88,16 +88,15 @@ class Crontab(object):
             cmd,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            universal_newlines=True)  # kwarg encoding was added in py3.6
+            stderr=subprocess.PIPE)
 
         stdoutdata, stderrdata = ssh.communicate(input=stdin)
 
         if ssh.returncode:
-            if stderrdata.lower().startswith('no crontab for '):
+            if stderrdata.lower().startswith(b'no crontab for '):
                 raise NoCrontab
             else:
-                print(stderrdata, end='', file=sys.stderr)
+                sys.stderr.buffer.write(stderrdata)
                 err('unable to execute remote crontab command')
                 sys.exit(ssh.returncode)
 
@@ -105,7 +104,15 @@ class Crontab(object):
 
     def _add_jsub(self, text):
         """Wrapper for the add_jsub function."""
-        text = text.split('\n')
+        # We don't really want to force utf-8 on our client, and prefer to
+        # keep processing in binary data. However all the text processing here
+        # must be executed on text, not binary, data, and surrogates is one of
+        # the only ways to not lose information. Similar methods is also used
+        # by python internally such as sys.args when non-ascii data is provided
+        # with non-utf8 locale. In most cases, such as with utf8, any non-ascii
+        # character will be escaped, and all the text-processing code will work
+        # fine, but this is not guaranteed to be true for all codecs.
+        text = text.decode('ascii', 'surrogateescape').split('\n')
         for lineno, line in enumerate(text):
             newline = add_jsub(line, 'cron-{}'.format(lineno))
             if newline is not None:
@@ -114,7 +121,7 @@ class Crontab(object):
         text = '\n'.join(text)
         # Make sure there is one and only one line feed at the end
         text = text.rstrip('\n') + '\n'
-        return text
+        return text.encode('ascii', 'surrogateescape')
 
     def load(self):
         return self._remote('-l')
@@ -205,7 +212,7 @@ def add_jsub(line, jobname='cronjob'):
 
 def editor(text):
     """Open an editor with the given content and return results."""
-    with tempfile.NamedTemporaryFile('w+t', encoding='utf-8') as f:
+    with tempfile.NamedTemporaryFile('w+b') as f:
         f.write(text)
         f.flush()
 
@@ -225,7 +232,8 @@ def main():
     parser.add_argument('-u', dest='user', help=argparse.SUPPRESS)
     group = parser.add_mutually_exclusive_group()
     group.add_argument(
-        'file', default=sys.stdin, nargs='?', type=argparse.FileType('r'),
+        'file', default=sys.stdin.buffer, nargs='?',
+        type=argparse.FileType('rb'),
         help='replace crontab with file (default)')
     subgroup = group.add_mutually_exclusive_group()
     subgroup.add_argument(
@@ -294,7 +302,7 @@ def main():
         elif args.operation == 'l':
             # List
             try:
-                print(crontab.load(), end='')  # crontab already has lf
+                sys.stdout.buffer.write(crontab.load())
             except NoCrontab:
                 print(
                     'no crontab for {}'.format(pw.pw_name), file=sys.stderr)

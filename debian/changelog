@@ -1,8 +1,9 @@
-toollabs (1.2y) unstable; urgency=medium
+toollabs (1.27) unstable; urgency=medium
 
+  [ YiFei Zhu]
   * crontab: convert to mostly binary processing, and use surrogates for text
 
- -- YiFei Zhu <zhuyifei1999@gmail.com>  Mon, 4 Dec 2017 07:34:32 +0000
+ -- Arturo Borrero Gonzalez <aborrero@wikimedia.org>  Fri, 19 Jan 2018 17:55:00 +0200
 
 toollabs (1.26) unstable; urgency=medium
 

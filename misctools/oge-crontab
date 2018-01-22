@@ -251,6 +251,10 @@ def main():
 
     args = parser.parse_args()
 
+    # https://bugs.python.org/issue14156
+    if args.file is sys.stdin:
+        args.file = args.file.buffer
+
     if args.i and args.operation != 'r':
         parser.error('argument -i: only applicable with -r')
 

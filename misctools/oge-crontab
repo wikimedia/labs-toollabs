@@ -74,15 +74,12 @@ class NoCrontab(Exception):
 
 
 class Crontab(object):
-    def __init__(self, pw, cron_host):
-        self.pw = pw
+    def __init__(self, cron_host):
         self.cron_host = cron_host
 
     def _remote(self, *args, stdin=None):
         """Execute remote crontab command and return stdout."""
         cmd = ['/usr/bin/ssh', self.cron_host, '/usr/bin/crontab'] + list(args)
-        if self.pw.pw_uid != os.getuid():
-            cmd += ['-u', self.pw.pw_name]
 
         ssh = subprocess.Popen(
             cmd,
@@ -228,8 +225,18 @@ def err(message):
 
 
 def main():
+    # This part has to come first. Puppet calls crontab with `-u` which
+    # would be an unrecognized parameter. T179386
+    pw = pwd.getpwuid(os.getuid())
+    if pw.pw_uid < 500:
+        # If the target user is not managed in LDAP and thus likely
+        # a system user, invoke the original crontab instead.
+        os.execv('/usr/bin/crontab', sys.argv)
+    elif pw.pw_uid < 40000:
+        err('only tools are allowed crontabs')
+        sys.exit(1)
+
     parser = argparse.ArgumentParser()
-    parser.add_argument('-u', dest='user', help=argparse.SUPPRESS)
     group = parser.add_mutually_exclusive_group()
     group.add_argument(
         'file', default=sys.stdin.buffer, nargs='?',
@@ -258,30 +265,11 @@ def main():
     if args.i and args.operation != 'r':
         parser.error('argument -i: only applicable with -r')
 
-    if args.user:
-        if os.getuid():
-            parser.error('argument -u: must be privileged')
-        try:
-            pw = pwd.getpwnam(args.user)
-        except KeyError:
-            parser.error('argument -u: unknown user "{}"'.format(args.user))
-    else:
-        pw = pwd.getpwuid(os.getuid())
-
-    if pw.pw_uid < 500:
-        # If the target user is not managed in LDAP and thus likely
-        # a system user, invoke the original crontab instead.
-        os.execv('/usr/bin/crontab', sys.argv)
-
-    if pw.pw_uid < 40000 and os.getuid():
-        err('only tools are allowed crontabs')
-        sys.exit(1)
-
     with open('/etc/toollabs-cronhost', 'r') as f:
         cron_host = f.read().strip()
 
     try:
-        crontab = Crontab(pw, cron_host)
+        crontab = Crontab(cron_host)
 
         if args.operation is None:
             # Replace

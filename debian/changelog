@@ -1,3 +1,9 @@
+toollabs (1.29) unstable; urgency=medium
+
+  * crontab: Remove -u parameter, and make uid < 500 always edit local
+
+ -- YiFei Zhu <zhuyifei1999@gmail.com>  Tue, 23 Jan 2018 02:10:57 +0000
+
 toollabs (1.28) unstable; urgency=medium
 
   * crontab: Make the input file is binary when it is sys.stdin

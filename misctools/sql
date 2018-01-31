@@ -47,8 +47,8 @@ parser.add_argument(
     '-v', '--verbose', action='count', default=0, dest='loglevel',
     help='increase logging verbosity')
 parser.add_argument(
-    '--cluster', default='labsdb',
-    choices=['analytics', 'web', 'labsdb'],
+    '--cluster', default='analytics',
+    choices=['analytics', 'web'],
     help='cluster to connect to')
 parser.add_argument(
     'dbname', metavar='DATABASE',
@@ -64,10 +64,7 @@ logging.basicConfig(
     format='%(message)s',
     level=max(logging.DEBUG, logging.WARNING - (10 * args.loglevel)))
 
-if args.cluster == 'labsdb':
-    domain = 'labsdb'
-else:
-    domain = '{}.db.svc.eqiad.wmflabs'.format(args.cluster)
+domain = '{}.db.svc.eqiad.wmflabs'.format(args.cluster)
 
 exec_args = ['mysql']
 

@@ -1,3 +1,9 @@
+toollabs (1.31) unstable; urgency=medium
+
+  * sql: Add support for -N/--skip-column-names [MZMcBride]
+
+ -- YiFei Zhu <zhuyifei1999@gmail.com>  Mon, 12 Mar 2018 03:59:43 +0000
+
 toollabs (1.30) unstable; urgency=medium
 
   * sql: Set default cluster to 'analytics' and add bash completion

@@ -17,7 +17,7 @@ complete -F _become become
 _sql() {
   local cur="${COMP_WORDS[COMP_CWORD]}"
   local prev="${COMP_WORDS[COMP_CWORD-1]}"
-  local opts="--cluster"  # --verbose is rarely used
+  local opts="--cluster --skip-column-names"  # --verbose is rarely used
   COMPREPLY=()
 
   if [[ ${cur} == -* ]]; then
@@ -35,7 +35,7 @@ _sql() {
       # suggesting 'toolsdb' and 'tools-db' are still options.
       local -a DBS=(
         meta local tools
-        $(/usr/bin/sql --cluster web meta_p 'SELECT dbname AS "" FROM wiki WHERE is_closed = 0;' | /bin/sed '/^$/d')
+        $(/usr/bin/sql -N --cluster web meta_p 'SELECT dbname FROM wiki WHERE is_closed = 0;')
       )
       if [[ $COMP_CWORD -gt 1 && -n $(/usr/bin/comm -12 \
         <(printf '%s\n' "${COMP_WORDS[@]}" | /usr/bin/sort -u | /bin/sed 's/_p$//') \

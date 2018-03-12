@@ -47,6 +47,9 @@ parser.add_argument(
     '-v', '--verbose', action='count', default=0, dest='loglevel',
     help='increase logging verbosity')
 parser.add_argument(
+    '-N', '--skip-column-names', default=None,
+    action='store_true', help='do not write column names in results')
+parser.add_argument(
     '--cluster', default='analytics',
     choices=['analytics', 'web'],
     help='cluster to connect to')
@@ -76,6 +79,9 @@ elif not os.path.isfile(os.path.expanduser('~/.my.cnf')):
     logger.warn(
         'There is no configuration file for mysql to use, ' +
         'you will probably be unable to access the database')
+
+if args.skip_column_names:
+    exec_args.append('-N')
 
 db = ALIASES.get(args.dbname, args.dbname)
 

@@ -1,3 +1,9 @@
+toollabs (1.32) unstable; urgency=medium
+
+  * Add basic Debian stretch support.
+
+ -- Arturo Borrero Gonzalez <aborrero@wikimedia.org>  Thu, 08 Nov 2018 18:50:00 +0200
+
 toollabs (1.31) unstable; urgency=medium
 
   * sql: Add support for -N/--skip-column-names [MZMcBride]

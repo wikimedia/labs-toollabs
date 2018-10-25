@@ -62,17 +62,17 @@ AT_CLEANUP()
 # These tests will create two files (true.err and true.out) in the
 # home directory of the calling user.
 AT_TOOLLABS_JSUB([Normal call], [true], [Your job 501377 ("true") has been submitted
-], [], [0], [-j no -e $HOME/true.err -o $HOME/true.out -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=524288k -l release=trusty -q task -b yes /bin/true
+], [], [0], [-j no -e $HOME/true.err -o $HOME/true.out -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=524288k -l release=stretch -q task -b yes /bin/true
 ], [], [Your job 501377 ("true") has been submitted
 ], [], [0])
 AT_TOOLLABS_JSUB([Quiet call], [-quiet true], [Your job 501377 ("true") has been submitted
-], [], [0], [-j no -e $HOME/true.err -o $HOME/true.out -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=524288k -l release=trusty -q task -b yes /bin/true
+], [], [0], [-j no -e $HOME/true.err -o $HOME/true.out -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=524288k -l release=stretch -q task -b yes /bin/true
 ], [], [], [], [0])
 
 # Test that umasks are handled properly.
 AT_SETUP([-o points to a non-existing file])
 _AT_TOOLLABS_JSUB([-o does-not-exist.log -quiet true], [], [Your job 501377 ("true") has been submitted
-], [], [0], [-j no -e $HOME/true.err -o does-not-exist.log -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=524288k -l release=trusty -q task -b yes /bin/true
+], [], [0], [-j no -e $HOME/true.err -o does-not-exist.log -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=524288k -l release=stretch -q task -b yes /bin/true
 ], [], [], [], [0])
 AT_CHECK([stat -c %a does-not-exist.log], [0], [600
 ], [])
@@ -82,7 +82,7 @@ AT_SETUP([-o points to a existing file])
 AT_CHECK([touch does-exist.log], [0], [], [])
 AT_CHECK([chmod 664 does-exist.log], [0], [], [])
 _AT_TOOLLABS_JSUB([-o does-exist.log -quiet true], [], [Your job 501377 ("true") has been submitted
-], [], [0], [-j no -e $HOME/true.err -o does-exist.log -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=524288k -l release=trusty -q task -b yes /bin/true
+], [], [0], [-j no -e $HOME/true.err -o does-exist.log -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=524288k -l release=stretch -q task -b yes /bin/true
 ], [], [], [], [0])
 AT_CHECK([stat -c %a does-exist.log], [0], [664
 ], [])
@@ -90,7 +90,7 @@ AT_CLEANUP()
 
 AT_SETUP([-o points to a non-existing file and -umask is used])
 _AT_TOOLLABS_JSUB([-o does-not-exist.log -quiet -umask 000 true], [], [Your job 501377 ("true") has been submitted
-], [], [0], [-j no -e $HOME/true.err -o does-not-exist.log -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=524288k -l release=trusty -q task -b yes /bin/true
+], [], [0], [-j no -e $HOME/true.err -o does-not-exist.log -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=524288k -l release=stretch -q task -b yes /bin/true
 ], [], [], [], [0])
 AT_CHECK([stat -c %a does-not-exist.log], [0], [666
 ], [])
@@ -100,7 +100,7 @@ AT_SETUP([-o points to a existing file and -umask is used])
 AT_CHECK([touch does-exist.log], [0], [], [])
 AT_CHECK([chmod 664 does-exist.log], [0], [], [])
 _AT_TOOLLABS_JSUB([-o does-exist.log -quiet -umask 000 true], [], [Your job 501377 ("true") has been submitted
-], [], [0], [-j no -e $HOME/true.err -o does-exist.log -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=524288k -l release=trusty -q task -b yes /bin/true
+], [], [0], [-j no -e $HOME/true.err -o does-exist.log -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=524288k -l release=stretch -q task -b yes /bin/true
 ], [], [], [], [0])
 AT_CHECK([stat -c %a does-exist.log], [0], [664
 ], [])
@@ -109,7 +109,7 @@ AT_CLEANUP()
 AT_SETUP([-o points to a existing directory])
 AT_CHECK([mkdir does-exist], [0], [], [])
 _AT_TOOLLABS_JSUB([-o does-exist -quiet true], [], [Your job 501377 ("true") has been submitted
-], [], [0], [-j no -e $HOME/true.err -o does-exist -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=524288k -l release=trusty -q task -b yes /bin/true
+], [], [0], [-j no -e $HOME/true.err -o does-exist -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=524288k -l release=stretch -q task -b yes /bin/true
 ], [], [], [], [0])
 AT_CHECK([find does-exist -mindepth 1], [0], [], [])
 AT_CLEANUP()
@@ -121,7 +121,7 @@ _AT_TOOLLABS_JSUB([true], [-o does-exist.log
 -quiet
 -umask 000
 ], [Your job 501377 ("true") has been submitted
-], [], [0], [-j no -e $HOME/true.err -o does-exist.log -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=524288k -l release=trusty -q task -b yes /bin/true
+], [], [0], [-j no -e $HOME/true.err -o does-exist.log -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=524288k -l release=stretch -q task -b yes /bin/true
 ], [], [], [], [0])
 AT_CHECK([stat -c %a does-exist.log], [0], [664
 ], [])
@@ -134,7 +134,7 @@ _AT_TOOLLABS_JSUB([-o does-exist.log true], [-o some-name-other-than-exist.log
 -quiet
 -umask 000
 ], [Your job 501377 ("true") has been submitted
-], [], [0], [-j no -e $HOME/true.err -o does-exist.log -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=524288k -l release=trusty -q task -b yes /bin/true
+], [], [0], [-j no -e $HOME/true.err -o does-exist.log -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=524288k -l release=stretch -q task -b yes /bin/true
 ], [], [], [], [0])
 AT_CHECK([stat -c %a does-exist.log], [0], [664
 ], [])
@@ -142,38 +142,38 @@ AT_CLEANUP()
 
 # Test -l arg handling
 AT_TOOLLABS_JSUB([-l is exploded], [-l foo=1,bar=2 true], [Your job 501377 ("true") has been submitted
-], [], [0], [-l foo=1 -l bar=2 -j no -e $HOME/true.err -o $HOME/true.out -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=524288k -l release=trusty -q task -b yes /bin/true
+], [], [0], [-l foo=1 -l bar=2 -j no -e $HOME/true.err -o $HOME/true.out -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=524288k -l release=stretch -q task -b yes /bin/true
 ], [], [Your job 501377 ("true") has been submitted
 ], [], [0])
 AT_TOOLLABS_JSUB([-l h_vmem is processed], [-l foo=1,h_vmem=1G,bar=2 true], [Your job 501377 ("true") has been submitted
-], [], [0], [-l foo=1 -l bar=2 -j no -e $HOME/true.err -o $HOME/true.out -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=1048576k -l release=trusty -q task -b yes /bin/true
+], [], [0], [-l foo=1 -l bar=2 -j no -e $HOME/true.err -o $HOME/true.out -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=1048576k -l release=stretch -q task -b yes /bin/true
 ], [], [Your job 501377 ("true") has been submitted
 ], [], [0])
 AT_TOOLLABS_JSUB([-l largest wins (virtual_free)], [-l h_vmem=1k,virtual_free=1G true], [Your job 501377 ("true") has been submitted
-], [], [0], [-j no -e $HOME/true.err -o $HOME/true.out -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=1153433k -l release=trusty -q task -b yes /bin/true
+], [], [0], [-j no -e $HOME/true.err -o $HOME/true.out -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=1153433k -l release=stretch -q task -b yes /bin/true
 ], [], [Your job 501377 ("true") has been submitted
 ], [], [0])
 AT_TOOLLABS_JSUB([-l largest wins (h_vmem)], [-l h_vmem=1g,virtual_free=1K true], [Your job 501377 ("true") has been submitted
-], [], [0], [-j no -e $HOME/true.err -o $HOME/true.out -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=1048576k -l release=trusty -q task -b yes /bin/true
+], [], [0], [-j no -e $HOME/true.err -o $HOME/true.out -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=1048576k -l release=stretch -q task -b yes /bin/true
 ], [], [Your job 501377 ("true") has been submitted
 ], [], [0])
 AT_TOOLLABS_JSUB([-l largest wins (default)], [-l h_vmem=1m,virtual_free=1M true], [Your job 501377 ("true") has been submitted
-], [], [0], [-j no -e $HOME/true.err -o $HOME/true.out -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=524288k -l release=trusty -q task -b yes /bin/true
+], [], [0], [-j no -e $HOME/true.err -o $HOME/true.out -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=524288k -l release=stretch -q task -b yes /bin/true
 ], [], [Your job 501377 ("true") has been submitted
 ], [], [0])
 
 # Test release
 AT_TOOLLABS_JSUB([-l release=precise fails], [-l release=precise true], [], [], [0], [], [], [], [usage: jsub [[options...]] program [[args...]]
-jsub: error: argument -l: invalid release=precise. Expected release=[[trusty]].
+jsub: error: argument -l: invalid release=precise. Expected release=[[stretch|trusty]].
 ], [2])
 AT_TOOLLABS_JSUB([-release precise fails], [-release precise true], [], [], [0], [], [], [], [usage: jsub [[options...]] program [[args...]]
-jsub: error: argument -release: invalid choice: 'precise' (choose from 'trusty')
+jsub: error: argument -release: invalid choice: 'precise' (choose from 'stretch', 'trusty')
 ], [2])
-AT_TOOLLABS_JSUB([-l release=trusty], [-l release=trusty true], [Your job 501377 ("true") has been submitted
-], [], [0], [-j no -e $HOME/true.err -o $HOME/true.out -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=524288k -l release=trusty -q task -b yes /bin/true
+AT_TOOLLABS_JSUB([-l release=stretch], [-l release=stretch true], [Your job 501377 ("true") has been submitted
+], [], [0], [-j no -e $HOME/true.err -o $HOME/true.out -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=524288k -l release=stretch -q task -b yes /bin/true
 ], [], [Your job 501377 ("true") has been submitted
 ], [], [0])
-AT_TOOLLABS_JSUB([-release trusty], [-release trusty true], [Your job 501377 ("true") has been submitted
-], [], [0], [-j no -e $HOME/true.err -o $HOME/true.out -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=524288k -l release=trusty -q task -b yes /bin/true
+AT_TOOLLABS_JSUB([-release stretch], [-release stretch true], [Your job 501377 ("true") has been submitted
+], [], [0], [-j no -e $HOME/true.err -o $HOME/true.out -M ${LOGNAME:-$USER}@tools.wmflabs.org -N true -hard -l h_vmem=524288k -l release=stretch -q task -b yes /bin/true
 ], [], [Your job 501377 ("true") has been submitted
 ], [], [0])

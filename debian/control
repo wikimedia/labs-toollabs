@@ -6,7 +6,7 @@ Uploaders: Petr Bena <benapetr@gmail.com>,
  Carl Fürstenberg <azatoth@gmail.com>,
  Tim Landscheidt <tim@tim-landscheidt.de>,
  Yuvi Panda <yuvipanda@gmail.com>
-Build-Depends: debhelper (>= 8.0.0), dh-autoreconf, bash-completion, python, python3, python-setuptools
+Build-Depends: debhelper (>= 8.0.0), dh-python, dh-autoreconf, bash-completion, python, python3, python-setuptools
 Standards-Version: 3.9.5
 Vcs-Git: https://gerrit.wikimedia.org/r/labs/toollabs
 Vcs-Browser: https://phabricator.wikimedia.org/source/toollabs/
@@ -15,14 +15,14 @@ X-Python3-Version: >= 3.4
 Package: misctools
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}, ${python3:Depends},
- mariadb-client-core-5.5, python3, python3-mysql.connector
-Description: Miscellaneous Labs-specific tools
- Miscellaneous Labs-specific Tools used on Tool Labs
+ mariadb-client-core-5.5, python3, python3-mysql.connector, sensible-utils
+Description: Miscellaneous Toolforge-specific tools
+ Miscellaneous Toolforge-specific Tools used on Toolforge
 
 Package: jobutils
 Architecture: all
 Depends: ${misc:Depends}, ${python3:Depends},
  gridengine-client, python3
-Description: Set of utilities to use on wikimedia bots and tools cluster
- This package will install jstart (jsub) and jstop, the Tool Labs (more)
+Description: Set of utilities to use on wikimedia toolforge cluster
+ This package will install jstart (jsub) and jstop, the Toolforge (more)
  user-friendly wrappers to submit jobs to the gridengine

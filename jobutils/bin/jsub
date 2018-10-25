@@ -30,8 +30,8 @@ import textwrap
 import time
 
 
-AVAILABLE_RELEASES = ['trusty']
-DEFAULT_RELEASE = 'trusty'
+AVAILABLE_RELEASES = ['stretch', 'trusty']
+DEFAULT_RELEASE = 'stretch'
 
 
 class NonAbbreviatingArgumentParser(argparse.ArgumentParser):

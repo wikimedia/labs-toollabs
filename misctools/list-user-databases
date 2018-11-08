@@ -24,12 +24,12 @@ import mysql.connector
 
 GRANT_REPLICA = "GRANT SELECT, SHOW VIEW ON `%\\_p`.* TO '{}'@'%'"
 GRANT_ANY_RE = (
-    "^GRANT (SELECT, )?SHOW VIEW ON \*\.\* TO '{}'@'%'"
-    "(?: IDENTIFIED BY PASSWORD '\*[0-9A-F]{{40}}')?$"
+    r"^GRANT (SELECT, )?SHOW VIEW ON \*\.\* TO '{}'@'%'"
+    r"(?: IDENTIFIED BY PASSWORD '\*[0-9A-F]{{40}}')?$"
 )
 GRANT_ALL_RE = (
-    "^GRANT ALL PRIVILEGES ON `([^`]+)`\.\* TO '{}'@'%'"
-    "(?: WITH GRANT OPTION)?$"
+    r"^GRANT ALL PRIVILEGES ON `([^`]+)`\.\* TO '{}'@'%'"
+    r"(?: WITH GRANT OPTION)?$"
 )
 
 # Get list of defaults files to extract user information from.

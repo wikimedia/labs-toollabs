@@ -17,7 +17,8 @@ X-Python3-Version: >= 3.4
 Package: misctools
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}, ${python3:Depends}, sensible-utils,
- mariadb-client-core-5.5, python3, python3-mysql.connector
+ python3, python3-mysql.connector,
+ virtual-mysql-client-core
 Description: Miscellaneous Labs-specific tools
  Miscellaneous Labs-specific Tools used on Tool Labs
 

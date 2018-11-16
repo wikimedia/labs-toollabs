@@ -201,7 +201,7 @@ def add_jsub(line, jobname='cronjob'):
             prefix, cmd = prereobj.groups()
 
         if not re.match(r'(/usr/(local/)?bin/)?'
-                        r'(jsub|jstart|jmail|qsub|jlocal)\s', cmd):
+                        r'(jsub|jstart|qsub|jlocal)\s', cmd):
             cmd = "{}/usr/bin/jsub -N {} -once -quiet {}".format(
                 prefix, jobname, cmd)
             return ' '.join([sched, cmd, cmt]).strip()

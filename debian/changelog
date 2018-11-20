@@ -1,3 +1,10 @@
+toollabs (1.33) unstable; urgency=medium
+
+  [ Bryan Davis ]
+  * [8895e81] Remove jmail helper script
+
+ -- Arturo Borrero Gonzalez <arturo@debian.org>  Tue, 20 Nov 2018 11:33:32 +0100
+
 toollabs (1.32) unstable; urgency=medium
 
   * Add basic Debian stretch support.

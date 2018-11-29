@@ -31,10 +31,6 @@ import textwrap
 import time
 
 
-AVAILABLE_RELEASES = ['trusty']
-DEFAULT_RELEASE = 'trusty'
-
-
 class NonAbbreviatingArgumentParser(argparse.ArgumentParser):
     """ArgumentParser that doesn't process abbreviated arguments.
 
@@ -70,7 +66,7 @@ def argparse_memkb(val):
     argparse.ArgumentTypeError: expected ... 'k', 'm' or 'g'. 'pizza' given.
     >>>
     """
-    m = re.match(r'^(?P<digits>\d+)(?P<si>[kmg])(?i)$', val)
+    m = re.match(r'(?i)^(?P<digits>\d+)(?P<si>[kmg])$', val)
     if m is None:
         raise argparse.ArgumentTypeError((
             'expected an integer followed by '
@@ -187,14 +183,10 @@ def split_l(value):
 
 def argparse_resource(value):
     """Validate qsub's '-l resource=value,...' arguments."""
-    for label, val in split_l(value):
-        if label == 'release':
+    for label, _ in split_l(value):
+        if label == 'release' and sys.stderr.isatty():
             logging.warning("setting '-l release=' directly is deprecated "
                             "and may be removed in the future")
-        if label == 'release' and val not in AVAILABLE_RELEASES:
-            raise argparse.ArgumentTypeError(
-                'invalid release=%s. Expected release=[%s].' % (
-                    val, '|'.join(AVAILABLE_RELEASES)))
     return value
 
 
@@ -434,7 +426,7 @@ def build_jsub_argparser():
         default=0o0007 if os.geteuid() > 50000 else 0o0077,
         help="Set umask for output files if they don't exist")
     parser.add_argument(
-        '-release', choices=AVAILABLE_RELEASES, action='store', metavar='OS',
+        '-release', required=False, action='store', metavar='OS',
         help=('Choose operating system version required -- DEPRECATED -- '
               'option only exists for backward compatibility and is a noop')
         )
@@ -518,10 +510,10 @@ def read_script_comments(fh):
             if peek == '#!':
                 # Skip the #!... header
                 continue
-            else:
-                yield line
+
+            yield line
         else:
-            raise StopIteration
+            return
 
 
 def parse_script_comments(namespace):

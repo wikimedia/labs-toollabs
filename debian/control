@@ -7,7 +7,7 @@ Uploaders: Petr Bena <benapetr@gmail.com>,
  Tim Landscheidt <tim@tim-landscheidt.de>,
  Yuvi Panda <yuvipanda@gmail.com>
 Build-Depends: debhelper (>= 8.0.0), dh-autoreconf, bash-completion,
- dh-python, python3:any,
+ dh-python, python3,
  python-setuptools
 Standards-Version: 3.9.5
 Vcs-Git: https://gerrit.wikimedia.org/r/labs/toollabs

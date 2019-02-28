@@ -33,8 +33,8 @@ Request
 amount of memory for the job (number suffixed by "k", "m" or "g").
 .TP
 .BI \-once
-Only start one job with that name, fail if another is already started
-or queued (default if invoked as
+Only start one job with that name, fail if another job with the same name
+is already started or queued (default if invoked as
 .B jstart
 or
 .BR qcronsub ).

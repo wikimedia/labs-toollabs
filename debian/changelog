@@ -1,3 +1,9 @@
+toollabs (1.36) unstable; urgency=medium
+
+  * jsub: Clarify help & manual regarding -once
+
+ -- YiFei Zhu <zhuyifei1999@gmail.com> Thu, 28 Feb 2019 17:43:18 +0000
+
 toollabs (1.35) unstable; urgency=medium
 
   * Ensure warning is not displayed in a cron job.

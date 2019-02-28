@@ -413,8 +413,9 @@ def build_jsub_argparser():
     parser.add_argument(
         '-once', action='store_true',
         help=(
-            'Only start one job, fail if another is already started or queued '
-            "(default if invoked as 'jstart' or 'qcronsub')."))
+            'Only start one job, fail if another job with the same name is '
+            'already started or queued (default if invoked as '
+            "'jstart' or 'qcronsub')."))
     parser.add_argument(
         '-quiet', action='store_true',
         help="If successful, don't output anything")

@@ -1,3 +1,9 @@
+toollabs (1.37) unstable; urgency=medium
+
+  * misctools: update setup-tomcat for Stretch
+
+ -- Bryan Davis <bd808@wikimedia.org>  Wed, 06 Mar 2019 03:35:00 +0000
+
 toollabs (1.36) unstable; urgency=medium
 
   * jsub: Clarify help & manual regarding -once

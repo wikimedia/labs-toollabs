@@ -148,6 +148,8 @@ def argparse_qsub_bool(val):
 def argparse_whence(prog):
     """Resolve the canonical path to a program.
 
+    Symbolic links are not resolved (T229551).
+
     >>> __name__ = 'doctest'
     >>> exec(open('jobutils/bin/jsub').read())
     >>> argparse_whence('/usr/bin/env')
@@ -162,15 +164,15 @@ def argparse_whence(prog):
     """
     # Already a full path?
     if prog[0] == os.sep and os.path.exists(prog):
-        return os.path.realpath(prog)
+        return os.path.normpath(prog)
     if prog[0] != os.curdir:
         # Look in each dir of $PATH
         for path in os.environ.get('PATH', '').split(os.pathsep):
             if os.path.exists(os.path.join(path, prog)):
-                return os.path.realpath(os.path.join(path, prog))
+                return os.path.normpath(os.path.join(path, prog))
     # Not found in $PATH so try looking in $PWD
     if os.path.exists(os.path.join(os.getcwd(), prog)):
-        return os.path.realpath(os.path.join(os.getcwd(), prog))
+        return os.path.normpath(os.path.join(os.getcwd(), prog))
     raise argparse.ArgumentTypeError("Program '%s' not found." % prog)
 
 

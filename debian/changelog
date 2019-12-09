@@ -1,3 +1,9 @@
+toollabs (1.39) UNRELEASED; urgency=medium
+
+  * jsub: recognize HOME environment variable. T239910.
+
+ -- Antoine Musso <hashar@free.fr>  Tue, 17 Dec 2019 23:58:15 +0100
+
 toollabs (1.38) unstable; urgency=medium
 
   * jsub: use normpath instead of realpath to resolve executable path

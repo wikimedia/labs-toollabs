@@ -256,8 +256,13 @@ def effective_username():
 
 
 def homedir():
-    """Get the homedir of the real user."""
-    return pwd.getpwuid(os.getuid())[5]
+    """Get the homedir of the real user.
+
+    Relies on the HOME environment variable if set, else fall back to the
+    system password database.
+    """
+    return os.environ.get(
+        'HOME', pwd.getpwuid(os.getuid())[5])
 
 
 def die(msg):

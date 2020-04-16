@@ -164,7 +164,7 @@ def add_jsub(line, jobname='cronjob'):
     >>> add_jsub('@weekly true')  # command scheduled with @-strings T86446
     '@weekly /usr/bin/jsub -N cronjob -once -quiet true'
     >>> add_jsub('@weekly cd /bin/; ./true')  # cd handling
-    '@weekly cd /bin/; /usr/bin/jsub -N cronjob -once -quiet ./true'
+    '@weekly cd /bin/; /usr/bin/jsub -N cronjob -once -quiet -cwd ./true'
     >>> add_jsub('@daily [ -x /bin/ls ] && /bin/ls')  # test handling
     '@daily [ -x /bin/ls ] && /usr/bin/jsub -N cronjob -once -quiet /bin/ls'
     >>>
@@ -190,20 +190,24 @@ def add_jsub(line, jobname='cronjob'):
                         r'([^#]*)(#.*)?$', line)
     if cmdreobj:
         sched, cmd, cmt = cmdreobj.groups('')
+        has_cd_cmd = False
         prefix = ''
 
         # Check for common prefixes: (cd dir|[ test ]) (&&|;)
         # and strip them out before adding jsub to the real command.
         prereobj = re.match(
-            r'((?:cd\s+\S+|\[[^\]]*\])\s*(?:&&|;)\s*)(.*)',
+            r'((?:(cd)\s+\S+|\[[^\]]*\])\s*(?:&&|;)\s*)(.*)',
             cmd)
         if prereobj:
-            prefix, cmd = prereobj.groups()
+            prefix, has_cd_cmd, cmd = prereobj.groups()
 
         if not re.match(r'(/usr/(local/)?bin/)?'
                         r'(jsub|jstart|qsub|jlocal)\s', cmd):
-            cmd = "{}/usr/bin/jsub -N {} -once -quiet {}".format(
-                prefix, jobname, cmd)
+            cmd = "{}/usr/bin/jsub -N {} -once -quiet {}{}".format(
+                prefix,
+                jobname,
+                '-cwd ' if has_cd_cmd else '',
+                cmd)
             return ' '.join([sched, cmd, cmt]).strip()
 
 

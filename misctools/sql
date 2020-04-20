@@ -26,97 +26,112 @@ import sys
 logger = logging.getLogger(__name__)
 
 ALIASES = {
-    'commons': 'commonswiki_p',
-    'cs': 'cswiki_p',
-    'de': 'dewiki_p',
-    'en': 'enwiki_p',
-    'fr': 'frwiki_p',
-    'wikidata': 'wikidatawiki_p',
-    'meta': 'meta_p',
+    "commons": "commonswiki_p",
+    "cs": "cswiki_p",
+    "de": "dewiki_p",
+    "en": "enwiki_p",
+    "fr": "frwiki_p",
+    "wikidata": "wikidatawiki_p",
+    "meta": "meta_p",
 }
 
 parser = argparse.ArgumentParser(
     description=(
-        'Connect to or run SQL query '
-        'on replica or Tools database server'),
-    epilog=(
-        'Report bugs to Phabricator: '
-        'https://phabricator.wikimedia.org')
+        "Connect to or run SQL query " "on replica or Tools database server"
+    ),
+    epilog=("Report bugs to Phabricator: " "https://phabricator.wikimedia.org"),
 )
 parser.add_argument(
-    '-v', '--verbose', action='count', default=0, dest='loglevel',
-    help='increase logging verbosity')
+    "-v",
+    "--verbose",
+    action="count",
+    default=0,
+    dest="loglevel",
+    help="increase logging verbosity",
+)
 parser.add_argument(
-    '-N', '--skip-column-names', default=None,
-    action='store_true', help='do not write column names in results')
+    "-N",
+    "--skip-column-names",
+    default=None,
+    action="store_true",
+    help="do not write column names in results",
+)
 parser.add_argument(
-    '--cluster', default='analytics',
-    choices=['analytics', 'web'],
-    help='cluster to connect to')
+    "--cluster",
+    default="analytics",
+    choices=["analytics", "web"],
+    help="cluster to connect to",
+)
 parser.add_argument(
-    'dbname', metavar='DATABASE',
-    help='for example commonswiki_p or enwiki')
+    "dbname", metavar="DATABASE", help="for example commonswiki_p or enwiki"
+)
 parser.add_argument(
-    'sqlquery', metavar='...', nargs=argparse.REMAINDER,
-    help='SQL query; multiple arguments will be joined by spaces')
+    "sqlquery",
+    metavar="...",
+    nargs=argparse.REMAINDER,
+    help="SQL query; multiple arguments will be joined by spaces",
+)
 
 args = parser.parse_args()
 
 logging.basicConfig(
     stream=sys.stderr,
-    format='%(message)s',
-    level=max(logging.DEBUG, logging.WARNING - (10 * args.loglevel)))
+    format="%(message)s",
+    level=max(logging.DEBUG, logging.WARNING - (10 * args.loglevel)),
+)
 
-domain = '{}.db.svc.wikimedia.cloud'.format(args.cluster)
+domain = "{}.db.svc.wikimedia.cloud".format(args.cluster)
 
-exec_args = ['mysql']
+exec_args = ["mysql"]
 
-replica_cnf = os.path.expanduser('~/replica.my.cnf')
+replica_cnf = os.path.expanduser("~/replica.my.cnf")
 if os.path.isfile(replica_cnf):
-    exec_args.append('--defaults-file={}'.format(replica_cnf))
-elif not os.path.isfile(os.path.expanduser('~/.my.cnf')):
-    exec_args.append('-p')
-    logger.warn(
-        'There is no configuration file for mysql to use, ' +
-        'you will probably be unable to access the database')
+    exec_args.append("--defaults-file={}".format(replica_cnf))
+elif not os.path.isfile(os.path.expanduser("~/.my.cnf")):
+    exec_args.append("-p")
+    logger.warning(
+        "There is no configuration file for mysql to use, "
+        "you will probably be unable to access the database"
+    )
 
 if args.skip_column_names:
-    exec_args.append('-N')
+    exec_args.append("-N")
 
 db = ALIASES.get(args.dbname, args.dbname)
 
-if db == 'meta_p':
+if db == "meta_p":
     # [[wikitech:Help:Toolforge/Database#Metadata_database]]
     # not to be confused with metawiki_p.
-    server = 's7.{}'.format(domain)
-elif db in ['local', 'tools', 'tools-db', 'toolsdb']:
-    server = 'tools.db.svc.eqiad.wmflabs'
+    server = "s7.{}".format(domain)
+elif db in ["local", "tools", "tools-db", "toolsdb"]:
+    server = "tools.db.svc.eqiad.wmflabs"
     db = None
 else:
-    if not db.endswith('_p'):
-        db = '{}_p'.format(db)
-    server = '{}.{}'.format(db[:-2], domain)
+    if not db.endswith("_p"):
+        db = "{}_p".format(db)
+    server = "{}.{}".format(db[:-2], domain)
     try:
-        logger.debug('Looking up %s', server)
+        logger.debug("Looking up %s", server)
         socket.gethostbyname(server)
-        logger.info('Resolved %s to %s', db, server)
+        logger.info("Resolved %s to %s", db, server)
     except socket.gaierror:
-        errmsg = 'Could not find requested database'
+        errmsg = "Could not find requested database"
         if db != args.dbname:
             errmsg += "\nMake sure to ask for a db in format of <wiki>_p"
         sys.exit(errmsg)
 
-logger.info('Connecting to %s', server)
-exec_args.extend(['-h', server])
+logger.info("Connecting to %s", server)
+exec_args.extend(["-h", server])
 if db:
     exec_args.append(db)
 
 if args.sqlquery:
     if len(args.sqlquery) > 1:
-        logger.warn(
-            'More than one argument given; '
-            'joining SQL query words with spaces.')
-    exec_args.extend(['-e', ' '.join(args.sqlquery)])
+        logger.warning(
+            "More than one argument given; "
+            "joining SQL query words with spaces."
+        )
+    exec_args.extend(["-e", " ".join(args.sqlquery)])
 
 logger.debug(exec_args)
-os.execvp('mysql', exec_args)
+os.execvp("mysql", exec_args)

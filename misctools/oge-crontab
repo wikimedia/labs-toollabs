@@ -30,13 +30,13 @@ import sys
 import tempfile
 
 
-JSUB_MODIFIED = '''
+JSUB_MODIFIED = """
 NOTE: some crontab entries have been modified to grid submissions.
       You may want to examine the result with 'crontab -e'.
-'''
+"""
 
 
-DEFAULT_CRONTAB = b'''\
+DEFAULT_CRONTAB = b"""\
 # Edit this file to introduce tasks to be run by cron.
 #
 # Each task to run has to be defined through a single line
@@ -66,7 +66,7 @@ DEFAULT_CRONTAB = b'''\
 #   the two.
 #
 # m	h	dom	mon	dow	command
-'''
+"""
 
 
 class NoCrontab(Exception):
@@ -79,22 +79,23 @@ class Crontab(object):
 
     def _remote(self, *args, stdin=None):
         """Execute remote crontab command and return stdout."""
-        cmd = ['/usr/bin/ssh', self.cron_host, '/usr/bin/crontab'] + list(args)
+        cmd = ["/usr/bin/ssh", self.cron_host, "/usr/bin/crontab"] + list(args)
 
         ssh = subprocess.Popen(
             cmd,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE)
+            stderr=subprocess.PIPE,
+        )
 
         stdoutdata, stderrdata = ssh.communicate(input=stdin)
 
         if ssh.returncode:
-            if stderrdata.lower().startswith(b'no crontab for '):
+            if stderrdata.lower().startswith(b"no crontab for "):
                 raise NoCrontab
             else:
                 sys.stderr.buffer.write(stderrdata)
-                err('unable to execute remote crontab command')
+                err("unable to execute remote crontab command")
                 sys.exit(ssh.returncode)
 
         return stdoutdata
@@ -109,19 +110,19 @@ class Crontab(object):
         # with non-utf8 locale. In most cases, such as with utf8, any non-ascii
         # character will be escaped, and all the text-processing code will work
         # fine, but this is not guaranteed to be true for all codecs.
-        text = text.decode('ascii', 'surrogateescape').split('\n')
+        text = text.decode("ascii", "surrogateescape").split("\n")
         for lineno, line in enumerate(text):
-            newline = add_jsub(line, 'cron-{}'.format(lineno))
+            newline = add_jsub(line, "cron-{}".format(lineno))
             if newline is not None:
                 text[lineno] = newline
 
-        text = '\n'.join(text)
+        text = "\n".join(text)
         # Make sure there is one and only one line feed at the end
-        text = text.rstrip('\n') + '\n'
-        return text.encode('ascii', 'surrogateescape')
+        text = text.rstrip("\n") + "\n"
+        return text.encode("ascii", "surrogateescape")
 
     def load(self):
-        return self._remote('-l')
+        return self._remote("-l")
 
     def save(self, text):
         jsub_text = self._add_jsub(text)
@@ -130,10 +131,10 @@ class Crontab(object):
         self._remote(stdin=jsub_text)
 
     def remove(self):
-        self._remote('-r')
+        self._remote("-r")
 
 
-def add_jsub(line, jobname='cronjob'):
+def add_jsub(line, jobname="cronjob"):
     """
     Add jsub to each crontab entry when necessary.
 
@@ -175,49 +176,49 @@ def add_jsub(line, jobname='cronjob'):
         return
 
     # skip comments
-    if line[0] == '#':
+    if line[0] == "#":
         return
 
     # skip environment variables
-    if re.match(r'\S+\s*=', line):
+    if re.match(r"\S+\s*=", line):
         return
 
     # Split each crontab entry into schedule, command, and comment.
     # Schedule can be either 5 time and date fields seperated by
     # spaces or tabs, or special strings starting with an "@", such
     # as @weekly or @daily. See crontab(5) manpage.
-    cmdreobj = re.match(r'(@\S+|\S+\s+\S+\s+\S+\s+\S+\s+\S+)\s+'
-                        r'([^#]*)(#.*)?$', line)
+    cmdreobj = re.match(
+        r"(@\S+|\S+\s+\S+\s+\S+\s+\S+\s+\S+)\s+" r"([^#]*)(#.*)?$", line
+    )
     if cmdreobj:
-        sched, cmd, cmt = cmdreobj.groups('')
+        sched, cmd, cmt = cmdreobj.groups("")
         has_cd_cmd = False
-        prefix = ''
+        prefix = ""
 
         # Check for common prefixes: (cd dir|[ test ]) (&&|;)
         # and strip them out before adding jsub to the real command.
         prereobj = re.match(
-            r'((?:(cd)\s+\S+|\[[^\]]*\])\s*(?:&&|;)\s*)(.*)',
-            cmd)
+            r"((?:(cd)\s+\S+|\[[^\]]*\])\s*(?:&&|;)\s*)(.*)", cmd
+        )
         if prereobj:
             prefix, has_cd_cmd, cmd = prereobj.groups()
 
-        if not re.match(r'(/usr/(local/)?bin/)?'
-                        r'(jsub|jstart|qsub|jlocal)\s', cmd):
+        if not re.match(
+            r"(/usr/(local/)?bin/)?" r"(jsub|jstart|qsub|jlocal)\s", cmd
+        ):
             cmd = "{}/usr/bin/jsub -N {} -once -quiet {}{}".format(
-                prefix,
-                jobname,
-                '-cwd ' if has_cd_cmd else '',
-                cmd)
-            return ' '.join([sched, cmd, cmt]).strip()
+                prefix, jobname, "-cwd " if has_cd_cmd else "", cmd
+            )
+            return " ".join([sched, cmd, cmt]).strip()
 
 
 def editor(text):
     """Open an editor with the given content and return results."""
-    with tempfile.NamedTemporaryFile('w+b') as f:
+    with tempfile.NamedTemporaryFile("w+b") as f:
         f.write(text)
         f.flush()
 
-        subprocess.check_call(['/usr/bin/sensible-editor', f.name])
+        subprocess.check_call(["/usr/bin/sensible-editor", f.name])
 
         f.seek(0)
         return f.read()
@@ -225,7 +226,7 @@ def editor(text):
 
 def err(message):
     """Print an error message to stderr."""
-    print('{}: {}'.format(sys.argv[0], message), file=sys.stderr)
+    print("{}: {}".format(sys.argv[0], message), file=sys.stderr)
 
 
 def main():
@@ -235,30 +236,45 @@ def main():
     if pw.pw_uid < 500:
         # If the target user is not managed in LDAP and thus likely
         # a system user, invoke the original crontab instead.
-        os.execv('/usr/bin/crontab', sys.argv)
+        os.execv("/usr/bin/crontab", sys.argv)
     elif pw.pw_uid < 40000:
-        err('only tools are allowed crontabs')
+        err("only tools are allowed crontabs")
         sys.exit(1)
 
     parser = argparse.ArgumentParser()
     group = parser.add_mutually_exclusive_group()
     group.add_argument(
-        'file', default=sys.stdin.buffer, nargs='?',
-        type=argparse.FileType('rb'),
-        help='replace crontab with file (default)')
+        "file",
+        default=sys.stdin.buffer,
+        nargs="?",
+        type=argparse.FileType("rb"),
+        help="replace crontab with file (default)",
+    )
     subgroup = group.add_mutually_exclusive_group()
     subgroup.add_argument(
-        '-e', action='store_const', const='e', dest='operation',
-        help='edit crontab')
+        "-e",
+        action="store_const",
+        const="e",
+        dest="operation",
+        help="edit crontab",
+    )
     subgroup.add_argument(
-        '-l', action='store_const', const='l', dest='operation',
-        help='list crontab')
+        "-l",
+        action="store_const",
+        const="l",
+        dest="operation",
+        help="list crontab",
+    )
     subgroup.add_argument(
-        '-r', action='store_const', const='r', dest='operation',
-        help='delete crontab')
+        "-r",
+        action="store_const",
+        const="r",
+        dest="operation",
+        help="delete crontab",
+    )
     parser.add_argument(
-        '-i', action='store_true',
-        help='prompt before deleting crontab')
+        "-i", action="store_true", help="prompt before deleting crontab"
+    )
 
     args = parser.parse_args()
 
@@ -266,10 +282,10 @@ def main():
     if args.file is sys.stdin:
         args.file = args.file.buffer
 
-    if args.i and args.operation != 'r':
-        parser.error('argument -i: only applicable with -r')
+    if args.i and args.operation != "r":
+        parser.error("argument -i: only applicable with -r")
 
-    with open('/etc/toollabs-cronhost', 'r') as f:
+    with open("/etc/toollabs-cronhost", "r") as f:
         cron_host = f.read().strip()
 
     try:
@@ -278,7 +294,7 @@ def main():
         if args.operation is None:
             # Replace
             crontab.save(args.file.read())
-        elif args.operation == 'e':
+        elif args.operation == "e":
             # Edit
             try:
                 crontab_text = crontab.load()
@@ -287,49 +303,51 @@ def main():
             new_crontab_text = editor(crontab_text)
 
             if new_crontab_text == crontab_text:
-                print('No modification made', file=sys.stderr)
+                print("No modification made", file=sys.stderr)
             elif not new_crontab_text.strip():
-                err('cowardly refusing to install empty crontab')
-                err('use `{} -r` if you want to remove the crontab'.format(
-                    sys.srgv[0]))
+                err("cowardly refusing to install empty crontab")
+                err(
+                    "use `{} -r` if you want to remove the crontab".format(
+                        sys.srgv[0]
+                    )
+                )
                 sys.exit(1)
             else:
                 crontab.save(new_crontab_text)
-        elif args.operation == 'l':
+        elif args.operation == "l":
             # List
             try:
                 sys.stdout.buffer.write(crontab.load())
             except NoCrontab:
-                print(
-                    'no crontab for {}'.format(pw.pw_name), file=sys.stderr)
+                print("no crontab for {}".format(pw.pw_name), file=sys.stderr)
                 sys.exit(1)
-        elif args.operation == 'r':
+        elif args.operation == "r":
             # Delete
             try:
                 crontab.load()
             except NoCrontab:
-                print(
-                    'no crontab for {}'.format(pw.pw_name), file=sys.stderr)
+                print("no crontab for {}".format(pw.pw_name), file=sys.stderr)
                 sys.exit(1)
             if args.i:
                 prompt = "{}: really delete {}'s crontab? (y/n) ".format(
-                    sys.argv[0], pw.pw_name)
+                    sys.argv[0], pw.pw_name
+                )
                 while True:
                     try:
                         stdin = input(prompt).lower()
                     except EOFError:
-                        stdin = ''
+                        stdin = ""
                     except KeyboardInterrupt:
                         print(file=sys.stderr)
                         raise
 
-                    if stdin == 'y':
+                    if stdin == "y":
                         crontab.remove()
                         break
-                    elif stdin == 'n':
+                    elif stdin == "n":
                         break
                     else:
-                        prompt = 'Please enter Y or N: '
+                        prompt = "Please enter Y or N: "
 
             else:
                 crontab.remove()
@@ -337,5 +355,5 @@ def main():
         pass
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

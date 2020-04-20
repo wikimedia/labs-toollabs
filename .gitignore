@@ -1,11 +1,12 @@
-/Makefile
-/Makefile.in
+*.swp
+/*.egg-info
+/.python-version
+/.tox
 /aclocal.m4
 /autom4te.cache
 /build-aux
 /config.log
 /config.status
 /configure
-/.tox
-/*.egg-info
-*.swp
+/Makefile
+/Makefile.in

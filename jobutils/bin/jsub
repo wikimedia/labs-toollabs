@@ -30,8 +30,8 @@ import textwrap
 import time
 
 
-AVAILABLE_RELEASES = ['stretch', 'buster']
-DEFAULT_RELEASE = 'stretch'
+AVAILABLE_RELEASES = ["stretch", "buster"]
+DEFAULT_RELEASE = "stretch"
 
 
 class NonAbbreviatingArgumentParser(argparse.ArgumentParser):
@@ -39,6 +39,7 @@ class NonAbbreviatingArgumentParser(argparse.ArgumentParser):
 
     From https://bugs.python.org/issue14910#msg204678
     """
+
     def _get_option_tuples(self, option_string):
         return []
 
@@ -48,6 +49,7 @@ class ThrowingArgumentParser(NonAbbreviatingArgumentParser):
 
     From https://stackoverflow.com/a/14728477/8171
     """
+
     def error(self, message):
         raise ValueError(message)
 
@@ -69,16 +71,17 @@ def argparse_memkb(val):
     argparse.ArgumentTypeError: expected ... 'k', 'm' or 'g'. 'pizza' given.
     >>>
     """
-    m = re.match(r'(?i)^(?P<digits>\d+)(?P<si>[kmg])$', val)
+    m = re.match(r"(?i)^(?P<digits>\d+)(?P<si>[kmg])$", val)
     if m is None:
-        raise argparse.ArgumentTypeError((
-            'expected an integer followed by '
-            "'k', 'm' or 'g'. '%s' given.") % val)
-    ret = int(m.group('digits'))
-    si = m.group('si').lower()
-    if si in ['m', 'g']:
+        raise argparse.ArgumentTypeError(
+            ("expected an integer followed by " "'k', 'm' or 'g'. '%s' given.")
+            % val
+        )
+    ret = int(m.group("digits"))
+    si = m.group("si").lower()
+    if si in ["m", "g"]:
         ret *= 1024
-    if si == 'g':
+    if si == "g":
         ret *= 1024
     return ret
 
@@ -96,9 +99,10 @@ def argparse_octal(val):
     argparse.ArgumentTypeError: expected an octal value. '9' given.
     >>>
     """
-    if not re.match(r'^[0-7]+$', val):
+    if not re.match(r"^[0-7]+$", val):
         raise argparse.ArgumentTypeError(
-            "expected an octal value. '%s' given." % val)
+            "expected an octal value. '%s' given." % val
+        )
     return int(val, 8)
 
 
@@ -117,9 +121,10 @@ def argparse_email(val):
     argparse.ArgumentTypeError: expected list of email addresses. 'foo' given.
     >>>
     """
-    if not re.match(r'^[^@]+@[^,]+(,[^@]+@[^,]+)*$', val):
+    if not re.match(r"^[^@]+@[^,]+(,[^@]+@[^,]+)*$", val):
         raise argparse.ArgumentTypeError(
-            "expected list of email addresses. '%s' given." % val)
+            "expected list of email addresses. '%s' given." % val
+        )
     return val
 
 
@@ -142,10 +147,11 @@ def argparse_qsub_bool(val):
     argparse.ArgumentTypeError: expected y[es]|n[o]. 'foo' given.
     >>>
     """
-    if not re.match(r'^y(es)?|no?$', val.lower()):
+    if not re.match(r"^y(es)?|no?$", val.lower()):
         raise argparse.ArgumentTypeError(
-            "expected y[es]|n[o]. '%s' given." % val)
-    return val.lower()[0] == 'y'
+            "expected y[es]|n[o]. '%s' given." % val
+        )
+    return val.lower()[0] == "y"
 
 
 def argparse_whence(prog):
@@ -170,7 +176,7 @@ def argparse_whence(prog):
         return os.path.normpath(prog)
     if prog[0] != os.curdir:
         # Look in each dir of $PATH
-        for path in os.environ.get('PATH', '').split(os.pathsep):
+        for path in os.environ.get("PATH", "").split(os.pathsep):
             if os.path.exists(os.path.join(path, prog)):
                 return os.path.normpath(os.path.join(path, prog))
     # Not found in $PATH so try looking in $PWD
@@ -181,18 +187,19 @@ def argparse_whence(prog):
 
 def split_l(value):
     """Iterate over compontents of qsub's '-l resource=value,...' arguments."""
-    for part in value.split(','):
-        yield part.split('=', 1)
+    for part in value.split(","):
+        yield part.split("=", 1)
     return
 
 
 def argparse_resource(value):
     """Validate qsub's '-l resource=value,...' arguments."""
     for label, val in split_l(value):
-        if label == 'release' and val not in AVAILABLE_RELEASES:
+        if label == "release" and val not in AVAILABLE_RELEASES:
             raise argparse.ArgumentTypeError(
-                'invalid release=%s. Expected release=[%s].' % (
-                    val, '|'.join(AVAILABLE_RELEASES)))
+                "invalid release=%s. Expected release=[%s]."
+                % (val, "|".join(AVAILABLE_RELEASES))
+            )
     return value
 
 
@@ -202,11 +209,12 @@ class QsubAction(argparse.Action):
     Generally acts like argparse's built-in 'append' action, but it gives
     special handling to '-l ...' arguments.
     """
+
     def __init__(self, *args, **kwargs):
         super(QsubAction, self).__init__(*args, **kwargs)
 
     def __call__(self, parser, namespace, values, option_string=None):
-        if option_string == '-l':
+        if option_string == "-l":
             self._process_l(namespace, values[0])
         else:
             if self.nargs != 0 and type(values) is list:
@@ -226,18 +234,18 @@ class QsubAction(argparse.Action):
         flag.
         """
         for resource, value in split_l(values):
-            if resource == 'release':
-                setattr(namespace, 'release', value)
-            elif resource == 'h_vmem':
+            if resource == "release":
+                setattr(namespace, "release", value)
+            elif resource == "h_vmem":
                 vmem = argparse_memkb(value)
                 if vmem > namespace.mem:
-                    setattr(namespace, 'mem', vmem)
-            elif resource == 'virtual_free':
+                    setattr(namespace, "mem", vmem)
+            elif resource == "virtual_free":
                 vfree = int(argparse_memkb(value) * 1.1)
                 if vfree > namespace.mem:
                     namespace.mem = vfree
             else:
-                self._append(namespace, '%s=%s' % (resource, value), '-l')
+                self._append(namespace, "%s=%s" % (resource, value), "-l")
 
     def _ensure_value(self, namespace, name, value):
         """Get a value from the namespace."""
@@ -257,7 +265,8 @@ class QsubAction(argparse.Action):
 def effective_username():
     """Get the username of the effective user."""
     return os.environ.get(
-        'LOGNAME', os.environ.get('USER', pwd.getpwuid(os.getuid())[0]))
+        "LOGNAME", os.environ.get("USER", pwd.getpwuid(os.getuid())[0])
+    )
 
 
 def homedir():
@@ -266,8 +275,7 @@ def homedir():
     Relies on the HOME environment variable if set, else fall back to the
     system password database.
     """
-    return os.environ.get(
-        'HOME', pwd.getpwuid(os.getuid())[5])
+    return os.environ.get("HOME", pwd.getpwuid(os.getuid())[5])
 
 
 def die(msg):
@@ -280,7 +288,7 @@ def touch(path, umask):
     if not os.path.exists(path):
         old_mask = os.umask(umask)
         try:
-            open(path, 'a').close()
+            open(path, "a").close()
         except IOError as e:
             die("Failed to touch '%s': %s" % (path, e))
         finally:
@@ -290,9 +298,9 @@ def touch(path, umask):
 def is_running(name):
     """Check status of a named job."""
     try:
-        running = subprocess.call(['/usr/bin/job', '-q', name])
+        running = subprocess.call(["/usr/bin/job", "-q", name])
     except OSError as e:
-        die('unable to get job status: e' % e)
+        die("unable to get job status: e" % e)
     else:
         return running != 0
 
@@ -300,9 +308,9 @@ def is_running(name):
 def as_qsub_bool(val):
     """Make a 'yes' or 'no' for passing to qsub."""
     if val:
-        return 'yes'
+        return "yes"
     else:
-        return 'no'
+        return "no"
 
 
 def make_cmd(exe, args):
@@ -327,85 +335,163 @@ def build_qsub_argparser():
     parser = NonAbbreviatingArgumentParser(add_help=False)
     # The time and date at which the job is eligible for execution.
     parser.add_argument(
-        '-a', nargs=1, metavar='[[CC]]YY]MMDDhhmm[.SS]',
-        action=QsubAction, dest='qsub_args', help=argparse.SUPPRESS)
+        "-a",
+        nargs=1,
+        metavar="[[CC]]YY]MMDDhhmm[.SS]",
+        action=QsubAction,
+        dest="qsub_args",
+        help=argparse.SUPPRESS,
+    )
     # Treat the program as a binary.
     parser.add_argument(
-        '-b', metavar='y[es]|n[o]', dest='binary',
-        type=argparse_qsub_bool, default=False, help=argparse.SUPPRESS)
+        "-b",
+        metavar="y[es]|n[o]",
+        dest="binary",
+        type=argparse_qsub_bool,
+        default=False,
+        help=argparse.SUPPRESS,
+    )
     # Execute the job from the current working directory.
     parser.add_argument(
-        '-cwd', nargs=0,
-        action=QsubAction, dest='qsub_args', help=argparse.SUPPRESS)
+        "-cwd",
+        nargs=0,
+        action=QsubAction,
+        dest="qsub_args",
+        help=argparse.SUPPRESS,
+    )
     # The path used for the standard error stream of the job
     parser.add_argument(
-        '-e', metavar='path', dest='log_err', help=argparse.SUPPRESS)
+        "-e", metavar="path", dest="log_err", help=argparse.SUPPRESS
+    )
     # Signifies that all -q and -l resource requirements following in the
     # command line will be hard requirements and must be satisfied in full
     # before a job can be scheduled.
     parser.add_argument(
-        '-hard', nargs=0,
-        action=QsubAction, dest='qsub_args', help=argparse.SUPPRESS)
+        "-hard",
+        nargs=0,
+        action=QsubAction,
+        dest="qsub_args",
+        help=argparse.SUPPRESS,
+    )
     # The file used for the standard input stream of the job.
     parser.add_argument(
-        '-i', nargs=1, metavar='[[hostname]:]file,...',
-        action=QsubAction, dest='qsub_args', help=argparse.SUPPRESS)
+        "-i",
+        nargs=1,
+        metavar="[[hostname]:]file,...",
+        action=QsubAction,
+        dest="qsub_args",
+        help=argparse.SUPPRESS,
+    )
     # Merge standard error stream into the standard ouput stream.
     parser.add_argument(
-        '-j', metavar='y[es]|n[o]', dest='log_join',
-        type=argparse_qsub_bool, default=False, help=argparse.SUPPRESS)
+        "-j",
+        metavar="y[es]|n[o]",
+        dest="log_join",
+        type=argparse_qsub_bool,
+        default=False,
+        help=argparse.SUPPRESS,
+    )
     # Launch the job in a queue meeting the given resource request list.
     parser.add_argument(
-        '-l', nargs=1, metavar='resource=value,...',
-        action=QsubAction, type=argparse_resource, dest='qsub_args',
-        help=argparse.SUPPRESS)
+        "-l",
+        nargs=1,
+        metavar="resource=value,...",
+        action=QsubAction,
+        type=argparse_resource,
+        dest="qsub_args",
+        help=argparse.SUPPRESS,
+    )
     # Under which circumstances mail is to be sent to the job owner or to the
     # users defined with the -M option. See `man qsub` for details.
     parser.add_argument(
-        '-m', nargs=1, metavar='b|e|a|s|n,...',
-        action=QsubAction, dest='qsub_args', help=argparse.SUPPRESS)
+        "-m",
+        nargs=1,
+        metavar="b|e|a|s|n,...",
+        action=QsubAction,
+        dest="qsub_args",
+        help=argparse.SUPPRESS,
+    )
     # The list of users to which to send email about the job.
     parser.add_argument(
-        '-M', metavar='user@host,...', dest='mailto', type=argparse_email,
-        default='%s@tools.wmflabs.org' % effective_username(),
-        help=argparse.SUPPRESS)
+        "-M",
+        metavar="user@host,...",
+        dest="mailto",
+        type=argparse_email,
+        default="%s@tools.wmflabs.org" % effective_username(),
+        help=argparse.SUPPRESS,
+    )
     # Start the job immediately or not at all.
     parser.add_argument(
-        '-now', nargs=1, metavar='y[es]|n[o]',
-        action=QsubAction, dest='qsub_args', help=argparse.SUPPRESS)
+        "-now",
+        nargs=1,
+        metavar="y[es]|n[o]",
+        action=QsubAction,
+        dest="qsub_args",
+        help=argparse.SUPPRESS,
+    )
     parser.add_argument(
-        '-N', metavar='name', dest='jobname', help='The name of the job')
+        "-N", metavar="name", dest="jobname", help="The name of the job"
+    )
     # The path used for the standard output stream of the job.
     parser.add_argument(
-        '-o', metavar='path', dest='log_out', help=argparse.SUPPRESS)
+        "-o", metavar="path", dest="log_out", help=argparse.SUPPRESS
+    )
     # The priority of the job relative to other jobs.
     parser.add_argument(
-        '-p', nargs=1, metavar='priority',
-        action=QsubAction, dest='qsub_args', help=argparse.SUPPRESS)
+        "-p",
+        nargs=1,
+        metavar="priority",
+        action=QsubAction,
+        dest="qsub_args",
+        help=argparse.SUPPRESS,
+    )
     # A list of cluster queues, queue domains or queue instances which may be
     # used to execute this job.
     parser.add_argument(
-        '-q', metavar='wc_queue_list', dest='queue', default='task',
-        help=argparse.SUPPRESS)
+        "-q",
+        metavar="wc_queue_list",
+        dest="queue",
+        default="task",
+        help=argparse.SUPPRESS,
+    )
     # Signifies that all resource requirements following in the command line
     # will be soft requirements and are to be filled on an "as available"
     # basis.
     parser.add_argument(
-        '-soft', nargs=0,
-        action=QsubAction, dest='qsub_args', help=argparse.SUPPRESS)
+        "-soft",
+        nargs=0,
+        action=QsubAction,
+        dest="qsub_args",
+        help=argparse.SUPPRESS,
+    )
     # Wait for the job to complete before exiting.
     parser.add_argument(
-        '-sync', nargs=1, metavar='y[es]|n[o]',
-        action=QsubAction, dest='qsub_args', help=argparse.SUPPRESS)
+        "-sync",
+        nargs=1,
+        metavar="y[es]|n[o]",
+        action=QsubAction,
+        dest="qsub_args",
+        help=argparse.SUPPRESS,
+    )
     # Environment variables to be exported to the execution context of the
     # job.
     parser.add_argument(
-        '-v', nargs=1, metavar='variable[=value],...',
-        action=QsubAction, dest='qsub_args', help=argparse.SUPPRESS)
+        "-v",
+        nargs=1,
+        metavar="variable[=value],...",
+        action=QsubAction,
+        dest="qsub_args",
+        help=argparse.SUPPRESS,
+    )
     # Execute the job from the specified directory.
     parser.add_argument(
-        '-wd', nargs=1, metavar='working_dir',
-        action=QsubAction, dest='qsub_args', help=argparse.SUPPRESS)
+        "-wd",
+        nargs=1,
+        metavar="working_dir",
+        action=QsubAction,
+        dest="qsub_args",
+        help=argparse.SUPPRESS,
+    )
     return parser
 
 
@@ -413,67 +499,101 @@ def build_jsub_argparser():
     """Build an argparse parser for jsub specific options."""
     parser = NonAbbreviatingArgumentParser(add_help=False)
     parser.add_argument(
-        '-continuous', action='store_true',
+        "-continuous",
+        action="store_true",
         help=(
-            'Start a self-restarting job on the continuous queue '
-            "(default if invoked as 'jstart')"))
+            "Start a self-restarting job on the continuous queue "
+            "(default if invoked as 'jstart')"
+        ),
+    )
     parser.add_argument(
-        '-mem', type=argparse_memkb, default=524288,
+        "-mem",
+        type=argparse_memkb,
+        default=524288,
         help=(
-            'Requested amount of memory for the job. '
-            "(integer prefixed by 'k', 'm' or 'g')"))
+            "Requested amount of memory for the job. "
+            "(integer prefixed by 'k', 'm' or 'g')"
+        ),
+    )
     parser.add_argument(
-        '-once', action='store_true',
+        "-once",
+        action="store_true",
         help=(
-            'Only start one job, fail if another job with the same name is '
-            'already started or queued (default if invoked as '
-            "'jstart' or 'qcronsub')."))
+            "Only start one job, fail if another job with the same name is "
+            "already started or queued (default if invoked as "
+            "'jstart' or 'qcronsub')."
+        ),
+    )
     parser.add_argument(
-        '-quiet', action='store_true',
-        help="If successful, don't output anything")
+        "-quiet",
+        action="store_true",
+        help="If successful, don't output anything",
+    )
     parser.add_argument(
-        '-stderr', action='store_true',
-        help='Send errors to stderr rather than the error output file.')
+        "-stderr",
+        action="store_true",
+        help="Send errors to stderr rather than the error output file.",
+    )
     parser.add_argument(
-        '-umask', type=argparse_octal,
+        "-umask",
+        type=argparse_octal,
         default=0o0007 if os.geteuid() > 50000 else 0o0077,
-        help="Set umask for output files if they don't exist")
+        help="Set umask for output files if they don't exist",
+    )
     parser.add_argument(
-        '-release', choices=AVAILABLE_RELEASES, action='store', metavar='OS',
-        help='Choose operating system version required by this job')
+        "-release",
+        choices=AVAILABLE_RELEASES,
+        action="store",
+        metavar="OS",
+        help="Choose operating system version required by this job",
+    )
     return parser
 
 
 def build_parser(parents=None):
     """Build argparse parser."""
     parser = NonAbbreviatingArgumentParser(
-        usage='%(prog)s [options...] program [args...]',
-        description='Submit a job to the job grid.',
-        epilog="\n\n".join([
-            "\n".join(textwrap.wrap(
-                'Many (but not all) qsub options are also supported.'
-            )),
-            "\n".join(textwrap.wrap(
-                'Output is appended by default to files named <job>.err and '
-                '<job>.out in your home directory (without job numbers), '
-                'including errors from starting the job itself.'
-            )),
-            "\n".join(textwrap.wrap(
-                'You must to provide an executable on the command line, '
-                '%(prog)s will not read a script from standard '
-                'input.'
-            ))
-        ]),
+        usage="%(prog)s [options...] program [args...]",
+        description="Submit a job to the job grid.",
+        epilog="\n\n".join(
+            [
+                "\n".join(
+                    textwrap.wrap(
+                        "Many (but not all) qsub options are also supported."
+                    )
+                ),
+                "\n".join(
+                    textwrap.wrap(
+                        "Output is appended by default to files named <job>.err and "
+                        "<job>.out in your home directory (without job numbers), "
+                        "including errors from starting the job itself."
+                    )
+                ),
+                "\n".join(
+                    textwrap.wrap(
+                        "You must to provide an executable on the command line, "
+                        "%(prog)s will not read a script from standard "
+                        "input."
+                    )
+                ),
+            ]
+        ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        parents=[build_jsub_argparser(), build_qsub_argparser()])
+        parents=[build_jsub_argparser(), build_qsub_argparser()],
+    )
 
     # Positional arguments
     parser.add_argument(
-        'program', type=argparse_whence,
-        help='Path to binary or script to execute.')
+        "program",
+        type=argparse_whence,
+        help="Path to binary or script to execute.",
+    )
     parser.add_argument(
-        'program_args', metavar='args...', nargs=argparse.REMAINDER,
-        help='Optional arguments for program.')
+        "program_args",
+        metavar="args...",
+        nargs=argparse.REMAINDER,
+        help="Optional arguments for program.",
+    )
     return parser
 
 
@@ -484,19 +604,20 @@ def parse_arglist(args, namespace=None):
     a hard exit.
     """
     parser = ThrowingArgumentParser(
-        add_help=False,
-        parents=[build_jsub_argparser(), build_qsub_argparser()])
+        add_help=False, parents=[build_jsub_argparser(), build_qsub_argparser()]
+    )
     return parser.parse_args(args=args, namespace=namespace)
 
 
 def parse_jsubrc():
     """Read options from a ~/.jsubrc file if it exists."""
     jsubrc = os.environ.get(
-        'JOBUTILS_JSUBRC', os.path.join(homedir(), '.jsubrc'))
+        "JOBUTILS_JSUBRC", os.path.join(homedir(), ".jsubrc")
+    )
     if os.path.exists(jsubrc):
         args = []
-        pat = re.compile(r'^(?P<opt>-[a-zA-Z]+)(?:\s+(?P<arg>[^#\s]+))?')
-        with open(jsubrc, 'r') as fh:
+        pat = re.compile(r"^(?P<opt>-[a-zA-Z]+)(?:\s+(?P<arg>[^#\s]+))?")
+        with open(jsubrc, "r") as fh:
             for line in fh:
                 m = pat.match(line)
                 if m:
@@ -516,9 +637,9 @@ def read_script_comments(fh):
     """
     while True:
         peek = fh.read(2)
-        if peek in ['#!', '#$']:
+        if peek in ["#!", "#$"]:
             line = fh.readline()
-            if peek == '#!':
+            if peek == "#!":
                 # Skip the #!... header
                 continue
 
@@ -533,9 +654,9 @@ def parse_script_comments(namespace):
     This mostly matches the behavior of SGE's qsub for non-binary programs.
     See '-C prefix_string' in `man qsub` for more ugly details.
     """
-    pat = re.compile(r'\s*(?P<opt>-[a-zA-Z]+)(?:\s+(?P<arg>[^#\s]+))?')
+    pat = re.compile(r"\s*(?P<opt>-[a-zA-Z]+)(?:\s+(?P<arg>[^#\s]+))?")
     args = []
-    with open(namespace.program, 'r', encoding='latin1') as fh:
+    with open(namespace.program, "r", encoding="latin1") as fh:
         for line in read_script_comments(fh):
             m = pat.match(line)
             if m:
@@ -558,32 +679,32 @@ def main():
 
     # Set options based on the name we were invoked as
     script_name = os.path.basename(sys.argv[0])
-    if script_name == 'jstart':
+    if script_name == "jstart":
         args.continuous = True
         args.once = True
-    elif script_name == 'qcronsub':
+    elif script_name == "qcronsub":
         args.once = True
 
     if args.continuous:
         args.once = True
         # Respect explict queue name if passed as an argument
-        if args.queue == 'task':
-            args.queue = 'continuous'
+        if args.queue == "task":
+            args.queue = "continuous"
     else:
         # Non-continuous jobs are always treated as binary
         args.binary = True
 
     if args.jobname is None:
         # Take the program filename minus any extension as the job name
-        args.jobname = os.path.basename(args.program).split('.')[0]
+        args.jobname = os.path.basename(args.program).split(".")[0]
 
     # Compute filenames for stderr and stdout output from job
     if args.log_out is None:
-        args.log_out = os.path.join(homedir(), '%s.out' % args.jobname)
+        args.log_out = os.path.join(homedir(), "%s.out" % args.jobname)
     if args.log_join:
         args.log_err = args.log_out
     if args.log_err is None:
-        args.log_err = os.path.join(homedir(), '%s.err' % args.jobname)
+        args.log_err = os.path.join(homedir(), "%s.err" % args.jobname)
 
     # Ensure that stderr and stdout files exist
     touch(args.log_out, args.umask)
@@ -593,12 +714,12 @@ def main():
     # redirect this script's STDERR to it.
     if not args.stderr and not os.path.isdir(args.log_err):
         try:
-            sys.stderr = open(args.log_err, 'a')
+            sys.stderr = open(args.log_err, "a")
         except IOError as e:
             die("Failed to redirect STDERR to '%s': %s" % (args.log_err, e))
 
     if not os.access(args.program, os.X_OK):
-        die('%s: not an executable file' % args.program)
+        die("%s: not an executable file" % args.program)
 
     if args.once and is_running(args.jobname):
         die("there is a job named '%s' already active" % args.jobname)
@@ -608,18 +729,29 @@ def main():
 
     # Build argument list for calling qsub
     qsub_args = args.qsub_args or []
-    qsub_args.extend([
-        '-j', as_qsub_bool(args.log_join),
-        '-e', args.log_err,
-        '-o', args.log_out,
-        '-M', args.mailto,
-        '-N', args.jobname,
-        '-hard',
-        '-l', 'h_vmem=%dk' % args.mem,
-        '-l', 'release=%s' % args.release,
-        '-q', args.queue,
-        '-b', as_qsub_bool(args.binary),
-    ])
+    qsub_args.extend(
+        [
+            "-j",
+            as_qsub_bool(args.log_join),
+            "-e",
+            args.log_err,
+            "-o",
+            args.log_out,
+            "-M",
+            args.mailto,
+            "-N",
+            args.jobname,
+            "-hard",
+            "-l",
+            "h_vmem=%dk" % args.mem,
+            "-l",
+            "release=%s" % args.release,
+            "-q",
+            args.queue,
+            "-b",
+            as_qsub_bool(args.binary),
+        ]
+    )
 
     qsub_stdin = None
     job = make_cmd(args.program, args.program_args)
@@ -627,30 +759,32 @@ def main():
         # Send qsub a shell script that executes the given job repeatedly until
         # the program exits with exit code 0.
         qsub_stdin = textwrap.dedent(
-            '''\
+            """\
             #!/bin/sh
             until %(job)s ; do
                 echo "[%(ts)s] %(prog)s exited with code $?. Respawning..." >&2
                 sleep 5
             done
-            ''' % {
-                'job': ' '.join(pipes.quote(arg) for arg in job),
-                'ts': '`date +%Y-%m-%dT%H:%M:%S`',
-                'prog': args.program,
-            }).encode('latin1')
+            """
+            % {
+                "job": " ".join(pipes.quote(arg) for arg in job),
+                "ts": "`date +%Y-%m-%dT%H:%M:%S`",
+                "prog": args.program,
+            }
+        ).encode("latin1")
     else:
         qsub_args.extend(job)
 
-    qsub = make_cmd(
-        os.environ.get('JOBUTILS_QSUB', '/usr/bin/qsub'), qsub_args)
+    qsub = make_cmd(os.environ.get("JOBUTILS_QSUB", "/usr/bin/qsub"), qsub_args)
     try:
         proc = subprocess.Popen(
             qsub,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE)
+            stderr=subprocess.PIPE,
+        )
     except OSError as e:
-        die("Failed to execute '%s': %s" % (' '.join(qsub), e))
+        die("Failed to execute '%s': %s" % (" ".join(qsub), e))
     else:
         (out, err) = proc.communicate(qsub_stdin)
         if not args.quiet or proc.returncode != 0:
@@ -659,5 +793,5 @@ def main():
         sys.exit(proc.returncode)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

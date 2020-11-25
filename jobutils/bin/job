@@ -59,7 +59,7 @@ for job in root.iter('job_list'):
                 job.find('JAT_start_time').text,
                 job.find('JB_job_number').text))
         else:
-            print("Job '{}' is pending as id ()".format(
+            print("Job '{}' is pending as id {}".format(
                 jname,
                 job.find('JB_job_number').text))
     elif not args.quiet:

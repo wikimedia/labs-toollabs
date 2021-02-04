@@ -1,4 +1,10 @@
-toollabs (1.39) UNRELEASED; urgency=medium
+toollabs (1.40) unstable; urgency=medium
+
+  * oge-crontab: Add -cwd during jsub-adding if cd is prefixed
+
+ -- YiFei Zhu <zhuyifei1999@gmail.com>  Thu, 16 Apr 2020 14:51:02 -0500
+
+toollabs (1.39) unstable; urgency=medium
 
   * jsub: recognize HOME environment variable. T239910.
 

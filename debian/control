@@ -1,11 +1,7 @@
 Source: toollabs
 Section: utils
 Priority: extra
-Maintainer: Marc-André Pelletier <mpelletier@wikimedia.org>
-Uploaders: Petr Bena <benapetr@gmail.com>,
-           Carl Fürstenberg <azatoth@gmail.com>,
-           Tim Landscheidt <tim@tim-landscheidt.de>,
-           Yuvi Panda <yuvipanda@gmail.com>
+Maintainer: Wikimedia Cloud Admins <cloud-admin@lists.wikimedia.org>
 Build-Depends: bash-completion,
                debhelper (>= 8.0.0),
                dh-autoreconf,

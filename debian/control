@@ -17,7 +17,7 @@ X-Python3-Version: >= 3.4
 Package: misctools
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}, ${python3:Depends}, sensible-utils,
- python3, python3-mysql.connector,
+ python3, python3-mysqldb,
  virtual-mysql-client-core
 Description: Miscellaneous Labs-specific tools
  Miscellaneous Labs-specific Tools used on Tool Labs

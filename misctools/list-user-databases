@@ -19,8 +19,7 @@
 import argparse
 import configparser
 import re
-
-import mysql.connector
+import MySQLdb
 
 GRANT_REPLICA = "GRANT SELECT, SHOW VIEW ON `%\\_p`.* TO '{}'@'%'"
 GRANT_ANY_RE = (
@@ -57,7 +56,7 @@ for mycnffilename in args.mycnffilenames:
     dbpass = c['client']['password'].strip("'")
     databases_found = []
     for server in args.host:
-        conn = mysql.connector.connect(
+        conn = MySQLdb.connect(
             database='mysql',
             host=server,
             user=dbuser,

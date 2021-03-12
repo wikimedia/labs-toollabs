@@ -1,5 +1,4 @@
 usr/bin/become
-usr/bin/list-user-databases
 usr/bin/oge-crontab
 usr/bin/setup-tomcat
 usr/bin/sql

@@ -67,7 +67,7 @@ logging.basicConfig(
     format='%(message)s',
     level=max(logging.DEBUG, logging.WARNING - (10 * args.loglevel)))
 
-domain = '{}.db.svc.eqiad.wmflabs'.format(args.cluster)
+domain = '{}.db.svc.wikimedia.cloud'.format(args.cluster)
 
 exec_args = ['mysql']
 

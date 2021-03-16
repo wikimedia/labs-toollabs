@@ -6,8 +6,8 @@ Build-Depends: bash-completion,
                debhelper (>= 8.0.0),
                dh-autoreconf,
                dh-python,
-               python-setuptools,
-               python3
+               python3,
+               python3-setuptools
 Standards-Version: 3.9.5
 Vcs-Git: https://gerrit.wikimedia.org/r/labs/toollabs
 Vcs-Browser: https://phabricator.wikimedia.org/source/toollabs/

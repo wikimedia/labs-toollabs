@@ -8,3 +8,4 @@
 /configure
 /.tox
 /*.egg-info
+*.swp

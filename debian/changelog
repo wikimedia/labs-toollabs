@@ -1,3 +1,22 @@
+toollabs (1.41) unstable; urgency=medium
+
+  [ Tim Starling ]
+  * [c2f8a50] Output for pending job now shows its id
+  * [5a4c5c0] Fix the date format in the job script's respawn message
+
+  [ Arturo Borrero Gonzalez ]
+  * [f5776fc] misctools: switch away from python3-mysql.connector to python3-mysqldb
+  * [b3632cc] toollabs: run wrap-and-sort
+  * [58a1110] toollabs: refresh package maintainers
+
+  [ Brooke Storm ]
+  * [d9666b0] wikireplicas: switch sql command to multiinstance replicas
+
+  [ Arturo Borrero Gonzalez ]
+  * [eabddf4] misctools: drop list-user-databases script
+
+ -- Arturo Borrero Gonzalez <aborrero@wikimedia.org>  Tue, 16 Mar 2021 13:07:36 +0100
+
 toollabs (1.40) unstable; urgency=medium
 
   * oge-crontab: Add -cwd during jsub-adding if cd is prefixed

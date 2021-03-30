@@ -20,7 +20,6 @@
 
 import argparse
 import copy
-import logging
 import os
 import pipes
 import pwd
@@ -29,6 +28,10 @@ import subprocess
 import sys
 import textwrap
 import time
+
+
+AVAILABLE_RELEASES = ['stretch', 'buster']
+DEFAULT_RELEASE = 'stretch'
 
 
 class NonAbbreviatingArgumentParser(argparse.ArgumentParser):
@@ -180,15 +183,16 @@ def split_l(value):
     """Iterate over compontents of qsub's '-l resource=value,...' arguments."""
     for part in value.split(','):
         yield part.split('=', 1)
-    return
+    raise StopIteration
 
 
 def argparse_resource(value):
     """Validate qsub's '-l resource=value,...' arguments."""
-    for label, _ in split_l(value):
-        if label == 'release' and sys.stderr.isatty():
-            logging.warning("setting '-l release=' directly is deprecated "
-                            "and may be removed in the future")
+    for label, val in split_l(value):
+        if label == 'release' and val not in AVAILABLE_RELEASES:
+            raise argparse.ArgumentTypeError(
+                'invalid release=%s. Expected release=[%s].' % (
+                    val, '|'.join(AVAILABLE_RELEASES)))
     return value
 
 
@@ -215,6 +219,7 @@ class QsubAction(argparse.Action):
         Some settings are intercepted and processed specially:
         * h_vmem=value : adjust '-mem'
         * virtual_free=value : adjust '-mem'
+        * release=value : adjust '-release'
 
         Other resource=value pairs are stored unaltered except they are
         expanded so each 'resource=value' pair is attached to its own '-l'
@@ -434,10 +439,8 @@ def build_jsub_argparser():
         default=0o0007 if os.geteuid() > 50000 else 0o0077,
         help="Set umask for output files if they don't exist")
     parser.add_argument(
-        '-release', required=False, action='store', metavar='OS',
-        help=('Choose operating system version required -- DEPRECATED -- '
-              'option only exists for backward compatibility and is a noop')
-        )
+        '-release', choices=AVAILABLE_RELEASES, action='store', metavar='OS',
+        help='Choose operating system version required by this job')
     return parser
 
 
@@ -600,6 +603,9 @@ def main():
     if args.once and is_running(args.jobname):
         die("there is a job named '%s' already active" % args.jobname)
 
+    if not args.release:
+        args.release = DEFAULT_RELEASE
+
     # Build argument list for calling qsub
     qsub_args = args.qsub_args or []
     qsub_args.extend([
@@ -610,6 +616,7 @@ def main():
         '-N', args.jobname,
         '-hard',
         '-l', 'h_vmem=%dk' % args.mem,
+        '-l', 'release=%s' % args.release,
         '-q', args.queue,
         '-b', as_qsub_bool(args.binary),
     ])

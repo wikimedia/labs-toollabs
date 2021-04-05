@@ -1,4 +1,4 @@
-AC_INIT([toollabs], m4_esyscmd_s([sed -ne '1s/^toollabs (\(.\+\)) .*$/\1/p;' debian/changelog]), [mpelletier@wikimedia.org])
+AC_INIT([toollabs], m4_esyscmd_s([sed -ne '1s/^toollabs (\(.\+\)) .*$/\1/p;' debian/changelog]), [cloud-admin@lists.wikimedia.org])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_TESTDIR([tests])
 

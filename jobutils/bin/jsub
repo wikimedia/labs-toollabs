@@ -183,7 +183,7 @@ def split_l(value):
     """Iterate over compontents of qsub's '-l resource=value,...' arguments."""
     for part in value.split(','):
         yield part.split('=', 1)
-    raise StopIteration
+    return
 
 
 def argparse_resource(value):

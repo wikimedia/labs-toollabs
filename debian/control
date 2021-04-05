@@ -3,8 +3,7 @@ Section: utils
 Priority: extra
 Maintainer: Wikimedia Cloud Admins <cloud-admin@lists.wikimedia.org>
 Build-Depends: bash-completion,
-               debhelper (>= 8.0.0),
-               dh-autoreconf,
+               debhelper-compat (= 12),
                dh-python,
                python3,
                python3-setuptools

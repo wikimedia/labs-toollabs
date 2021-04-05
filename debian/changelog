@@ -1,3 +1,14 @@
+toollabs (1.42) unstable; urgency=medium
+
+  * [070039f] Revert "jsub: Make release a deprecated noop"
+  * [cc2885c] jsub: split_l(): the generator should return silently
+  * [4df8eed] tests/: update tests with the new default release argument
+  * [e28219a] configure.ac: refresh email address
+  * [e5d587f] d/control: use python3-setuptools instead of the v2 version
+  * [93c2dab] src: bump debian compat version
+
+ -- Arturo Borrero Gonzalez <aborrero@wikimedia.org>  Tue, 06 Apr 2021 11:08:22 +0200
+
 toollabs (1.41) unstable; urgency=medium
 
   [ Tim Starling ]

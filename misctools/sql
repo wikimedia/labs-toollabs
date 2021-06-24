@@ -83,6 +83,7 @@ logging.basicConfig(
 domain = "{}.db.svc.wikimedia.cloud".format(args.cluster)
 
 exec_args = ["mysql"]
+exec_args.append("--default-character-set=utf8mb4")
 
 replica_cnf = os.path.expanduser("~/replica.my.cnf")
 if os.path.isfile(replica_cnf):

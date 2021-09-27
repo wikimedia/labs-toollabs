@@ -1,3 +1,11 @@
+toollabs (1.43) unstable; urgency=medium
+
+  [ Lucas Werkmeister ]
+  * [e040070] Split misctools bash-completion into individual files
+  * [a123b68] tests/: use env instead of true as binary
+
+ -- Taavi Väänänen <hi@taavi.wtf>  Mon, 27 Sep 2021 15:20:58 +0300
+
 toollabs (1.42) unstable; urgency=medium
 
   * [070039f] Revert "jsub: Make release a deprecated noop"

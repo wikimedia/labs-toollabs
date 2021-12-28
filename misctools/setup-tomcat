@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-prefix=$(/bin/cat /etc/wmflabs-project)
+prefix=$(/bin/cat /etc/wmcs-project)
 tool=$(/usr/bin/id -nu|sed -e "s/^$prefix.//")
 user="$prefix.$tool"
 

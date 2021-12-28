@@ -104,7 +104,7 @@ if db == "meta_p":
     # not to be confused with metawiki_p.
     server = "s7.{}".format(domain)
 elif db in ["local", "tools", "tools-db", "toolsdb"]:
-    server = "tools.db.svc.eqiad.wmflabs"
+    server = "tools.db.svc.eqiad.wikimedia.cloud"
     db = None
 else:
     if not db.endswith("_p"):

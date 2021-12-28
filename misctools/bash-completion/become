@@ -1,10 +1,10 @@
 _become() {
-  local labsproject="$(/bin/cat /etc/wmflabs-project)"
+  local project="$(/bin/cat /etc/wmcs-project)"
   local cur="${COMP_WORDS[COMP_CWORD]}"
   COMPREPLY=( )
   for g in $(groups); do
-    if [ "${g:0:$((${#labsproject} + 1))}" = "$labsproject." ]; then
-      tool="${g:$((${#labsproject} + 1))}"
+    if [ "${g:0:$((${#project} + 1))}" = "$project." ]; then
+      tool="${g:$((${#project} + 1))}"
       if [ "${tool:0:${#cur}}" = "$cur" ]; then
         COMPREPLY+=( $tool )
       fi

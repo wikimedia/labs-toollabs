@@ -417,7 +417,7 @@ def build_qsub_argparser():
         metavar="user@host,...",
         dest="mailto",
         type=argparse_email,
-        default="%s@tools.wmflabs.org" % effective_username(),
+        default="%s@toolforge.org" % effective_username(),
         help=argparse.SUPPRESS,
     )
     # Start the job immediately or not at all.

@@ -15,7 +15,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #
 
-prefix=$(/bin/cat /etc/wmflabs-project)
+prefix=$(/bin/cat /etc/wmcs-project)
 if [ $# -lt 1 -o "$1" = "--help" ]; then
   echo "usage: $(basename $0) <toolname> [command [args...]]" >&2
   exit 1

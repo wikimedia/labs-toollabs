@@ -31,7 +31,7 @@ import time
 
 
 AVAILABLE_RELEASES = ["stretch", "buster"]
-DEFAULT_RELEASE = "stretch"
+DEFAULT_RELEASE = "buster"
 
 
 class NonAbbreviatingArgumentParser(argparse.ArgumentParser):

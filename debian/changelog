@@ -1,3 +1,19 @@
+toollabs (1.44) unstable; urgency=medium
+
+  [ Bryan Davis ]
+  * Format with Black
+
+  [ Taavi Väänänen ]
+  * Replace "wmflabs" with newer terms
+
+  [ Dan Andreescu ]
+  * Default to utf8mb4 to properly decode strings
+
+  [ Taavi Väänänen ]
+  * jsub: set buster as default release
+
+ -- Taavi Väänänen <hi@taavi.wtf>  Thu, 02 Jun 2022 13:57:45 +0300
+
 toollabs (1.43) unstable; urgency=medium
 
   [ Lucas Werkmeister ]

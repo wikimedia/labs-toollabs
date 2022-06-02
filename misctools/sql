@@ -83,7 +83,6 @@ logging.basicConfig(
 domain = "{}.db.svc.wikimedia.cloud".format(args.cluster)
 
 exec_args = ["mysql"]
-exec_args.append("--default-character-set=utf8mb4")
 
 replica_cnf = os.path.expanduser("~/replica.my.cnf")
 if os.path.isfile(replica_cnf):
@@ -94,6 +93,8 @@ elif not os.path.isfile(os.path.expanduser("~/.my.cnf")):
         "There is no configuration file for mysql to use, "
         "you will probably be unable to access the database"
     )
+
+exec_args.append("--default-character-set=utf8mb4")
 
 if args.skip_column_names:
     exec_args.append("-N")

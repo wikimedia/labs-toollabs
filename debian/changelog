@@ -1,3 +1,9 @@
+toollabs (1.46) unstable; urgency=medium
+
+  * sql: fix tools-db hostname
+
+ -- Taavi Väänänen <hi@taavi.wtf>  Thu, 02 Jun 2022 16:52:17 +0300
+
 toollabs (1.45) unstable; urgency=medium
 
   * sql: defaults-file must be set first

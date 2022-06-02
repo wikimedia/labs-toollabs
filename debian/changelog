@@ -1,3 +1,9 @@
+toollabs (1.45) unstable; urgency=medium
+
+  * sql: defaults-file must be set first
+
+ -- Taavi Väänänen <hi@taavi.wtf>  Thu, 02 Jun 2022 15:59:16 +0300
+
 toollabs (1.44) unstable; urgency=medium
 
   [ Bryan Davis ]

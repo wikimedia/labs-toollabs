@@ -30,7 +30,7 @@ import textwrap
 import time
 
 
-AVAILABLE_RELEASES = ["stretch", "buster"]
+AVAILABLE_RELEASES = ["buster"]
 DEFAULT_RELEASE = "buster"
 
 

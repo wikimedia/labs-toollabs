@@ -1,3 +1,9 @@
+toollabs (1.47) stretch; urgency=medium
+
+  * [7b5e186] jsub: Remove stretch support
+
+ -- Taavi Väänänen <hi@taavi.wtf>  Thu, 23 Jun 2022 17:38:37 +0300
+
 toollabs (1.46) unstable; urgency=medium
 
   * sql: fix tools-db hostname

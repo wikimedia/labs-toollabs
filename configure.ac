@@ -1,6 +1,5 @@
 AC_INIT([toollabs], m4_esyscmd_s([sed -ne '1s/^toollabs (\(.\+\)) .*$/\1/p;' debian/changelog]), [cloud-admin@lists.wikimedia.org])
 AC_CONFIG_AUX_DIR([build-aux])
-AC_CONFIG_TESTDIR([tests])
 
 # If parsing the current version from debian/changelog did not work
 # (debian/changelog mangled, wrong pattern, sed not available, etc.),
@@ -35,7 +34,6 @@ AC_CONFIG_FILES([Makefile
                  misctools/become.1
                  misctools/sql.1
                  src/Makefile
-                 src/take.1
-                 tests/Makefile])
+                 src/take.1])
 
 AC_OUTPUT

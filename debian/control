@@ -13,9 +13,9 @@ Vcs-Browser: https://phabricator.wikimedia.org/source/toollabs/
 
 Package: misctools
 Architecture: any
-Depends: python3,
+Depends: mariadb-client-core | virtual-mysql-client-core,
+         python3,
          sensible-utils,
-         virtual-mysql-client-core,
          ${misc:Depends},
          ${python3:Depends},
          ${shlibs:Depends}

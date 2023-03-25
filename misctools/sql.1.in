@@ -13,7 +13,7 @@ sql \- connect to database or execute SQL command
 connects to the named
 .I database
 with
-.BR mysql ;
+.BR mariadb ;
 if an SQL statement is given, it is executed, otherwise an interactive
 session is started.
 
@@ -21,12 +21,12 @@ There are three categories of databases that can be specified by
 .IR database :
 .IR enwiki_p ,
 etc. refers to the database for the English Wikipedia, etc.  on the
-replica servers.
+wiki replica servers.
 .I local
 only works in the form
 .B sql local
 and connects to the
-.I tools-db
+.I ToolsDB
 server.
 .IR meta_p ,
 not to be confused with
@@ -36,9 +36,9 @@ refers to the database that contains meta information about Wikimedia wikis (cf.
 .SH EXIT STATUS
 .B sql
 returns the exit status of the spawned
-.B mysql
+.B mariadb
 command.
 .SH AUTHORS
 Petr Bena
 .SH SEE ALSO
-.BR mysql (1)
+.BR mariadb (1)

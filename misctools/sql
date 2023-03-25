@@ -37,9 +37,9 @@ ALIASES = {
 
 parser = argparse.ArgumentParser(
     description=(
-        "Connect to or run SQL query " "on replica or Tools database server"
+        "Connect to or run SQL query on the wiki replicas or on ToolsDB"
     ),
-    epilog=("Report bugs to Phabricator: " "https://phabricator.wikimedia.org"),
+    epilog=("Report bugs to Phabricator: https://phabricator.wikimedia.org"),
 )
 parser.add_argument(
     "-v",
@@ -82,7 +82,7 @@ logging.basicConfig(
 
 domain = "{}.db.svc.wikimedia.cloud".format(args.cluster)
 
-exec_args = ["mysql"]
+exec_args = ["mariadb"]
 
 replica_cnf = os.path.expanduser("~/replica.my.cnf")
 if os.path.isfile(replica_cnf):
@@ -90,7 +90,7 @@ if os.path.isfile(replica_cnf):
 elif not os.path.isfile(os.path.expanduser("~/.my.cnf")):
     exec_args.append("-p")
     logger.warning(
-        "There is no configuration file for mysql to use, "
+        "There is no configuration file for MariaDB to use, "
         "you will probably be unable to access the database"
     )
 
@@ -136,4 +136,4 @@ if args.sqlquery:
     exec_args.extend(["-e", " ".join(args.sqlquery)])
 
 logger.debug(exec_args)
-os.execvp("mysql", exec_args)
+os.execvp("mariadb", exec_args)

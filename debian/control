@@ -10,7 +10,6 @@ Build-Depends: bash-completion,
 Standards-Version: 3.9.5
 Vcs-Git: https://gerrit.wikimedia.org/r/labs/toollabs
 Vcs-Browser: https://phabricator.wikimedia.org/source/toollabs/
-X-Python3-Version: >= 3.4
 
 Package: misctools
 Architecture: any

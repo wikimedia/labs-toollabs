@@ -22,20 +22,9 @@ export DEB_BUILD_OPTIONS=noddebs
 
 %:
 	dh -l
-	dh $@ --with bash-completion,python3
-
-override_dh_auto_clean:
-	dh_auto_clean --buildsystem=pybuild
+	dh $@ --with bash-completion
 
 # Make take setuid.
 override_dh_fixperms:
 	dh_fixperms
 	chmod u+s debian/misctools/usr/bin/take
-
-# jsub default to write to the user home directory mentionned in the password
-# database which fails when building with pbuilder 0.220+ since the user
-# intentionally has no home directory.
-override_dh_auto_test:
-	mkdir -p $(CURDIR)/fake-home
-	HOME=$(CURDIR)/fake-home dh_auto_test
-	rm -rf $(CURDIR)/fake-home

@@ -1,9 +1,6 @@
 /autoreconf.after
 /autoreconf.before
 /files
-/jobutils
-/jobutils.debhelper.log
-/jobutils.substvars
 /misctools
 /misctools.debhelper.log
 /misctools.substvars

@@ -4,9 +4,6 @@ Priority: extra
 Maintainer: Wikimedia Cloud Admins <cloud-admin@lists.wikimedia.org>
 Build-Depends: bash-completion,
                debhelper-compat (= 12),
-               dh-python,
-               python3,
-               python3-setuptools
 Standards-Version: 3.9.5
 Vcs-Git: https://gerrit.wikimedia.org/r/labs/toollabs
 Vcs-Browser: https://phabricator.wikimedia.org/source/toollabs/
@@ -17,14 +14,6 @@ Depends: mariadb-client-core | virtual-mysql-client-core,
          python3,
          sensible-utils,
          ${misc:Depends},
-         ${python3:Depends},
          ${shlibs:Depends}
 Description: Miscellaneous Labs-specific tools
  Miscellaneous Labs-specific Tools used on Tool Labs
-
-Package: jobutils
-Architecture: all
-Depends: gridengine-client, python3, ${misc:Depends}, ${python3:Depends}
-Description: Set of utilities to use on wikimedia bots and tools cluster
- This package will install jstart (jsub) and jstop, the Tool Labs (more)
- user-friendly wrappers to submit jobs to the gridengine

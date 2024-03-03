@@ -24,12 +24,6 @@ AC_SUBST([TOOLLABS_RELEASEDATE], ["$(date --date="$(sed -ne '1,/^ -- .*  /s/^ --
 AC_SUBST([CONFIG_STATUS_DEPENDENCIES], ['$(top_srcdir)/debian/changelog'])
 
 AC_CONFIG_FILES([Makefile
-                 jobutils/Makefile
-                 jobutils/bin/Makefile
-                 jobutils/man/Makefile
-                 jobutils/man/job.1
-                 jobutils/man/jstop.1
-                 jobutils/man/jsub.1
                  misctools/Makefile
                  misctools/become.1
                  misctools/sql.1

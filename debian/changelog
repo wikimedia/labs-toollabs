@@ -1,3 +1,16 @@
+toollabs (1.48) bookworm; urgency=medium
+
+  * Drop tests for jsub
+  * Drop setup-tomcat
+  * tox: raise compat level for py3.7/buster
+  * sql: Use mariadb command instead of mysql
+  * debian: Remove unused override
+  * Remove jobutils binary package
+  * misctools: Remove oge-crontab script
+  * tox: Raise compat level to py3.11/Bookworm
+
+ -- Taavi Väänänen <hi@taavi.wtf>  Thu, 14 Mar 2024 19:02:32 +0200
+
 toollabs (1.47) stretch; urgency=medium
 
   * [7b5e186] jsub: Remove stretch support

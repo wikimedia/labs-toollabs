@@ -61,6 +61,12 @@ parser.add_argument(
     help="cluster to connect to",
 )
 parser.add_argument(
+    "--extension",
+    default=None,
+    choices=["termstore"],
+    help="optional extension database to connect to",
+)
+parser.add_argument(
     "dbname", metavar="DATABASE", help="for example commonswiki_p or enwiki"
 )
 parser.add_argument(
@@ -110,6 +116,8 @@ else:
     if not db.endswith("_p"):
         db = "{}_p".format(db)
     server = "{}.{}".format(db[:-2], domain)
+    if args.extension:
+        server = "{}.{}".format(args.extension, server)
     try:
         logger.debug("Looking up %s", server)
         socket.gethostbyname(server)
@@ -118,6 +126,10 @@ else:
         errmsg = "Could not find requested database"
         if db != args.dbname:
             errmsg += "\nMake sure to ask for a db in format of <wiki>_p"
+        if args.extension:
+            errmsg += (
+                "\nMake sure this extension database is available for this wiki"
+            )
         sys.exit(errmsg)
 
 logger.info("Connecting to %s", server)

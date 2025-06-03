@@ -36,10 +36,8 @@ ALIASES = {
 }
 
 parser = argparse.ArgumentParser(
-    description=(
-        "Connect to or run SQL query on the wiki replicas or on ToolsDB"
-    ),
-    epilog=("Report bugs to Phabricator: https://phabricator.wikimedia.org"),
+    description="Connect to or run SQL query on the wiki replicas or on ToolsDB",
+    epilog="Report bugs to Phabricator: https://phabricator.wikimedia.org",
 )
 parser.add_argument(
     "-v",

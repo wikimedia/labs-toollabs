@@ -1,4 +1,4 @@
-toollabs (1.49) UNRELEASED; urgency=medium
+toollabs (1.49) bookworm; urgency=medium
 
   * [ab7e3b6] sql: Remove unnecessary parens
   * [ea4ccf3] sql: Support connecting to extension databases

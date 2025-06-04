@@ -1,3 +1,12 @@
+toollabs (1.49) UNRELEASED; urgency=medium
+
+  * [ab7e3b6] sql: Remove unnecessary parens
+  * [ea4ccf3] sql: Support connecting to extension databases
+  * [027ef82] sql: Add --extension to tab completion
+  * [ecd0b58] build: Add gbp.conf with id-length
+
+ -- Taavi Väänänen <taavi@wikimedia.org>  Wed, 04 Jun 2025 13:56:10 +0300
+
 toollabs (1.48) bookworm; urgency=medium
 
   * Drop tests for jsub

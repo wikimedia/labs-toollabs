@@ -1,7 +1,7 @@
 _sql() {
   local cur="${COMP_WORDS[COMP_CWORD]}"
   local prev="${COMP_WORDS[COMP_CWORD-1]}"
-  local opts="--cluster --skip-column-names"  # --verbose is rarely used
+  local opts="--cluster --extension --skip-column-names"  # --verbose is rarely used
   COMPREPLY=()
 
   if [[ ${cur} == -* ]]; then
@@ -13,6 +13,8 @@ _sql() {
     --cluster)
       COMPREPLY=( $(compgen -W "analytics web" -- ${cur}) )
       ;;
+    --extension)
+      COMPREPLY=( $(compgen -W "termstore" -- ${cur}) )
     *)
       # the docs advertise `sql local` rather than `sql toolsdb`. If one
       # autocompletes with 'tools' we want to end this argument rather than
